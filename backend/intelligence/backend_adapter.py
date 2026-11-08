@@ -7,6 +7,8 @@ from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import json
+import math
+import os
 import pandas as pd
 
 
@@ -56,13 +58,21 @@ def _customer(profile):
     spend = sum((-t.amount for t in metrics.checking_variable_transactions(profile)
                  if start < t.date <= profile.as_of), Decimal(0))
     bills = sum((b.amount for _, b in metrics.bill_occurrences(profile, 30)), Decimal(0))
-    return {'customer_id': profile.user.id, 'as_of': profile.as_of.isoformat(),
+    c = {'customer_id': profile.user.id, 'as_of': profile.as_of.isoformat(),
         'checking_balance': float(metrics.cash_balance(profile)),
         'savings_balance': float(sum((a.balance for a in profile.accounts if a.account_type == 'savings'), Decimal(0))),
         'monthly_income': float(metrics.monthly_income(profile)), 'monthly_variable_spending': float(spend),
         'monthly_debt_payments': float(metrics.monthly_debt_payments(profile)),
         'bills': [{'name': 'scheduled_outflows_next_30_days', 'amount': float(bills), 'day': 1}],
         'paydays': [1], 'safety_buffer': float(profile.user.safety_buffer), 'budget': None}
+    try:
+        budget = float(os.environ.get('DEFAULT_MONTHLY_BUDGET', '').strip())
+    except ValueError:
+        budget = 0.
+    if not c['budget'] and math.isfinite(budget) and budget > 0:
+        c['budget'] = budget
+        c.setdefault('assumptions', []).append(f'Demo assumption: monthly variable-spending budget of ${budget:g} (DEFAULT_MONTHLY_BUDGET); not a user-entered budget.')
+    return c
 
 
 def health_profile(profile):
@@ -121,6 +131,17 @@ def forecast_profile(profile, days):
     return _project(profile, forecast_spending(_history(profile), days))
 
 
+def _low_balance_scenario(projected_low, buffer, forecast_daily, as_of):
+    from app.schemas.common import SpendingCut
+    shortfall = Decimal(str(buffer))-Decimal(str(projected_low))
+    if shortfall <= 0 or not forecast_daily:
+        return None
+    amount = min(Decimal(100000), max(Decimal(50), (shortfall/50).to_integral_value('ROUND_CEILING')*50))
+    low_day = min(forecast_daily, key=lambda r: r['balance'])['date']
+    days = (pd.Timestamp(low_day).date()-as_of).days
+    return SpendingCut(reduction_amount=amount, horizon_days=max(1, min(90, days)))
+
+
 def guardian_profile(profile, forecast):
     from app.calc import metrics
     from app.schemas.guardian import Alert
@@ -141,6 +162,8 @@ def guardian_profile(profile, forecast):
     for a in alerts:
         cut = a['suggested_simulation'].get('monthly_spending_cut')
         scenario = SpendingCut(reduction_amount=Decimal(str(cut))*forecast.days/30, horizon_days=forecast.days) if cut else None
+        if a['id'] == 'low_balance':
+            scenario = _low_balance_scenario(a['evidence']['projected_low'], a['evidence']['buffer'], raw['daily'], profile.as_of) or scenario
         numbers = {k: v if isinstance(v, (float, int, str)) else json.dumps(v) for k, v in a['evidence'].items() if v is not None}
         result.append(Alert(id=a['event_key'], rule=a['id'], severity={'critical': 'high', 'info': 'low'}.get(a['severity'], a['severity']),
             title=a['id'].replace('_', ' ').title(), cause=a['explanation'], numbers=numbers,
