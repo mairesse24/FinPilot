@@ -72,8 +72,12 @@ export type Context = {
   loaded_at: string | null;
 };
 
+// Empty in local dev (Vite proxies /api to the backend). Set VITE_API_BASE at build time
+// (for example https://finpilot-xxxx.onrender.com) when the frontend is hosted separately.
+export const API_BASE: string = ((import.meta as unknown as { env?: Record<string, string | undefined> }).env?.VITE_API_BASE ?? '').replace(/\/+$/, '');
+
 export async function get<T>(path: string, signal: AbortSignal): Promise<T> {
-  const response = await fetch(`/api/${path}`, { signal, cache: "no-store" });
+  const response = await fetch(`${API_BASE}/api/${path}`, { signal, cache: "no-store" });
   if (!response.ok)
     throw new Error(
       `API ${response.status}: unable to load ${path.split("?")[0]}. Check backend configuration.`,

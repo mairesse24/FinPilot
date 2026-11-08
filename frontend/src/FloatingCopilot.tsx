@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MessageSquareText, X, Send } from "lucide-react";
 import { useFinancialWorkspace } from "./FinancialWorkspace";
+import { API_BASE } from "./api";
 
 export type Delivery = {
   mode: "live" | "offline" | "fallback";
@@ -91,7 +92,7 @@ export default function FloatingCopilot() {
     activeRequest.current = controller;
     const timer = window.setTimeout(() => controller.abort(), 90000);
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch(`${API_BASE}/api/chat`, {
         method: "POST",
         cache: "no-store",
         signal: controller.signal,
