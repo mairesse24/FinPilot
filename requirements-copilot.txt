@@ -1,0 +1,4 @@
+-r requirements-ml.txt
+openai>=2,<3
+google-genai>=1.0,<3
+python-dotenv>=1,<2

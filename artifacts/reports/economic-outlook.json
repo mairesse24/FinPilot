@@ -1,0 +1,163 @@
+{
+  "as_of": "2026-10-31",
+  "feature_month": "2026-10-31",
+  "target_month": "2026-11-30",
+  "data_basis": "current-revised FRED history with conservative two-month macro lags",
+  "point_in_time_validated": false,
+  "limitations": [
+    "Current revised data can contain revisions unavailable at historical forecast dates.",
+    "Not a tradable backtest; no dividends, costs, or live execution.",
+    "Household results forecast national indicators, not an individual household or job loss.",
+    "Small monthly evaluation sample; no calibrated probabilities."
+  ],
+  "household": {
+    "next_inflation": {
+      "ridge_estimate_pct": 3.037,
+      "persistence_estimate_pct": 3.353,
+      "evaluation_months": 24,
+      "mae_percentage_points": 0.508,
+      "persistence_mae_percentage_points": 0.4655,
+      "beats_persistence": false,
+      "recommended_display": "persistence_baseline_until_point_in_time_validation",
+      "status": "research_only_pending_vintage_validation"
+    },
+    "next_unemployment": {
+      "ridge_estimate_pct": 3.766,
+      "persistence_estimate_pct": 4.1,
+      "evaluation_months": 24,
+      "mae_percentage_points": 0.5698,
+      "persistence_mae_percentage_points": 0.1,
+      "beats_persistence": false,
+      "recommended_display": "persistence_baseline_until_point_in_time_validation",
+      "status": "research_only_pending_vintage_validation"
+    }
+  },
+  "market": {
+    "target": "next calendar month S&P 500 price return > 0",
+    "experimental_up_probability": 0.6786,
+    "probability_calibrated": false,
+    "evaluation_months": 24,
+    "balanced_accuracy": 0.5,
+    "historical_prior_balanced_accuracy": 0.5,
+    "momentum_balanced_accuracy": 0.5,
+    "brier_score": 0.3016,
+    "historical_prior_brier_score": 0.2843,
+    "beats_baselines": false,
+    "direction": "abstain",
+    "reason": "Does not beat predeclared baseline gates; no supported directional signal."
+  },
+  "indicators": {
+    "as_of": "2026-10-31",
+    "inflation_yoy_pct": 3.7172508442689933,
+    "unemployment_pct": 4.1,
+    "policy_rate_pct": 3.88,
+    "observation_dates": {
+      "inflation_yoy_pct": "2026-09-01",
+      "unemployment_pct": "2026-10-01",
+      "policy_rate_pct": "2026-10-01",
+      "unemployment_change_3m_pp": "2026-10-01",
+      "market_return_3m_pct": "2026-10-30",
+      "market_drawdown_252d_pct": "2026-10-30"
+    },
+    "source": "FRED current-revised cache; historical vintage availability unverified",
+    "unemployment_change_3m_pp": 0.0,
+    "market_return_3m_pct": 1.915126189390981,
+    "market_drawdown_252d_pct": -3.0548937002889187
+  },
+  "customer_pressure": {
+    "available": true,
+    "index": 45.61,
+    "snapshot": {
+      "as_of": "2026-10-31",
+      "inflation_yoy_pct": 3.7172508442689933,
+      "unemployment_pct": 4.1,
+      "policy_rate_pct": 3.88,
+      "observation_dates": {
+        "inflation_yoy_pct": "2026-09-01",
+        "unemployment_pct": "2026-10-01",
+        "policy_rate_pct": "2026-10-01",
+        "unemployment_change_3m_pp": "2026-10-01",
+        "market_return_3m_pct": "2026-10-30",
+        "market_drawdown_252d_pct": "2026-10-30"
+      },
+      "source": "FRED current-revised cache; historical vintage availability unverified",
+      "unemployment_change_3m_pp": 0.0,
+      "market_return_3m_pct": 1.915126189390981,
+      "market_drawdown_252d_pct": -3.0548937002889187
+    },
+    "conditions": {
+      "policy_version": "conditions-v1",
+      "as_of": "2026-10-31",
+      "method": "transparent observed-condition rules; no trained-classifier accuracy claim",
+      "economy": {
+        "label": "watch",
+        "factors": {
+          "living_costs": "watch",
+          "labor_trend": "steady",
+          "borrowing_costs": "watch"
+        },
+        "data_complete": true,
+        "evidence": {
+          "inflation_yoy_pct": 3.7172508442689933,
+          "unemployment_change_3m_pp": 0.0,
+          "policy_rate_pct": 3.88
+        }
+      },
+      "market": {
+        "label": "steady",
+        "evidence": {
+          "return_3m_pct": 1.915126189390981,
+          "drawdown_252d_pct": -3.0548937002889187
+        }
+      },
+      "thresholds": {
+        "inflation_watch_pct": 3,
+        "inflation_pressure_pct": 4,
+        "unemployment_3m_watch_pp": 0.3,
+        "unemployment_3m_pressure_pp": 0.5,
+        "policy_rate_watch_pct": 3.5,
+        "policy_rate_pressure_pct": 5,
+        "market_drawdown_watch_pct": -5,
+        "market_drawdown_stress_pct": -10,
+        "market_return_3m_stress_pct": -10
+      },
+      "note": "Prototype thresholds, not validated regime labels. Steady means no configured stress flag, not a healthy economy or future gains."
+    },
+    "personalization_missing_fields": [
+      "variable_rate_debt_balance",
+      "high_interest_debt_balance",
+      "equity_exposure",
+      "planned_equity_withdrawal_90d"
+    ],
+    "illustrative_monthly_variable_cost_increase": 68.88,
+    "formula": "50% inflation/8 + 25% policy rate/8 + 25% unemployment/10; each capped at 1, times 100",
+    "note": "Design-assumption pressure index, not personal job-loss probability. Cost impact is a hypothetical year-over-year stress, not a monthly forecast."
+  },
+  "provenance": {
+    "retrieved_at": "2026-11-07T23:46:42.390534+00:00",
+    "series": {
+      "CPIAUCSL": {
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL&cosd=2000-01-01",
+        "last_observation": "2026-09-01",
+        "source_page": "https://fred.stlouisfed.org/series/CPIAUCSL"
+      },
+      "UNRATE": {
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=UNRATE&cosd=2000-01-01",
+        "last_observation": "2026-10-01",
+        "source_page": "https://fred.stlouisfed.org/series/UNRATE"
+      },
+      "FEDFUNDS": {
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=FEDFUNDS&cosd=2000-01-01",
+        "last_observation": "2026-10-01",
+        "source_page": "https://fred.stlouisfed.org/series/FEDFUNDS"
+      },
+      "SP500": {
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=SP500&cosd=2000-01-01",
+        "last_observation": "2026-11-05",
+        "source_page": "https://fred.stlouisfed.org/series/SP500"
+      }
+    },
+    "vintage": "current_revised; not point-in-time",
+    "synthetic": false
+  }
+}

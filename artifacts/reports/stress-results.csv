@@ -1,0 +1,53 @@
+case_id,engine,pattern,passed,economy,market,alerts,total_spending,serving_model,ending_checking,minimum_checking,ending_savings,change_from_pnc_total,inflation_estimate,unemployment_estimate,market_up_probability,error,failures,forecast_warnings
+healthy_control,controlled,pnc,True,steady,steady,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+overspending,controlled,pnc,True,steady,steady,spending_above_budget|projected_spending_above_budget,2400.0,controlled_known_spending_fixture_NOT_ML,12100.0,10000.0,30000.0,,,,,,,[]
+budget_exact_120pct,controlled,pnc,True,steady,steady,,1200.0,controlled_known_spending_fixture_NOT_ML,13300.0,10000.0,30000.0,,,,,,,[]
+future_overspending,controlled,pnc,True,steady,steady,projected_spending_above_budget,3000.0,controlled_known_spending_fixture_NOT_ML,11500.0,10000.0,30000.0,,,,,,,[]
+short_horizon_budget,controlled,pnc,True,steady,steady,,700.0,controlled_known_spending_fixture_NOT_ML,12300.0,10000.0,30000.0,,,,,,,[]
+low_cash,controlled,pnc,True,steady,steady,savings_below_floor|low_balance|emergency_savings|payment_pressure,900.0,controlled_known_spending_fixture_NOT_ML,-2300.0,-2300.0,0.0,,,,,,,[]
+savings_crossing,controlled,pnc,True,steady,steady,savings_below_floor|low_balance|emergency_savings|payment_pressure|projected_spending_above_budget,6000.0,controlled_known_spending_fixture_NOT_ML,-6900.0,-6900.0,0.0,,,,,,,[]
+no_implicit_savings,controlled,pnc,True,steady,steady,low_balance|emergency_savings|payment_pressure|projected_spending_above_budget,6000.0,controlled_known_spending_fixture_NOT_ML,-7400.0,-7400.0,500.0,,,,,,,[]
+inflation_tight,controlled,pnc,True,pressured,steady,savings_below_floor|low_balance|emergency_savings|payment_pressure|cost_pressure_exposure,900.0,controlled_known_spending_fixture_NOT_ML,250.0,-770.0,500.0,,,,,,,[]
+inflation_ample,controlled,pnc,True,pressured,steady,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+unemployment_rising,controlled,pnc,True,pressured,steady,savings_below_floor|low_balance|emergency_savings|payment_pressure|income_resilience_exposure,900.0,controlled_known_spending_fixture_NOT_ML,250.0,-770.0,500.0,,,,,,,[]
+unemployment_stable,controlled,pnc,True,steady,steady,savings_below_floor|low_balance|emergency_savings|payment_pressure,900.0,controlled_known_spending_fixture_NOT_ML,250.0,-770.0,500.0,,,,,,,[]
+high_rates_variable,controlled,pnc,True,pressured,steady,variable_rate_exposure,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+high_rates_fixed,controlled,pnc,True,pressured,steady,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+low_rates_not_loan_signal,controlled,pnc,True,steady,steady,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+market_near_term,controlled,pnc,True,steady,stressed,near_term_equity_exposure,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+market_long_term,controlled,pnc,True,steady,stressed,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+market_no_equity,controlled,pnc,True,steady,stressed,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+stale_market,controlled,pnc,True,steady,unknown,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+stale_all,controlled,pnc,True,unknown,unknown,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+future_observations,controlled,pnc,True,unknown,unknown,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+missing_economy,controlled,pnc,True,unknown,unknown,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+debt_tight,controlled,pnc,True,pressured,steady,savings_below_floor|low_balance|emergency_savings|payment_pressure|debt_liquidity_tradeoff,900.0,controlled_known_spending_fixture_NOT_ML,250.0,-770.0,500.0,,,,,,,[]
+debt_surplus,controlled,pnc,True,pressured,steady,debt_paydown_option,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+inflation_boundary,controlled,pnc,True,pressured,steady,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+rate_boundary,controlled,pnc,True,pressured,steady,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+drawdown_boundary,controlled,pnc,True,steady,stressed,,900.0,controlled_known_spending_fixture_NOT_ML,13600.0,10000.0,30000.0,,,,,,,[]
+negative_savings,controlled,pnc,True,,,,,,,,,,,,,savings_balance is out of range,,
+nan_income,controlled,pnc,True,,,,,,,,,,,,,monthly_income must be finite numeric data,,
+invalid_bill_day,controlled,pnc,True,,,,,,,,,,,,,bill day must be 1..31,,
+zero_income,controlled,pnc,True,steady,steady,savings_below_floor|low_balance|emergency_savings|payment_pressure,900.0,controlled_known_spending_fixture_NOT_ML,-2300.0,-2300.0,0.0,,,,,,,[]
+ml_pnc_7,ml,pnc,True,steady,steady,,433.91,lightgbm,12566.09,10000.0,30000.0,,,,,,,[]
+ml_pnc_30,ml,pnc,True,steady,steady,projected_spending_above_budget,3882.99,lightgbm,10617.01,10000.0,30000.0,,,,,,,[]
+ml_pnc_90,ml,pnc,True,steady,steady,projected_spending_above_budget,11449.11,lightgbm,12050.89,10000.0,30000.0,0.0,,,,,,[]
+ml_zero,ml,zero,True,steady,steady,,9.67,lightgbm,23490.33,10000.0,30000.0,-11439.44,,,,,,[]
+ml_irregular,ml,irregular,True,steady,steady,,3336.8,moving_average_28,20163.2,10000.0,30000.0,-8112.31,,,,,,['Spending occurs much more frequently than in training data; using an unvalidated rolling-average fallback instead of the synthetic-calendar model.']
+ml_surge,ml,surge,True,steady,steady,projected_spending_above_budget,20687.21,lightgbm,2812.79,2812.79,30000.0,9238.1,,,,,,[]
+ml_one_off_spike,ml,one_off_spike,True,steady,steady,projected_spending_above_budget,11931.68,lightgbm,11568.32,10000.0,30000.0,482.57,,,,,,[]
+ml_invalid_short,ml,short,True,,,,,,,,,,,,,Provide at least 29 consecutive daily observations for one customer,,
+ml_invalid_gap,ml,gap,True,,,,,,,,,,,,,"Daily history must be unique and contiguous, including zero spending days",,
+ml_invalid_duplicate,ml,duplicate,True,,,,,,,,,,,,,"Daily history must be unique and contiguous, including zero spending days",,
+ml_invalid_nan,ml,nan,True,,,,,,,,,,,,,Spending must be finite and nonnegative,,
+ml_invalid_negative,ml,negative,True,,,,,,,,,,,,,Spending must be finite and nonnegative,,
+ml_invalid_horizon_0,ml,pnc,True,,,,,,,,,,,,,days must be an integer from 1 to 90,,
+ml_invalid_horizon_91,ml,pnc,True,,,,,,,,,,,,,days must be an integer from 1 to 90,,
+research_base,research,base,True,not_applicable,research_abstains,,,,,,,,3.037,3.766,0.6786,,,
+research_inflation_spike,research,inflation_spike,True,not_applicable,research_abstains,,,,,,,,18.607,2.579,0.1811,,,
+research_labor_shock,research,labor_shock,True,not_applicable,research_abstains,,,,,,,,3.063,4.773,0.7023,,,
+research_rate_hike,research,rate_hike,True,not_applicable,research_abstains,,,,,,,,2.742,3.636,0.6703,,,
+research_market_crash,research,market_crash,True,not_applicable,research_abstains,,,,,,,,1.532,8.503,0.8514,,,
+research_missing_month,research,missing_month,True,not_applicable,research_abstains,,,,,,,,4.293,4.288,0.6053,,,
+research_short_history,research,short_history,True,,,,,,,,,,,,,Need at least 72 usable monthly feature rows,,

@@ -1,0 +1,27 @@
+{
+  "retrieved_at": "2026-11-07T23:46:42.390534+00:00",
+  "series": {
+    "CPIAUCSL": {
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL&cosd=2000-01-01",
+      "last_observation": "2026-09-01",
+      "source_page": "https://fred.stlouisfed.org/series/CPIAUCSL"
+    },
+    "UNRATE": {
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=UNRATE&cosd=2000-01-01",
+      "last_observation": "2026-10-01",
+      "source_page": "https://fred.stlouisfed.org/series/UNRATE"
+    },
+    "FEDFUNDS": {
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=FEDFUNDS&cosd=2000-01-01",
+      "last_observation": "2026-10-01",
+      "source_page": "https://fred.stlouisfed.org/series/FEDFUNDS"
+    },
+    "SP500": {
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=SP500&cosd=2000-01-01",
+      "last_observation": "2026-11-05",
+      "source_page": "https://fred.stlouisfed.org/series/SP500"
+    }
+  },
+  "vintage": "current_revised; not point-in-time",
+  "synthetic": false
+}
