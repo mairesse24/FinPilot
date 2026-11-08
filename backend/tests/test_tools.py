@@ -39,3 +39,23 @@ def test_registry_tools_run_and_are_json_serializable():
                        ("get_forecast", {"days": 7}), ("get_guardian_alerts", {}),
                        ("run_simulation", {"reduction_amount": 100})]:
         json.dumps(r.call(name, args))
+
+
+def test_purchase_gift_portfolio_reconciles_assets_debt_and_net_worth():
+    result = reg().call("evaluate_purchase", {
+        "amount": 20000, "item": "car", "gift_amount": 2000,
+    })
+    scenario = result["portfolio_scenario"]
+    assert result["available_source_funds"] == 3500.0
+    assert result["source_funding_gap"] == 16500.0
+    assert scenario == {
+        "gift_amount": 2000.0,
+        "assumed_down_payment": 2000.0,
+        "hypothetical_financing_needed": 18000.0,
+        "liquid_after_down_payment": 1500.0,
+        "assets_after_purchase": 21500.0,
+        "liabilities_after_purchase": 20300.0,
+        "net_worth_after_purchase": 1200.0,
+        "net_worth_change_before_fees_and_depreciation": 2000.0,
+    }
+    assert scenario["assets_after_purchase"] - scenario["liabilities_after_purchase"] == scenario["net_worth_after_purchase"]

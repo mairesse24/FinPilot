@@ -69,6 +69,16 @@ def test_chat_uses_supplied_vehicle_financing_terms():
     assert "taxes, fees, insurance" in r["reply"].lower()
 
 
+def test_chat_gift_car_scenario_uses_car_price_not_the_gift():
+    c = demo_client(date(2026, 11, 7))
+    r = ask(c, "My friend will give me 2000 dollars. Can I buy a carworth 20000 dollars?").json()
+    call = r["tool_calls"][-1]
+    assert call["name"] == "evaluate_purchase"
+    assert call["args"] == {"amount": 20000.0, "item": "car", "gift_amount": 2000.0}
+    for expected in ("$20,000.00", "$2,000.00", "$18,000.00"):
+        assert expected in r["reply"]
+
+
 def test_chat_followup_reuses_prior_savings_purchase_context(client):
     first="Can I buy a $10,000 TV right now with my savings?"
     body={"messages":[{"role":"user","content":first},

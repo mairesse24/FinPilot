@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 from app.schemas.chat import ChatMessage, ChatResult, ToolCallRecord
 from app.schemas.common import Meta
+from app.services.purchase_intent import explicit_purchase_args
 
 NOTE = "This is a prototype estimate based on simulated data, not financial advice."
 HELP = ("I can help with: your financial health score, cash-flow risks and forecast, and "
@@ -32,12 +33,8 @@ def chat(messages: list[ChatMessage], tools) -> ChatResult:
         calls.append(ToolCallRecord(name=name, args=args, summary=summary or f"called {name}"))
         return res
 
-    purchase_amount=re.search(r'\$\s*([\d,]+(?:\.\d+)?)',purchase_text)
-    if purchase_amount and (_has(purchase_text,("buy","purchase","car","vehicle","house","home","tv")) or followup):
-        amount=float(purchase_amount.group(1).replace(',',''))
-        item='car' if _has(purchase_text,("car","vehicle")) else 'home' if _has(purchase_text,("house","home")) else 'tv' if _has(purchase_text,("tv",)) else 'purchase'
-        args={'amount':amount,'item':item}
-        if 'saving' in purchase_text:args['funding_source']='savings'
+    args=explicit_purchase_args(purchase_text)
+    if args:
         down=(re.search(r'(?:put|pay)\s*\$\s*([\d,]+(?:\.\d+)?)\s*down',purchase_text) or
               re.search(r'down payment(?:\s+of|\s+is)?\s*\$\s*([\d,]+(?:\.\d+)?)',purchase_text))
         apr=re.search(r'apr(?:\s+is|\s+of)?\s*(\d+(?:\.\d+)?)\s*%',purchase_text)
@@ -50,6 +47,9 @@ def chat(messages: list[ChatMessage], tools) -> ChatResult:
         if r['funding_source']=='savings':
             reply+=f"Because you specified savings, the relevant available amount is {_usd(r['savings'])}, leaving a {_usd(r['source_funding_gap'])} gap. "
         if r['price_to_net_worth'] is not None:reply+=f"The price is {r['price_to_net_worth']:.2f} times current net worth. "
+        if r.get('gift_amount',0)>0:
+            p=r['portfolio_scenario'];reply+=(f"This scenario treats the {_usd(r['gift_amount'])} gift as a down-payment contribution, leaving {_usd(p['hypothetical_financing_needed'])} to finance. "
+                f"The illustrative portfolio would have {_usd(p['assets_after_purchase'])} in assets, {_usd(p['liabilities_after_purchase'])} in liabilities, {_usd(p['liquid_after_down_payment'])} liquid, and {_usd(p['net_worth_after_purchase'])} net worth before fees and depreciation. The gift is not available until received. ")
         if r['financing']:
             f=r['financing'];reply+=(f"With {_usd(f['down_payment'])} down, the financed principal is {_usd(f['principal'])}. "
                 f"At {f['apr_percent']:g}% APR for {f['term_months']} months, the estimated principal-and-interest payment is {_usd(f['monthly_payment'])} per month; "

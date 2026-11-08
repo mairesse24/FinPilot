@@ -65,9 +65,19 @@ def statements(name: str, args: dict, result: dict) -> list[str]:
         return facts
     if name == "evaluate_purchase":
         source=result.get('funding_source','liquid')
-        facts=[f"The {result.get('item','purchase')} price is {usd(result['price'])}. "
-               f"Available {source} funds are {usd(result['available_source_funds'])}, leaving a funding gap of {usd(result['source_funding_gap'])}.",
+        gift=result.get('gift_amount',0)
+        opening=(f"The {result.get('item','purchase')} price is {usd(result['price'])}. "
+                 f"Available {source} funds are {usd(result['available_source_funds'])}, leaving a cash funding gap of {usd(result['source_funding_gap'])}.")
+        if gift:
+            opening += (f" The portfolio scenario treats the {usd(gift)} gift as a down-payment contribution "
+                        f"and therefore requires {usd(result['portfolio_scenario']['hypothetical_financing_needed'])} of financing.")
+        facts=[opening,
                f"Current checking is {usd(result['checking'])}, savings are {usd(result['savings'])}, liabilities are {usd(result['liabilities'])}, and net worth is {usd(result['net_worth'])}."]
+        portfolio=result.get('portfolio_scenario')
+        if portfolio:
+            facts.append(f"If the contribution is applied as a down payment, the illustrative remaining financing need is {usd(portfolio['hypothetical_financing_needed'])}. Portfolio assets would be {usd(portfolio['assets_after_purchase'])}, liabilities {usd(portfolio['liabilities_after_purchase'])}, liquid funds {usd(portfolio['liquid_after_down_payment'])}, and net worth {usd(portfolio['net_worth_after_purchase'])} before taxes, fees, depreciation, or transaction costs.")
+        if result.get('gift_amount',0)>0:
+            facts.append(f"The {usd(result['gift_amount'])} gift or contribution is hypothetical income until received and verified.")
         financing=result.get('financing')
         if financing:
             facts += [f"With {usd(financing['down_payment'])} down, {usd(financing['principal'])} is financed at {financing['apr_percent']:g}% APR for {financing['term_months']} months. The estimated principal-and-interest payment is {usd(financing['monthly_payment'])} per month.",

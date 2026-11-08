@@ -128,6 +128,24 @@ def test_parallel_account_and_forecast_tools_return_real_numbers(monkeypatch, to
     assert fc["low_point_interval"]
 
 
+def test_explicit_gift_and_car_request_cannot_be_replaced_by_generic_summaries(monkeypatch, tools):
+    """Regression: Gemini once selected accounts/health and ignored the purchase scenario."""
+    provider = install(monkeypatch, Provider([response(
+        ("get_accounts_summary", {}), ("get_financial_assessment", {}))]))
+    out = copilot.chat(ask(
+        "My friend will give me $2,000. Can I buy a car worth $20,000, "
+        "what would my portfolio change look like, and should I buy it?"
+    ), tools)
+    purchase = next(call for call in out.tool_calls if call.name == "evaluate_purchase")
+    assert {key: purchase.args[key] for key in ("amount", "item", "gift_amount")} == {
+        "amount": 20000.0, "item": "car", "gift_amount": 2000.0,
+    }
+    plain = out.reply.replace("**", "")
+    for expected in ("$20,000.00", "$2,000.00", "$18,000.00"):
+        assert expected in plain
+    assert "portfolio" in plain.lower()
+
+
 def test_model_content_is_preserved_with_thought_signature(monkeypatch, tools):
     first = response(("get_health_score", {}), ("get_forecast", {"days": 45}))
     first.candidates[0].content.parts[0].thought_signature = b"signature"

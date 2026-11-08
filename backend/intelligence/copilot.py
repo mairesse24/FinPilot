@@ -16,6 +16,7 @@ from app.config import get_settings
 from app.schemas.chat import ChatMessage, ChatResult, ToolCallRecord, ChatDelivery
 from app.schemas.common import Meta
 from app.services.chat_format import SECTIONS, format_reply
+from app.services.purchase_intent import explicit_purchase_args
 from intelligence.copilot_evidence import statements
 
 NOTE = "This is a prototype estimate based on simulated data, not financial advice. Outcomes are not guaranteed."
@@ -81,6 +82,7 @@ class PurchaseArgs(NoArgs):
     amount: float = Field(gt=0, le=100000000, allow_inf_nan=False)
     item: str = Field(default="purchase", min_length=1, max_length=80)
     funding_source: Literal["liquid", "savings"] = "liquid"
+    gift_amount: float = Field(default=0, ge=0, allow_inf_nan=False)
     down_payment: float | None = Field(default=None, ge=0, allow_inf_nan=False)
     apr_percent: float | None = Field(default=None, ge=0, le=100, allow_inf_nan=False)
     term_months: int | None = Field(default=None, ge=1, le=480)
@@ -159,6 +161,8 @@ def concise_evidence(results: list[tuple[str, dict]]) -> tuple[list[tuple[str, s
             chosen = facts[:4]
         elif name == "run_simulation":
             chosen = facts[:5]
+        elif name == "evaluate_purchase":
+            chosen = facts[:5]
         else:
             chosen = facts[:3]
         groups.append([(SECTIONS[name], fact) for fact in chosen])
@@ -192,6 +196,8 @@ def _registry_chat(messages: list[ChatMessage], tools) -> ChatResult:
         cache: dict[str, dict] = {}
         requested: dict[str, tuple[str, dict]] = {}
         used = 0
+
+        required_purchase = explicit_purchase_args(messages[-1].content)
 
         def remaining_ms():
             remaining = deadline - time.monotonic()
@@ -309,6 +315,14 @@ def _registry_chat(messages: list[ChatMessage], tools) -> ChatResult:
             else:
                 raise CopilotUnavailable("Copilot round budget exceeded; using baseline guidance.")
 
+            if required_purchase:
+                payload = execute("evaluate_purchase", required_purchase)
+                if "error" not in payload:
+                    # An unmistakable purchase request must not be displaced by generic
+                    # account/health selections or a model call that dropped user terms.
+                    requested.clear()
+                    key = "evaluate_purchase:" + json.dumps(required_purchase, sort_keys=True)
+                    requested[key] = ("evaluate_purchase", payload)
             selected, next_step = concise_evidence(list(requested.values()) or [("get_guardian_alerts", guardian)])
             reply = format_reply(selected, NEXT_STEPS[next_step], NOTE)
             remaining_ms()
