@@ -68,6 +68,11 @@ export default function FloatingCopilot() {
     if (open) input.current?.focus();
   }, [open]);
   useEffect(() => {
+    const openChat = () => setOpen(true);
+    window.addEventListener("finpilot:open-chat", openChat);
+    return () => window.removeEventListener("finpilot:open-chat", openChat);
+  }, []);
+  useEffect(() => {
     if (thread.current) thread.current.scrollTop = thread.current.scrollHeight;
   }, [messages, busy]);
   const close = () => {

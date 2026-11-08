@@ -19,6 +19,7 @@ import {
 import ConnectedDashboard from "./ConnectedDashboard";
 import EconomicIntelligence from "./EconomicIntelligence";
 import FloatingCopilot from "./FloatingCopilot";
+import FinPilotWrapped from "./FinPilotWrapped";
 import { FinancialWorkspace } from "./FinancialWorkspace";
 import { get, post, type Context, type Alert } from "./api";
 
@@ -280,7 +281,9 @@ export default function App() {
         </header>
         <FinancialWorkspace scope={context?.user.id}>
           <div className="dashboard">
-            {["Economic Lab", "Health Score", "Digital Twin", "AI Co-Pilot"].includes(active) ? (
+            {active === "FinPilot Wrapped" ? (
+              <FinPilotWrapped />
+            ) : ["Economic Lab", "Health Score", "Digital Twin", "AI Co-Pilot"].includes(active) ? (
               <EconomicIntelligence page={active} />
             ) : (
               <ConnectedDashboard page={active} />
