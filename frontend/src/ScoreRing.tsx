@@ -49,7 +49,7 @@ export default function ScoreRing({
         </div>
       </div>
       <div>
-        <span className="eyebrow">Your financial health · v2</span>
+        <span className="eyebrow">Your financial health</span>
         <h2>
           {estimated
             ? "Automatic financial health estimate"

@@ -112,9 +112,8 @@ test("assessment explains the savings limit inline, then calculates and runs a s
     page.getByRole("heading", { name: "Try a what-if scenario", exact: true }),
   ).toBeVisible();
   const headings = await page.getByRole("heading", { level: 2 }).allTextContents();
-  expect(headings.indexOf("Try a what-if scenario")).toBeLessThan(
-    headings.findIndex((h) => h.startsWith("Economic conditions")),
-  );
+  expect(headings.indexOf("Test a spending cut")).toBeLessThan(headings.indexOf("Try a what-if scenario"));
+  expect(headings.some((h) => h.startsWith("Economic conditions"))).toBe(false);
   await page.getByLabel("Stress scenario", { exact: true }).selectOption("emergency_expense");
   await page.getByLabel("Stress amount", { exact: true }).fill("1000");
   await page.getByRole("button", { name: "Run hypothetical scenario", exact: true }).click();

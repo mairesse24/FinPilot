@@ -17,6 +17,12 @@ export type Meta = {
     reasons: string[];
   } | null;
 };
+export type SpendingCut = {
+  type: "spending_cut";
+  reduction_amount: number;
+  horizon_days: number;
+  category?: string | null;
+};
 export type Alert = {
   id: string;
   rule?: string;
@@ -24,6 +30,34 @@ export type Alert = {
   severity: string;
   cause: string;
   recommended_action: string;
+  numbers?: Record<string, number | string>;
+  suggested_scenario?: SpendingCut | null;
+};
+export type ScenarioOutcome = {
+  projected_low: { date: string; balance: number } | null;
+  end_balance: number;
+  health_score: number;
+  alerts: Alert[];
+};
+export type SimulationResult = {
+  baseline: ScenarioOutcome;
+  scenario: ScenarioOutcome;
+  delta: Record<string, number>;
+  meta: Meta;
+};
+export type HealthComponent = {
+  key: string;
+  name: string;
+  weight: number;
+  score: number;
+  explanation: string;
+};
+export type HealthV1 = {
+  score: number;
+  components: HealthComponent[];
+  strengths: string[];
+  weaknesses: string[];
+  meta: Meta;
 };
 export type Account = {
   id: string;

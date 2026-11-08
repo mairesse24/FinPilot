@@ -165,6 +165,7 @@ summary {
 }
 .main-content {
   min-width: 0;
+  padding-bottom: 96px; /* clear the floating Copilot button and host badges */
 }
 .topbar {
   position: sticky;

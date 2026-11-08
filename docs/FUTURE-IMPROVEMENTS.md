@@ -83,3 +83,13 @@ Decision (2026-11-08): the Wrapped story page (`frontend/src/FinPilotWrapped.tsx
 - **Loading state:** "Building your financial story…" is a plain text line; a skeleton or progress hint would feel faster.
 - **Route alias:** `#/wrapped` renders the Overview content (breadcrumb "Workspace / Overview"); the working route is `#/finpilot-wrapped`. An alias would avoid a broken-looking link.
 - **Untested:** the remaining slides, manual mode, keyboard use, phone layout, and behavior when the API is down.
+
+## Deferred after frontend redesign
+- Stale-while-revalidate on "Reload analysis" (avoid skeleton flash).
+- Slow-backend notice on pages other than Overview.
+- Reset forecast horizon when changing page.
+- Two score sources after the user confirms inputs: reconcile headline score.
+- Backend response caching.
+- Economic snapshot generation: `python -m scripts.refresh_intelligence`.
+- Gemini timeout/model via env (`GEMINI_MODEL=gemini-3.1-flash-lite`); Copilot answer reconciliation.
+- Wrapped: left untouched by request; suggestions stay here only.

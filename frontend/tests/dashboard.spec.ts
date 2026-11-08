@@ -36,13 +36,23 @@ test("dashboard matches API and forecast controls fetch each horizon", async ({
     await expect(accounts.locator(".live-row").filter({ hasText: a.name })).toContainText(
       currency(a.balance),
     );
+  // Each horizon is fetched once; revisiting a horizon reuses the cached result (no loading flash).
+  const forecasts: Record<number, any> = {};
+  const requested: Record<number, number> = {};
+  page.on("request", (r) => {
+    const m = r.url().match(/\/api\/forecast\?days=(\d+)$/);
+    if (m) requested[Number(m[1])] = (requested[Number(m[1])] ?? 0) + 1;
+  });
+  page.on("response", async (r) => {
+    const m = r.url().match(/\/api\/forecast\?days=(\d+)$/);
+    if (m && r.status() === 200) forecasts[Number(m[1])] = await r.json();
+  });
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Accounts", exact: true })).toBeVisible();
   for (const days of [7, 90, 30]) {
-    const response = page.waitForResponse(
-      (r) => r.url().endsWith(`/api/forecast?days=${days}`) && r.status() === 200,
-    );
     await page.getByRole("button", { name: `${days} days`, exact: true }).click();
-    const result = await (await response).json();
-    expect(result.series).toHaveLength(days);
+    await expect.poll(() => forecasts[days]?.series?.length).toBe(days);
+    const result = forecasts[days];
     await expect(page.getByText(`Daily forecast · ${days} days`, { exact: true })).toBeVisible();
     await page.getByText(`Daily forecast · ${days} days`, { exact: true }).click();
     await expect(page.locator("tbody tr")).toHaveCount(days);
@@ -50,6 +60,8 @@ test("dashboard matches API and forecast controls fetch each horizon", async ({
       currency(result.series[days - 1].projected_balance),
     );
   }
+  // 30 days was loaded first and revisited last: still exactly one request per horizon.
+  expect(requested).toEqual({ 7: 1, 30: 1, 90: 1 });
   await page.getByRole("link", { name: "Forecasts", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Forecasts", exact: true })).toBeVisible();
 });

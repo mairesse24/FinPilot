@@ -260,3 +260,9 @@ These were real in the old build and are gone in the merged build; they only mat
 | J-20 | C-13 | J-42 | D-5 |
 | J-21 | removed (section 6) | J-43 | C-21 |
 | J-22 | removed (section 6); wording in C-10 and C-12 | J-44 | C-21 (corrected, section 8) |
+
+## Implementation status (frontend redesign)
+
+Done in frontend: C-02 (UI side), C-03, C-04, C-05, C-06 (UI empty state), C-07/C-08/C-14/C-16 (one headline score with real breakdown), C-10, C-11/C-12/C-13 (chart, labels, derived event markers, alert numbers), C-15 (labels + spending-cut tool), C-18/C-19, C-23.
+Not code / out of scope: C-01 (redeploy dist), C-02 backend redeploy, C-09 (Gemini model/timeout env), C-22 (Nessie service). FinPilot Wrapped untouched.
+Tests: 34/37 pass; the 3 failures (below-buffer, confirmed synthetic customer facts, confirmed score survives navigation) expect Nessie data and fail identically on the unchanged original.

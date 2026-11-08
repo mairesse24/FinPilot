@@ -6,6 +6,8 @@ import { DeliveryStatus, type Delivery } from "./FloatingCopilot";
 import ReliabilityNotices from "./ReliabilityNotices";
 import { API_BASE, type Notice } from "./api";
 import ChatRichText from "./ChatRichText";
+import { useFinance, useHealthScore } from "./financeStore";
+import { SpendingCutSimulator, factorHelp, isDebug } from "./dashboardParts";
 
 type Facts = Record<string, string | boolean>;
 type Component = {
@@ -84,6 +86,26 @@ type Simulation = {
   ending_checking_change: number;
   net_worth_change: number;
   note: string;
+};
+const scenarioLabels: Record<string, string> = {
+  essential_cost_increase: "Essential costs rise",
+  cash_expense_increase: "Everyday cash spending rises",
+  income_reduction: "Income drops",
+  income_interruption: "Income stops for a while",
+  missed_paycheck: "A paycheck is missed",
+  emergency_expense: "Unexpected expense",
+  variable_rate_payment: "Variable-rate payment rises",
+  delayed_paycheck: "A paycheck arrives late",
+  fixed_bill_increase: "A fixed bill increases",
+  savings_transfer: "Move money to savings",
+};
+const humanize = (id: string) => {
+  const t = id.replace(/_/g, " ");
+  return t.charAt(0).toUpperCase() + t.slice(1);
+};
+const loadErrorText = (reason: unknown) => {
+  const m = reason instanceof Error ? reason.message : String(reason);
+  return /not found|404/i.test(m) && !isDebug() ? "Some FinPilot data could not be loaded yet. Please try again in a moment." : m;
 };
 const currency = (n: number) => n.toLocaleString("en-US", { style: "currency", currency: "USD" });
 async function request<T>(path: string, body?: object, signal?: AbortSignal): Promise<T> {
@@ -186,6 +208,9 @@ function CashChart({ result }: { result: Simulation }) {
 
 export default function EconomicIntelligence({ page }: { page: string }) {
   const { facts, setFacts, confirmedFacts, setConfirmedFacts } = useFinancialWorkspace();
+  const { health: v1 } = useHealthScore();
+  const fin = useFinance(30);
+  const [attempt, setAttempt] = useState(0);
   const inputs = useRef<HTMLFormElement>(null);
   const [inputsOpen, setInputsOpen] = useState(false);
   const [delivery, setDelivery] = useState<Delivery | null>(null);
@@ -215,21 +240,23 @@ export default function EconomicIntelligence({ page }: { page: string }) {
     );
   useEffect(() => {
     const controller = new AbortController();
-    Promise.all([
+    setError("");
+    // One missing endpoint must not blank the whole page: the profile is required, the input limits are optional.
+    Promise.allSettled([
       request<Context>("resilience", { facts: confirmedFacts ?? {} }, controller.signal),
       request<Constraints>("financial-inputs", undefined, controller.signal),
-    ])
-      .then(([c, limits]) => {
-        if (!controller.signal.aborted) {
-          setContext(c);
-          setConstraints(limits);
-        }
-      })
-      .catch((e) => {
-        if (!controller.signal.aborted) setError(e.message);
-      });
+    ]).then(([c, limits]) => {
+      if (controller.signal.aborted) return;
+      if (c.status === "fulfilled") setContext(c.value);
+      else {
+        // The load error must show even after the user has run an assessment, simulation or chat.
+        setErrorScope("loading");
+        setError(loadErrorText(c.reason));
+      }
+      if (limits.status === "fulfilled") setConstraints(limits.value);
+    });
     return () => controller.abort();
-  }, []);
+  }, [attempt]);
   const updateFact = (key: string, value: string | boolean) => {
     setFacts((f) => ({ ...f, [key]: value }));
     setDirty(true);
@@ -344,7 +371,25 @@ export default function EconomicIntelligence({ page }: { page: string }) {
       : (health.score ?? health.observed_score)
     : null;
   const scoreIsObserved = Boolean(health && (dirty || health.score == null));
-  const economyPanel = economy && (
+  const headlineScore = scoreIsObserved && !dirty && v1 ? v1.score : displayedScore;
+  const cutDefaults = fin.dashboard?.active_alerts.find((a) => a.suggested_scenario)?.suggested_scenario ?? null;
+  const cutPanel = <SpendingCutSimulator defaults={cutDefaults} buffer={fin.forecast?.safety_buffer ?? null} />;
+  const noEconomyData =
+    !!economy && !economy.indicators.length && Object.values(economy.features).every((v) => v == null);
+  const economyPanel = economy && (noEconomyData ? (
+    <section className="live-panel">
+      <h2>Economic conditions · {economy.as_of}</h2>
+      <strong className="live-value">{economy.status}</strong>
+      <div className="empty-state">
+        <h3>Economic indicators are not available right now</h3>
+        <p>
+          FinPilot has not loaded its latest inflation, jobs and interest-rate data yet. Your personal
+          forecast, score and Guardian alerts do not depend on it.
+        </p>
+        <small>Economic data is supplied as a dated snapshot and refreshed separately.</small>
+      </div>
+    </section>
+  ) : (
     <section className="live-panel">
       <h2>Economic conditions · {economy.as_of}</h2>
       <strong className="live-value">{economy.status}</strong>
@@ -434,7 +479,7 @@ export default function EconomicIntelligence({ page }: { page: string }) {
             </tbody>
           </table>
         </div>
-        {Object.entries(economy.provider_errors).map(([k, v]) => (
+        {isDebug() && Object.entries(economy.provider_errors).map(([k, v]) => (
           <p key={k}>
             {k}: {v}
           </p>
@@ -445,7 +490,7 @@ export default function EconomicIntelligence({ page }: { page: string }) {
         </p>
       </details>
     </section>
-  );
+  ));
   const inputPanel = (
     <details
       className="live-panel optional-inputs"
@@ -638,8 +683,8 @@ export default function EconomicIntelligence({ page }: { page: string }) {
       tabIndex={-1}
       style={{ scrollMarginTop: 90 }}
     >
-      <h2>FinPilot personal financial health · v2</h2>
-      <ScoreRing score={displayedScore} estimated={scoreIsObserved} />
+      <h2>Your financial health</h2>
+      <ScoreRing score={headlineScore} estimated={scoreIsObserved} />
       {scoreIsObserved && (
         <div className="score-next-step">
           <p>
@@ -665,13 +710,34 @@ export default function EconomicIntelligence({ page }: { page: string }) {
       )}
       {!dirty && (
         <p>
-          {health.score == null
-            ? `Confirmed-input assessment: ${health.completeness.available_components} / ${health.completeness.required_components} components supported.`
-            : "All confirmed-input components supported."}{" "}
-          The displayed automatic estimate is not a CFPB or credit score.
+          {scoreIsObserved && v1
+            ? "This score combines every factor FinPilot can measure from your imported accounts, bills and spending. Confirm your inputs below for a more precise assessment."
+            : health.score == null
+              ? `Confirmed-input assessment: ${health.completeness.available_components} / ${health.completeness.required_components} components supported.`
+              : "All confirmed-input components supported."}{" "}
+          It is not a CFPB or credit score.
         </p>
       )}
-      {!dirty && (
+      {!dirty && scoreIsObserved && v1 && (
+        <details open>
+          <summary>Score breakdown</summary>
+          {v1.components.map((c) => (
+            <article key={c.key} className="live-row">
+              <div style={{ width: "100%" }}>
+                <strong>
+                  {c.name}: {c.score.toFixed(0)} / 100 <small>· {Math.round(c.weight)}% of your score</small>
+                </strong>
+                <div role="progressbar" aria-label={c.name} aria-valuenow={c.score} aria-valuemin={0} aria-valuemax={100} style={{ height: 8, background: "#263345", margin: "10px 0" }}>
+                  <div style={{ width: `${c.score}%`, height: 8, background: c.score < 25 ? "#fb7185" : c.score < 50 ? "#fb923c" : c.score < 75 ? "#eac75f" : "#55d5ad" }} />
+                </div>
+                <p>{factorHelp[c.key] ?? (isDebug() ? c.explanation : "")}</p>
+                {isDebug() && <small>{c.explanation}</small>}
+              </div>
+            </article>
+          ))}
+        </details>
+      )}
+      {!dirty && !(scoreIsObserved && v1) && (
         <details open={health.score != null}>
           <summary>Score breakdown</summary>
           {health.components.map((c) => (
@@ -715,7 +781,7 @@ export default function EconomicIntelligence({ page }: { page: string }) {
           ))}
         </details>
       )}
-      {!dirty && (
+      {!dirty && !(scoreIsObserved && v1) && (
         <details>
           <summary>Financial metrics and missing inputs</summary>
           {Object.entries(health.metrics).map(([k, v]) => (
@@ -728,7 +794,7 @@ export default function EconomicIntelligence({ page }: { page: string }) {
           ))}
         </details>
       )}
-      {!dirty && health.warnings.map((w) => <p key={w}>{w}</p>)}
+      {!dirty && !(scoreIsObserved && v1) && health.warnings.map((w) => <p key={w}>{w}</p>)}
     </section>
   );
   const resiliencePanel = (
@@ -744,7 +810,7 @@ export default function EconomicIntelligence({ page }: { page: string }) {
       {context?.alerts.length ? (
         context.alerts.map((a) => (
           <article className="live-alert" key={a.id}>
-            <h3>{a.id.replace(/_/g, " ")}</h3>
+            <h3>{scenarioLabels[a.id] ?? humanize(a.id)}</h3>
             <p>{a.cause}</p>
             <p>{a.action}</p>
             <button
@@ -794,7 +860,7 @@ export default function EconomicIntelligence({ page }: { page: string }) {
           "savings_transfer",
         ].map((s) => (
           <option key={s} value={s}>
-            {s.replace(/_/g, " ")}
+            {scenarioLabels[s] ?? humanize(s)}
           </option>
         ))}
       </select>
@@ -924,15 +990,17 @@ export default function EconomicIntelligence({ page }: { page: string }) {
     resilience: resiliencePanel,
     economy: economyPanel,
     chat: chatPanel,
+    cut: cutPanel,
   };
+  // Each page shows only what belongs to it (previously all four pages repeated the same panels).
   const panelOrder =
     page === "Digital Twin"
-      ? ["simulation", "inputs", "health", "resilience", "economy", "chat"]
+      ? ["cut", "simulation", "inputs", "resilience"]
       : page === "Health Score"
-        ? ["health", "inputs", "simulation", "resilience", "economy", "chat"]
+        ? ["health", "inputs"]
         : page === "AI Co-Pilot"
-          ? ["chat", "inputs", "health", "resilience", "economy", "simulation"]
-          : ["economy", "resilience", "inputs", "health", "simulation", "chat"];
+          ? ["chat", "inputs"]
+          : ["economy", "resilience"];
   return (
     <div className="live-finance">
       <section className="welcome">
@@ -955,10 +1023,15 @@ export default function EconomicIntelligence({ page }: { page: string }) {
       )}
       {error && errorScope === "loading" && (
         <p className="live-warning" role="alert">
-          {error}
+          {error} <button onClick={() => setAttempt((n) => n + 1)}>Try again</button>
         </p>
       )}
-      {!context && !error && <p role="status">Loading economic evidence and profile…</p>}
+      {!context && !error && (
+        <div role="status" aria-busy="true">
+          <p className="skeleton-label">Loading economic evidence and profile…</p>
+          <div className="skeleton skeleton-panel" />
+        </div>
+      )}
       {panelOrder.map((name) => (
         <div key={name}>{panelByName[name]}</div>
       ))}
