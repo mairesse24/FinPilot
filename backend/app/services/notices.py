@@ -14,7 +14,7 @@ RULES = [
   'A calculation service was unavailable. A simpler method is being used; review its limitations.'),
  (' raised ', 'calculation_fallback','critical',
   'A calculation service was unavailable. A simpler method is being used; review its limitations.'),
- ('Spending occurs much more frequently', 'forecast_pattern_shift','critical',
+ ('Spending occurs much more frequently', 'forecast_pattern_shift','data_limitation',
   "Your recent spending pattern differs from the model's training data, so we're using a simpler estimate. Forecast confidence is limited."),
  ('Forecast abstained', 'forecast_unavailable','critical',
   'Forecast abstained: more spending history or a confirmed budget is needed. Future balances are unavailable.'),

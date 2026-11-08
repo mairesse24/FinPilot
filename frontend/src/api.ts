@@ -1,5 +1,22 @@
-export type Notice = { code: string; context: string; category: 'critical' | 'data_limitation' | 'diagnostic'; message: string; technical_detail: string };
-export type Meta = { source: string; as_of: string; warning: string | null; notices?: Notice[]; forecast_reliability?: { method: string; status: string; validation: string; reasons: string[] } | null };
+export type Notice = {
+  code: string;
+  context: string;
+  category: "critical" | "data_limitation" | "diagnostic";
+  message: string;
+  technical_detail: string;
+};
+export type Meta = {
+  source: string;
+  as_of: string;
+  warning: string | null;
+  notices?: Notice[];
+  forecast_reliability?: {
+    method: string;
+    status: string;
+    validation: string;
+    reasons: string[];
+  } | null;
+};
 export type Alert = {
   id: string;
   rule?: string;
@@ -8,13 +25,22 @@ export type Alert = {
   cause: string;
   recommended_action: string;
 };
+export type Account = {
+  id: string;
+  name: string;
+  account_type: string;
+  balance: number;
+  apr?: number | null;
+  min_payment?: number | null;
+  credit_limit?: number | null;
+};
 export type Dashboard = {
   net_worth: number;
   assets: number;
   liabilities: number;
   income_30d: number;
   spending_30d: number;
-  accounts: { id: string; name: string; account_type: string; balance: number }[];
+  accounts: Account[];
   by_category: { category: string; amount: number }[];
   upcoming_bills: { name: string; amount: number; due_date: string }[];
   health_score: number;
@@ -51,12 +77,26 @@ export type Context = {
 export const API_BASE: string = ((import.meta as unknown as { env?: Record<string, string | undefined> }).env?.VITE_API_BASE ?? '').replace(/\/+$/, '');
 
 export async function get<T>(path: string, signal: AbortSignal): Promise<T> {
-  const response = await fetch(`${API_BASE}/api/${path}`, { signal, cache: 'no-store' });
+  const response = await fetch(`${API_BASE}/api/${path}`, { signal, cache: "no-store" });
   if (!response.ok)
     throw new Error(
       `API ${response.status}: unable to load ${path.split("?")[0]}. Check backend configuration.`,
     );
   if (!response.headers.get("content-type")?.includes("application/json"))
     throw new Error("API unavailable. Start the backend on port 8000.");
+  return response.json() as Promise<T>;
+}
+
+export async function post<T>(path: string, body?: object): Promise<T> {
+  const response = await fetch(`${API_BASE}/api/${path}`, {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(typeof payload.detail === "string" ? payload.detail : "The simulation could not run.");
+  }
   return response.json() as Promise<T>;
 }

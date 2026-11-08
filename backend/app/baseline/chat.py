@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 from app.schemas.chat import ChatMessage, ChatResult, ToolCallRecord
 from app.schemas.common import Meta
+from app.services.purchase_intent import explicit_purchase_args
 
 NOTE = "This is a prototype estimate based on simulated data, not financial advice."
 HELP = ("I can help with: your financial health score, cash-flow risks and forecast, and "
@@ -20,6 +21,11 @@ def _has(text: str, words: tuple[str, ...]) -> bool:
 
 def chat(messages: list[ChatMessage], tools) -> ChatResult:
     text = next((m.content for m in reversed(messages) if m.role == "user"), "").lower()
+    followup=bool(re.search(r'\b(consequence|went ahead|go ahead|did it|what happens|impact)\b',text))
+    purchase_text=text
+    if followup:
+        purchase_text=next((m.content.lower() for m in reversed(messages[:-1])
+            if m.role=='user' and re.search(r'\$\s*[\d,]+',m.content) and _has(m.content.lower(),('buy','purchase','car','vehicle','house','home','tv'))),text)
     calls: list[ToolCallRecord] = []
 
     def use(name: str, args: dict, summary: str | None = None) -> dict:
@@ -27,7 +33,40 @@ def chat(messages: list[ChatMessage], tools) -> ChatResult:
         calls.append(ToolCallRecord(name=name, args=args, summary=summary or f"called {name}"))
         return res
 
-    if _has(text,("economy","inflation","unemployment","borrowing","market")) and not _has(text,("what if","simulate")):
+    args=explicit_purchase_args(purchase_text)
+    if args:
+        down=(re.search(r'(?:put|pay)\s*\$\s*([\d,]+(?:\.\d+)?)\s*down',purchase_text) or
+              re.search(r'down payment(?:\s+of|\s+is)?\s*\$\s*([\d,]+(?:\.\d+)?)',purchase_text))
+        apr=re.search(r'apr(?:\s+is|\s+of)?\s*(\d+(?:\.\d+)?)\s*%',purchase_text)
+        term=(re.search(r'(?:term\s+is\s+)?(\d+)\s*months?',purchase_text) or re.search(r'(\d+)[ -]month',purchase_text))
+        if down and apr and term:args.update(down_payment=float(down.group(1).replace(',','')),
+            apr_percent=float(apr.group(1)),term_months=int(term.group(1)))
+        r=use('evaluate_purchase',args,'compared proposed purchase and supplied financing terms with verified balances')
+        reply=(f"The purchase price is {_usd(r['price'])}. You have {_usd(r['liquid_funds'])} in checking and savings; "
+               f"current checking is {_usd(r['checking'])}, liabilities are {_usd(r['liabilities'])}, and net worth is {_usd(r['net_worth'])}. ")
+        if r['funding_source']=='savings':
+            reply+=f"Because you specified savings, the relevant available amount is {_usd(r['savings'])}, leaving a {_usd(r['source_funding_gap'])} gap. "
+        if r['price_to_net_worth'] is not None:reply+=f"The price is {r['price_to_net_worth']:.2f} times current net worth. "
+        reply+=(f"To preserve the {_usd(r['safety_buffer'])} safety buffer, the simple cash ceiling is "
+                f"{_usd(r['recommended_max_cash_purchase'])}; upcoming bills and ownership costs can make the affordable amount lower. ")
+        if r.get('reserve_warning'):reply+=r['reserve_warning']['message']+' '
+        if r.get('gift_amount',0)>0:
+            p=r['portfolio_scenario'];reply+=(f"This scenario treats the {_usd(r['gift_amount'])} gift as a down-payment contribution, leaving {_usd(p['hypothetical_financing_needed'])} to finance. "
+                f"The illustrative portfolio would have {_usd(p['assets_after_purchase'])} in assets, {_usd(p['liabilities_after_purchase'])} in liabilities, {_usd(p['liquid_after_down_payment'])} liquid, and {_usd(p['net_worth_after_purchase'])} net worth before fees and depreciation. The gift is not available until received. ")
+        if r['financing']:
+            f=r['financing'];reply+=(f"With {_usd(f['down_payment'])} down, the financed principal is {_usd(f['principal'])}. "
+                f"At {f['apr_percent']:g}% APR for {f['term_months']} months, the estimated principal-and-interest payment is {_usd(f['monthly_payment'])} per month; "
+                f"total loan payments are {_usd(f['total_of_payments'])}, including {_usd(f['total_interest'])} interest. "
+                f"The down payment alone exceeds known liquid funds by {_usd(f['down_payment_funding_gap'])}. ")
+            if f['payment_to_scheduled_income'] is not None:reply+=f"The payment is {f['payment_to_scheduled_income']:.1%} of scheduled monthly deposits. "
+            reply+="Based on the known balances, the stated down payment is not currently funded. Taxes, fees, insurance, maintenance, fuel and depreciation are excluded, so full affordability remains incomplete. "
+        else:
+            reply+=(f"A cash purchase leaves a funding gap of {_usd(r['source_funding_gap'])}. "
+                "A financing payment needs a down payment, APR and loan term. Taxes, fees, insurance and operating costs are also unknown. ")
+        if followup and r['source_funding_gap']>0:
+            reply+="Going ahead cannot be funded from the stated account alone; it would require other borrowing, an overdraft, or another unmodeled source of money, and would reduce the cash available for upcoming bills and emergencies. "
+        reply+="Compare the complete monthly cost with the cash-flow forecast before deciding. "+NOTE
+    elif _has(text,("economy","inflation","unemployment","borrowing","market")) and not _has(text,("what if","simulate")):
         r=use('get_economic_resilience',{},'fetched dated economic observations and scoped financial assessment')
         c=r['economic_conditions']
         reply=f"Economic conditions as of {c['as_of']}: {c['status']}. "+' '.join(c['labels'])+'. '
@@ -45,7 +84,8 @@ def chat(messages: list[ChatMessage], tools) -> ChatResult:
         else:reply='Specify the dollar amount and whether savings come from existing checking or new income. A transfer alone does not create net worth.'
     elif _has(text,("assessment","v2","score","health")) and 'legacy' not in text:
         r=use('get_financial_assessment',{},'fetched versioned v2 components and completeness')
-        reply=(f"FinPilot v2 score: {r['score']}/100. " if r['score'] is not None else 'FinPilot v2 score is withheld until required inputs are confirmed. ')
+        reply=(f"FinPilot v2 score: {r['score']}/100. " if r['score'] is not None else
+               f"Automatic observed-data estimate: {r['observed_score']} out of 100. The confirmed-input v2 assessment is incomplete. ")
         reply+=' '.join(r['withheld_reasons'])+' This is not the CFPB questionnaire score.'
         known=[c for c in r['components'] if c['score'] is not None]
         if known:
@@ -72,8 +112,8 @@ def chat(messages: list[ChatMessage], tools) -> ChatResult:
         mt = re.search(r"\$?\s*(\d[\d,]*(?:\.\d+)?)", text)
         if mt:
             amount = float(mt.group(1).replace(",", ""))
-        if not amount or amount <= 0:
-            reply = ("Tell me an amount, like \"what if I cut $200 a month?\", and I will "
+        if not amount or amount <= 0 or amount > 100000:
+            reply = ("Tell me a positive amount up to $100,000, like \"what if I cut $200?\", and I will "
                      "run the numbers.")
         else:
             r = use("run_simulation", {"reduction_amount": amount, "horizon_days": horizon},

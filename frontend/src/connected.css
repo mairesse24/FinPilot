@@ -67,6 +67,12 @@
   padding: 12px;
   background: #f59e0b0c;
 }
+.estimate-notices { color: #94a3b8; font-size: 13px; }
+.estimate-notices details { margin: 0; }
+.estimate-notices summary { width: fit-content; cursor: pointer; color: #8fa1b8; }
+.estimate-details { margin-top: 10px; padding: 12px 14px; border: 1px solid #263345; border-radius: 10px; background: #0d121a; }
+.estimate-details p { margin: 5px 0; }
+.snapshot-time { margin: -12px 0 0; font-size: 12px; color: #718198 !important; }
 .live-panel figure {
   margin: 20px 0;
 }
@@ -110,4 +116,319 @@
   .live-value {
     font-size: 23px;
   }
+}
+
+/* Connected workspace */
+.live-finance {
+  gap: 20px;
+}
+.live-panel {
+  background: #121721;
+  border-color: #293242;
+  border-radius: 12px;
+  padding: 22px;
+}
+.live-panel h2 {
+  font-weight: 600;
+}
+.live-panel h3 {
+  font-weight: 600;
+}
+.live-panel p {
+  font-size: 13px;
+}
+.live-value {
+  font-size: 26px;
+  letter-spacing: -0.7px;
+}
+.live-finance > p {
+  font-size: 11px;
+}
+.live-finance .account-tile {
+  display: block;
+  text-align: left;
+  background: #121721;
+  border: 1px solid #293242;
+  padding: 20px;
+  border-radius: 12px;
+}
+.account-tile:hover {
+  border-color: #48cfb0;
+  background: #151f29;
+}
+.account-tile > span {
+  display: flex;
+  justify-content: space-between;
+  color: #a5b3c5;
+  font-size: 13px;
+}
+.account-tile small {
+  color: #8594a9;
+  font-size: 11px;
+}
+.cash-strip {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 14px 20px;
+  border: 1px solid #293242;
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+.cash-strip p {
+  display: flex;
+  gap: 14px;
+  color: #9baabe;
+  font-size: 12px;
+}
+.cash-strip strong {
+  color: #eef2f7;
+}
+.cash-strip small {
+  color: #8594a9;
+  font-size: 11px;
+  margin-left: auto;
+}
+.account-dialog {
+  color: #eef2f7;
+  background: #121923;
+  border: 1px solid #3a465b;
+  border-radius: 16px;
+  padding: 28px;
+  width: min(740px, calc(100vw - 32px));
+  max-height: 85vh;
+  margin: auto;
+  overflow-y: auto;
+}
+.account-dialog::backdrop {
+  background: #000a;
+  backdrop-filter: blur(3px);
+}
+.dialog-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+.dialog-heading h2 {
+  font-size: 23px;
+  margin: 5px 0 12px;
+}
+.account-dialog button {
+  border: 1px solid #3a465b;
+  background: #1c2736;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+.account-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+.account-tabs button[aria-pressed="true"] {
+  color: #b3f0df;
+  background: #23483f;
+  border-color: #458a78;
+}
+.account-total {
+  font-size: 13px;
+  color: #a7b5c8;
+  margin: 16px 0;
+}
+.account-total strong {
+  color: #eef2f7;
+}
+.account-detail-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  border-top: 1px solid #303c4e;
+  padding: 18px 0;
+}
+.account-detail-row h3 {
+  font-size: 15px;
+}
+.account-detail-row p {
+  font-size: 11px;
+  color: #95a5ba;
+}
+.account-detail-row > strong {
+  font-size: 18px;
+}
+.account-detail-row dl {
+  grid-column: 1/-1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  font-size: 11px;
+  color: #b5c3d4;
+}
+.account-detail-row dt {
+  color: #8292a9;
+  margin-bottom: 4px;
+}
+.live-panel label {
+  font-size: 12px;
+  color: #c4cedd;
+}
+.live-panel input[type="number"],
+.live-panel textarea,
+.live-panel select {
+  padding: 11px;
+  background: #1a2230;
+  border: 1px solid #3c485e;
+  border-radius: 6px;
+  color: #eef2f7;
+  margin: 6px 0;
+  width: 100%;
+  max-width: 100%;
+}
+.live-panel input[type="checkbox"] {
+  accent-color: #48cfb0;
+  margin-right: 5px;
+}
+.live-panel input[aria-invalid="true"] {
+  border: 1px solid #fb7185 !important;
+}
+.input-hint {
+  display: block;
+  color: #91a2b9;
+  line-height: 1.5;
+  font-size: 11px;
+}
+.field-error {
+  display: block;
+  color: #ff9fae;
+  line-height: 1.5;
+  margin: 6px 0;
+}
+.form-error {
+  background: #41232a;
+  border: 1px solid #ad5263;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+.form-error p {
+  color: #fbc9d1;
+  margin-top: 6px;
+}
+.score-overview {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  margin: 18px 0;
+}
+.score-ring {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  flex: 0 0 150px;
+}
+.live-panel .score-ring svg {
+  width: 150px;
+  height: 150px;
+}
+.score-ring > div {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #eef2f7;
+}
+.score-ring strong {
+  font-size: 18px;
+}
+.score-ring small {
+  font-size: 10px;
+  color: #93a4bc;
+}
+.score-overview > div:last-child {
+  max-width: 580px;
+}
+.score-overview small {
+  font-size: 11px;
+  color: #93a4bc;
+}
+.tone-red {
+  color: #fb7185;
+}
+.tone-orange {
+  color: #fb923c;
+}
+.tone-yellow {
+  color: #eac75f;
+}
+.tone-green {
+  color: #55d5ad;
+}
+.tone-unknown {
+  color: #8491a6;
+}
+.indicator-card {
+  border-left: 3px solid currentColor;
+}
+.indicator-card .live-value {
+  color: inherit;
+}
+.color-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 15px 0;
+}
+.status-dot {
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  margin-top: 6px;
+}
+@media (max-width: 640px) {
+  .score-overview {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .cash-strip small {
+    margin-left: 0;
+  }
+  .account-detail-row dl {
+    grid-template-columns: 1fr;
+  }
+  .account-dialog {
+    padding: 20px;
+  }
+}
+
+.financial-fields {
+  border: 0;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+}
+.optional-inputs > summary {
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 650;
+}
+.optional-input-form {
+  margin-top: 20px;
+}
+.assessment-status {
+  padding: 12px 0;
+  color: #9ee2ca !important;
+}
+
+.field-warning {
+  display: block;
+  color: #eac75f;
+  font-size: 11px;
+  line-height: 1.5;
+  margin-top: 6px;
 }

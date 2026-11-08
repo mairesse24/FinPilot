@@ -22,7 +22,16 @@ class ToolCallRecord(BaseModel):
     summary: str
 
 
+class ChatDelivery(BaseModel):
+    mode: Literal['live','offline','fallback'] = 'offline'
+    provider: str = 'offline'
+    model: str | None = None
+    code: str | None = None
+    message: str = 'Local calculation-based assistant; no live AI request was made.'
+
+
 class ChatResult(BaseModel):
     reply: str
     tool_calls: list[ToolCallRecord]
     meta: Meta
+    delivery: ChatDelivery = Field(default_factory=ChatDelivery)

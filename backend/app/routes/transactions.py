@@ -1,10 +1,13 @@
 from datetime import date
 
-from fastapi import APIRouter, Depends, Query
+from decimal import Decimal
 
+from fastapi import APIRouter, Depends, HTTPException, Query
+
+from app.calc.models import FinancialProfile
 from app.db.repository import Repository
-from app.deps import get_repo, get_user_id
-from app.schemas.accounts import TransactionOut, TransactionsResult
+from app.deps import get_profile, get_repo, get_user_id
+from app.schemas.accounts import SavingsStressResult, TransactionOut, TransactionsResult
 
 router = APIRouter(prefix="/api", tags=["transactions"])
 
@@ -20,3 +23,18 @@ def transactions(limit: int = Query(50, ge=1, le=500), offset: int = Query(0, ge
     return TransactionsResult(items=[TransactionOut(id=t.id, account_id=t.account_id,
                                                     amount=t.amount, category=t.category,
                                                     date=t.date) for t in items], total=total)
+
+
+@router.post("/demo/savings-stress", response_model=SavingsStressResult)
+def savings_stress_demo(profile: FinancialProfile = Depends(get_profile)):
+    """Read-only judge demo: preview a purchase equal to 90% of savings."""
+    savings=sum((a.balance for a in profile.accounts if a.account_type=='savings'),Decimal(0))
+    if savings<=0:
+        raise HTTPException(status_code=422,detail="A savings balance is required for this demo.")
+    amount=(savings*Decimal('0.90')).quantize(Decimal('0.01'))
+    remaining=savings-amount
+    return SavingsStressResult(mode='simulation',executed=False,percentage=90,
+        purchase_amount=amount,savings_before=savings,savings_after=remaining,
+        alert={'id':'demo-savings-depletion','title':'Large savings purchase simulated','severity':'high',
+            'cause':f'A hypothetical ${amount:,.2f} purchase would use 90% of savings and leave ${remaining:,.2f}.',
+            'recommended_action':'Review emergency reserves and upcoming bills before making this purchase.'})

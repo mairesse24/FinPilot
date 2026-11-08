@@ -1,0 +1,167 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "as_of": "2026-11-08",
+  "repeats": 3,
+  "samples": [
+    {
+      "question": "health",
+      "sample": 1,
+      "success": false,
+      "error_category": "CopilotUnavailable",
+      "total_s": 22.7792,
+      "model_s": 19.644,
+      "composition_s": 0,
+      "tool_s": 0.0185,
+      "render_s": 0,
+      "model_calls": 1,
+      "tool_executions": 1
+    },
+    {
+      "question": "health",
+      "sample": 2,
+      "success": false,
+      "error_category": "CopilotUnavailable",
+      "total_s": 19.9474,
+      "model_s": 19.6291,
+      "composition_s": 0,
+      "tool_s": 0.0025,
+      "render_s": 0,
+      "model_calls": 1,
+      "tool_executions": 1
+    },
+    {
+      "question": "health",
+      "sample": 3,
+      "success": true,
+      "source": "model",
+      "reply_characters": 748,
+      "total_s": 9.0056,
+      "model_s": 8.652,
+      "composition_s": 6.6043,
+      "tool_s": 0.0044,
+      "render_s": 0.0005,
+      "model_calls": 3,
+      "tool_executions": 2
+    },
+    {
+      "question": "risk",
+      "sample": 1,
+      "success": true,
+      "source": "model",
+      "reply_characters": 843,
+      "total_s": 2.9611,
+      "model_s": 2.6583,
+      "composition_s": 1.5975,
+      "tool_s": 0.0014,
+      "render_s": 0.0001,
+      "model_calls": 2,
+      "tool_executions": 1
+    },
+    {
+      "question": "risk",
+      "sample": 2,
+      "success": true,
+      "source": "model",
+      "reply_characters": 843,
+      "total_s": 10.6505,
+      "model_s": 10.3045,
+      "composition_s": 6.7592,
+      "tool_s": 0.0007,
+      "render_s": 0.0002,
+      "model_calls": 2,
+      "tool_executions": 1
+    },
+    {
+      "question": "risk",
+      "sample": 3,
+      "success": true,
+      "source": "model",
+      "reply_characters": 843,
+      "total_s": 2.4202,
+      "model_s": 2.1076,
+      "composition_s": 0.7831,
+      "tool_s": 0.002,
+      "render_s": 0.0001,
+      "model_calls": 2,
+      "tool_executions": 1
+    },
+    {
+      "question": "simulation",
+      "sample": 1,
+      "success": false,
+      "error_category": "CopilotUnavailable",
+      "total_s": 12.8286,
+      "model_s": 12.5165,
+      "composition_s": 0.0379,
+      "tool_s": 0.011,
+      "render_s": 0,
+      "model_calls": 3,
+      "tool_executions": 2
+    },
+    {
+      "question": "simulation",
+      "sample": 2,
+      "success": false,
+      "error_category": "CopilotUnavailable",
+      "total_s": 20.0164,
+      "model_s": 19.7067,
+      "composition_s": 17.1447,
+      "tool_s": 0.006,
+      "render_s": 0,
+      "model_calls": 3,
+      "tool_executions": 2
+    },
+    {
+      "question": "simulation",
+      "sample": 3,
+      "success": false,
+      "error_category": "CopilotUnavailable",
+      "total_s": 11.5034,
+      "model_s": 11.1769,
+      "composition_s": 0.1229,
+      "tool_s": 0.0051,
+      "render_s": 0,
+      "model_calls": 3,
+      "tool_executions": 2
+    }
+  ],
+  "summary": {
+    "health": {
+      "successes": 1,
+      "median_s": 9.0056,
+      "median_model_calls": 3,
+      "median_model_s": 8.652,
+      "median_tool_s": 0.0044,
+      "median_composition_s": 6.6043,
+      "attempt_median_s": 19.9474,
+      "attempt_range_s": [
+        9.0056,
+        22.7792
+      ],
+      "failures": 2
+    },
+    "risk": {
+      "successes": 3,
+      "median_s": 2.9611,
+      "median_model_calls": 2,
+      "median_model_s": 2.6583,
+      "median_tool_s": 0.0014,
+      "median_composition_s": 1.5975,
+      "attempt_median_s": 2.9611,
+      "attempt_range_s": [
+        2.4202,
+        10.6505
+      ],
+      "failures": 0
+    },
+    "simulation": {
+      "successes": 0,
+      "attempt_median_s": 12.8286,
+      "attempt_range_s": [
+        11.5034,
+        20.0164
+      ],
+      "failures": 3
+    }
+  }
+}

@@ -2,10 +2,18 @@ import { useEffect, useState } from "react";
 import { get, type Context, type Dashboard, type Forecast } from "./api";
 import "./connected.css";
 import ReliabilityNotices from "./ReliabilityNotices";
+import AccountDetails from "./AccountDetails";
 import type { Notice } from "./api";
 
 const money = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+
+const methodLabel = (method?: string) => ({
+  moving_average_28: "Recent 28-day spending average",
+  rolling_average: "Recent spending average",
+  lightgbm: "LightGBM spending model",
+  baseline: "Baseline estimate",
+}[method ?? ""] ?? "Spending estimate");
 
 function BalanceChart({ forecast }: { forecast: Forecast }) {
   const rows = forecast.series;
@@ -67,6 +75,7 @@ function BalanceChart({ forecast }: { forecast: Forecast }) {
 
 export default function ConnectedDashboard({ page }: { page: string }) {
   const [days, setDays] = useState(30);
+  const [selectedAccounts, setSelectedAccounts] = useState<string | null>(null);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [context, setContext] = useState<Context | null>(null);
   const [forecast, setForecast] = useState<Forecast | null>(null);
@@ -97,7 +106,9 @@ export default function ConnectedDashboard({ page }: { page: string }) {
     setForecast(null);
     setForecastError("");
     get<Forecast>(`forecast?days=${days}`, controller.signal)
-      .then(f => { if (!controller.signal.aborted) setForecast(f); })
+      .then((f) => {
+        if (!controller.signal.aborted) setForecast(f);
+      })
       .catch((e) => {
         if (!controller.signal.aborted) setForecastError(String(e.message));
       });
@@ -118,52 +129,124 @@ export default function ConnectedDashboard({ page }: { page: string }) {
   const savings = dashboard.accounts
     .filter((a) => a.account_type === "savings")
     .reduce((s, a) => s + a.balance, 0);
-  const alerts = dashboard.active_alerts.filter(a => a.rule !== 'forecast_uncertain');
+  const loans = dashboard.accounts
+    .filter((a) => a.account_type === "loan")
+    .reduce((s, a) => s + a.balance, 0);
+  const cards = dashboard.accounts
+    .filter((a) => a.account_type === "credit_card")
+    .reduce((s, a) => s + a.balance, 0);
+  const alerts = dashboard.active_alerts.filter((a) => a.rule !== "forecast_uncertain");
   return (
     <div className="live-finance">
+      <AccountDetails
+        selected={selectedAccounts}
+        accounts={dashboard.accounts}
+        close={() => setSelectedAccounts(null)}
+      />
       <section className="welcome">
         <div>
           <span className="eyebrow">
             {context.as_of} · {context.data_source}
           </span>
           <h1>{page === "Overview" ? `Welcome, ${context.user.name}` : page}</h1>
-          <p>Synthetic financial prototype · {context.user.id} · not financial advice</p>
+          <p>Your accounts, cash flow and upcoming obligations in one place.</p>
         </div>
         <button onClick={() => setRetry((r) => r + 1)}>Reload analysis</button>
       </section>
       {context.loaded_at && (
-        <p>
-          Bank snapshot loaded {new Date(context.loaded_at).toLocaleString()}.
-        </p>
+        <p className="snapshot-time">Last bank-data sync: {new Date(context.loaded_at).toLocaleString()}</p>
       )}
-      <ReliabilityNotices groups={[
-        context.notices ?? [], dashboard.meta.notices ?? [], forecast?.meta.notices ?? [],
-        ...(!forecast?.meta.notices?.length && forecast?.status === "abstained" ? [[{
-          code: "forecast_unavailable", context: "analysis", category: "critical",
-          message: "Forecast abstained: more history is needed. Future balances are unavailable.",
-          technical_detail: forecast.meta.warning ?? "No observed history."
-        } as Notice]] : [])
-      ]} metas={[dashboard.meta, ...(forecast ? [forecast.meta] : [])]} />
+      <ReliabilityNotices
+        groups={[
+          context.notices ?? [],
+          dashboard.meta.notices ?? [],
+          forecast?.meta.notices ?? [],
+          ...(!forecast?.meta.notices?.length && forecast?.status === "abstained"
+            ? [
+                [
+                  {
+                    code: "forecast_unavailable",
+                    context: "analysis",
+                    category: "critical",
+                    message:
+                      "Forecast abstained: more history is needed. Future balances are unavailable.",
+                    technical_detail: forecast.meta.warning ?? "No observed history.",
+                  } as Notice,
+                ],
+              ]
+            : []),
+        ]}
+        metas={[dashboard.meta, ...(forecast ? [forecast.meta] : [])]}
+      />
       {page !== "Forecasts" && (
         <>
-          <section className="live-grid">
+          <section className="live-grid account-summary">
             {[
-              ["Net worth", dashboard.net_worth],
-              ["Checking", checking],
-              ["Savings", savings],
-              ["Liabilities owed", dashboard.liabilities],
-              ["Inflow · last 30 days", dashboard.income_30d],
-              ["Spending · last 30 days", dashboard.spending_30d],
-            ].map(([label, value]) => (
-              <article className="live-panel" key={String(label)}>
-                <p>{label}</p>
-                <strong className="live-value">{money(Number(value))}</strong>
-              </article>
+              {
+                label: "Net worth",
+                value: dashboard.net_worth,
+                filter: "all",
+                hint: "Assets minus recorded debt",
+              },
+              {
+                label: "Checking",
+                value: checking,
+                filter: "checking",
+                hint: "Every imported checking account",
+              },
+              {
+                label: "Savings",
+                value: savings,
+                filter: "savings",
+                hint: "Every imported savings account",
+              },
+              {
+                label: "Loans",
+                value: loans,
+                filter: "loan",
+                hint: "Outstanding recorded principal",
+              },
+              {
+                label: "Credit cards",
+                value: cards,
+                filter: "credit_card",
+                hint: "Recorded card balances owed",
+              },
+              {
+                label: "Liabilities owed",
+                value: dashboard.liabilities,
+                filter: "debt",
+                hint: "Loans and credit cards",
+              },
+            ].map((item) => (
+              <button
+                className="live-panel account-tile"
+                key={item.label}
+                onClick={() => setSelectedAccounts(item.filter)}
+              >
+                <span>
+                  <span>{item.label}</span>
+                  <span aria-hidden="true"> +</span>
+                </span>
+                <strong className="live-value">{money(item.value)}</strong>
+                <small>{item.hint}</small>
+              </button>
             ))}
           </section>
+          <div className="cash-strip">
+            <p>
+              Inflow - last 30 days <strong>{money(dashboard.income_30d)}</strong>
+            </p>
+            <p>
+              Spending - last 30 days <strong>{money(dashboard.spending_30d)}</strong>
+            </p>
+          </div>
           <section className="live-grid two">
             <article className="live-panel">
-              <h2>Accounts</h2>
+              <div className="live-row">
+                <h2>Accounts</h2>
+                <button onClick={() => setSelectedAccounts("all")}>View all accounts</button>
+              </div>
               {dashboard.accounts.length ? (
                 dashboard.accounts.map((a) => (
                   <div className="live-row" key={a.id}>
@@ -174,7 +257,12 @@ export default function ConnectedDashboard({ page }: { page: string }) {
                         {["credit_card", "loan"].includes(a.account_type) ? " · owed" : ""}
                       </small>
                     </span>
-                    <strong>{money(a.balance)}</strong>
+                    <button
+                      aria-label={`View ${a.name}`}
+                      onClick={() => setSelectedAccounts(a.account_type)}
+                    >
+                      {money(a.balance)}
+                    </button>
                   </div>
                 ))
               ) : (
@@ -211,9 +299,9 @@ export default function ConnectedDashboard({ page }: { page: string }) {
               ))}
             </article>
             <article className="live-panel">
-              <h2>Financial health · legacy v1</h2>
+              <h2>Financial health snapshot</h2>
               <strong className="live-value">{dashboard.health_score.toFixed(1)} / 100</strong>
-              <p>Internal heuristic, not a credit score. Data gaps can affect this assessment.</p>
+              <p>Estimate based on currently available account, spending and payment data.</p>
             </article>
           </section>
           <section className="live-panel">
@@ -251,13 +339,14 @@ export default function ConnectedDashboard({ page }: { page: string }) {
           </p>
         ) : !forecast ? (
           <p role="status">Calculating {days}-day forecast…</p>
-          ) : forecast.status === "abstained" ? (
-            <p>No balance path is shown because spending could not be estimated.</p>
+        ) : forecast.status === "abstained" ? (
+          <p>No balance path is shown because spending could not be estimated.</p>
         ) : (
           <>
             <p>
-              Estimate method: {forecast.meta.forecast_reliability?.method ?? forecast.meta.source} · As of {forecast.meta.as_of}. Scheduled income and
-              bills are combined with predicted variable spending.
+              Estimate method: {methodLabel(forecast.meta.forecast_reliability?.method)}{" "}
+              · As of {forecast.meta.as_of}. Scheduled income and bills are combined with estimated
+              variable spending.
             </p>
 
             <div className="live-grid">
@@ -278,12 +367,16 @@ export default function ConnectedDashboard({ page }: { page: string }) {
                 Safety buffer<strong className="live-value">{money(forecast.safety_buffer)}</strong>
               </p>
             </div>
-            {forecast.shortfall && (page === 'Forecasts' || !alerts.some(a => a.rule === 'low_projected_balance' || a.rule === 'low_balance')) && (
-              <p className="live-warning" role="alert">
-                Cash-shortage warning: checking is projected below your safety buffer during this
-                horizon. Review scheduled obligations and test optional spending reductions.
-              </p>
-            )}
+            {forecast.shortfall &&
+              (page === "Forecasts" ||
+                !alerts.some(
+                  (a) => a.rule === "low_projected_balance" || a.rule === "low_balance",
+                )) && (
+                <p className="live-warning" role="alert">
+                  Cash-shortage warning: checking is projected below your safety buffer during this
+                  horizon. Review scheduled obligations and test optional spending reductions.
+                </p>
+              )}
             <BalanceChart forecast={forecast} />
             <details>
               <summary>Forecast assumptions</summary>

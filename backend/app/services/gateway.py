@@ -7,6 +7,7 @@ from typing import Any, Callable, Literal
 from app.schemas.common import Meta, ForecastReliability, Notice
 
 log = logging.getLogger(__name__)
+PUBLIC_FALLBACK_WARNING = "Some insights are temporarily unavailable. Showing a backup estimate."
 
 
 @dataclass
@@ -35,16 +36,16 @@ class Gateway:
             if exc.name in (name, self.package):
                 fn = None
             else:
-                return self._fallback(baseline, args, kwargs, f"{name} failed to import: {exc}")
+                return self._fallback(baseline, args, kwargs, f"{name} import failed ({type(exc).__name__})")
         except Exception as exc:
-            return self._fallback(baseline, args, kwargs, f"{name} failed to import: {exc}")
+            return self._fallback(baseline, args, kwargs, f"{name} import failed ({type(exc).__name__})")
         if fn is None:
             value = baseline(*args, **kwargs)
             return self._outcome(value,'baseline')
         try:
             value = fn(*args, **kwargs)
         except Exception as exc:
-            return self._fallback(baseline, args, kwargs, f"{name}.{func} raised {exc!r}")
+            return self._fallback(baseline, args, kwargs, f"{name}.{func} failed ({type(exc).__name__})")
         if expect is not None and not isinstance(value, expect):
             return self._fallback(baseline, args, kwargs,
                                   f"{name}.{func} returned {type(value).__name__}, "
@@ -64,12 +65,11 @@ class Gateway:
     def _fallback(baseline, args, kwargs, warning: str) -> GatewayOutcome:
         log.warning(warning)
         value = baseline(*args, **kwargs)
-        own_warning = getattr(getattr(value,"meta",None),"warning",None)
         out=Gateway._outcome(value,'baseline')
-        out.warning=warning + ('; '+own_warning if own_warning else '')
+        out.warning=PUBLIC_FALLBACK_WARNING
         from app.services.notices import merge_notices
         out.notices=merge_notices(out.notices or [],[Notice(code='calculation_fallback',context='analysis',category='critical',
-            message='A calculation service was unavailable. A simpler method is being used; review its limitations.',technical_detail=warning)])
+            message=PUBLIC_FALLBACK_WARNING,technical_detail='An internal calculation provider failed; sensitive details were suppressed.')])
         return out
 
 

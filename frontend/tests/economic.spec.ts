@@ -1,13 +1,14 @@
 import { expect, test } from '@playwright/test';
 
-test('economic page displays actual API classification and missing-score state', async ({ page, request }) => {
+test('economic page displays actual API classification and automatic score', async ({ page, request }) => {
   const response = await request.get('/api/economy');
   expect(response.ok()).toBeTruthy();
   const economy = await response.json();
   await page.goto('/#/economic-lab');
   await expect(page.getByRole('heading', { name: `Economic conditions · ${economy.as_of}` })).toBeVisible();
   await expect(page.getByText(economy.status, { exact: true })).toBeVisible();
-  await expect(page.getByText('Score withheld — confirmation needed', { exact: true })).toBeVisible();
+  await expect(page.getByText('Automatic financial health estimate', { exact: true })).toBeVisible();
+  await expect(page.getByRole('img', { name: /Financial health score: .* out of 100/ })).toBeVisible();
   expect(economy.method).not.toContain('accuracy');
 });
 
@@ -20,6 +21,7 @@ test('confirmed synthetic customer facts produce actual score and deterministic 
   const health = await api.json();
   expect(health.score).not.toBeNull();
   await page.goto('/#/health-score');
+  await page.getByText('Review or correct imported assumptions', { exact: false }).click();
   for (const [label, value] of [['Monthly take-home income', '4200'], ['Monthly essential cash expenses', '1900'],
     ['Monthly discretionary cash expenses', '400'], ['Monthly required debt payments', '185'], ['Accessible emergency savings', '600']]) {
     await page.getByLabel(label, { exact: true }).fill(value);

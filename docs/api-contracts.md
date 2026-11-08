@@ -10,7 +10,8 @@ Example files below are real baseline responses for the demo customer (as_of 202
 | GET | `/api/dashboard` | `user_id` | `DashboardResult` | `examples/dashboard.json` |
 | GET | `/api/context` | `user_id` | `{user: {id, name}, as_of, data_source, warnings, loaded_at, synthetic}` | Source metadata; no secrets |
 | GET | `/api/economy` | `user_id` | Dated indicators, features, dimensions, source errors, evidence coverage | Cached real data; no implicit refresh |
-| GET | `/api/financial-health` | `user_id` | Explicitly versioned v2 assessment; missing facts withhold score | Legacy `/api/health` unchanged |
+| GET | `/api/financial-health` | `user_id` | Automatic `observed_score` plus explicitly versioned confirmed-input v2 assessment | `score` remains nullable when confirmed facts are incomplete; legacy `/api/health` unchanged |
+| GET | `/api/financial-inputs` | `user_id` | Scoped savings balance, minimum expense budgets, dated debt, normalized income and payment calendar | Form validation helpers; no inferred bank facts |
 | POST | `/api/financial-health/assess` | `{facts: FinancialFacts}` | V2 score/components/completeness/metrics | Confirmed assumptions, not bank writes |
 | POST | `/api/resilience` | `{facts: FinancialFacts}` | Separate personal assessment, economy and contextual/financial alerts | No macro penalty applied to score |
 | POST | `/api/economic-simulate` | `{facts, scenario: EconomicScenario}` | Before/after cash plans, scores, alerts, explanations, net-worth change | Deterministic 30-day planning |
@@ -24,6 +25,18 @@ Example files below are real baseline responses for the demo customer (as_of 202
 
 Schema classes live in `backend/app/schemas/`.
 
+`ChatResult.delivery` adds `mode` (`live`, `offline`, `fallback`), `provider`,
+optional `model`/`code`, and a sanitized `message`. A successful HTTP 200 containing
+a local response is not evidence that the external AI provider worked. Show delivery
+status alongside the reply; `quota_exhausted` specifically indicates the provider
+reported a billing/quota failure. No raw provider error or API key belongs in this field.
+
+Assessment/resilience/simulation domain validation errors return 422 with string
+`detail` and optional `field_errors: {field_name: message}`. Clients should display
+these beside the corresponding input. Pydantic schema failures retain FastAPI's
+standard array-valued `detail`. Account objects add optional `apr` (fractional
+annual rate), `min_payment` and `credit_limit`; absent values remain null.
+
 Economic/financial v2 request classes live in `intelligence/personal_finance.py`
 and `intelligence/resilience.py`. Facts are per-request, explicitly confirmed
 assumptions; they are not persisted. New assessment routes may read up to one
@@ -32,6 +45,12 @@ diagnostics. Legacy profile lookbacks and score definitions are preserved.
 `POST /api/chat` accepts optional `financial_facts` with the same schema and
 passes them to scoped calculation tools. Unqualified score questions now name
 v2 explicitly; asking for a legacy score preserves the v1 calculation.
+The read-only `evaluate_purchase` tool compares a stated price with checking,
+savings, liabilities and net worth. When `down_payment`, `apr_percent` and
+`term_months` are all supplied, it calculates standard fixed-rate amortization,
+total loan payments, interest, the down-payment liquidity gap and payment share
+of scheduled deposits. It never invents taxes, fees, insurance, maintenance,
+fuel or depreciation; those remain explicit exclusions.
 No tool accepts a different customer's identifier. This remains a synthetic-data
 prototype; demo selection is not production authentication.
 

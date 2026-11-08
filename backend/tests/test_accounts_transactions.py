@@ -32,6 +32,20 @@ def test_empty_profile_no_crash(client):
     assert client.get(f"/api/transactions?user_id={EMPTY_UID}").json() == {"items": [], "total": 0}
 
 
+def test_ninety_percent_savings_demo_is_read_only_and_returns_notification(client):
+    dashboard = client.get("/api/dashboard").json()
+    before = sum(a["balance"] for a in dashboard["accounts"] if a["account_type"] == "savings")
+    response = client.post("/api/demo/savings-stress")
+    assert response.status_code == 200
+    result = response.json()
+    assert result["mode"] == "simulation" and result["executed"] is False
+    assert result["percentage"] == 90
+    assert result["savings_after"] == round(before * 0.1, 2)
+    assert result["alert"]["severity"] == "high"
+    after = client.get("/api/dashboard").json()
+    assert sum(a["balance"] for a in after["accounts"] if a["account_type"] == "savings") == before
+
+
 def test_default_app_boots_without_database_with_demo_data(settings):
     from fastapi.testclient import TestClient
     from app.data.synthetic import DEMO_USER_ID
