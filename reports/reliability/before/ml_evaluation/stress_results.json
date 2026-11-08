@@ -1,0 +1,252 @@
+[
+  {
+    "case": "BASE",
+    "type": "reference",
+    "source": "baseline",
+    "warning": null,
+    "spending_total": 600.0,
+    "projected_min": 500.0,
+    "ending_balance": 4300.0,
+    "health_score": 76.98,
+    "alerts": [
+      "emergency_savings"
+    ],
+    "reconciliation_residual": 0.0,
+    "crashed": false,
+    "finite_outputs": true,
+    "score_bounded": true,
+    "ending_change": 0.0,
+    "health_change": 0.0,
+    "invariants_pass": true
+  },
+  {
+    "case": "A_income_minus_30pct",
+    "type": "deterministic",
+    "source": "baseline",
+    "warning": null,
+    "spending_total": 600.0,
+    "projected_min": 500.0,
+    "ending_balance": 3040.0,
+    "health_score": 76.98,
+    "alerts": [
+      "emergency_savings"
+    ],
+    "reconciliation_residual": 0.0,
+    "crashed": false,
+    "finite_outputs": true,
+    "score_bounded": true,
+    "ending_change": -1260.0,
+    "health_change": 0.0,
+    "invariants_pass": true
+  },
+  {
+    "case": "B_emergency_1500",
+    "type": "deterministic",
+    "source": "baseline",
+    "warning": null,
+    "spending_total": 600.0,
+    "projected_min": -1000.0,
+    "ending_balance": 2800.0,
+    "health_score": 65.48,
+    "alerts": [
+      "low_balance",
+      "emergency_savings",
+      "payment_pressure"
+    ],
+    "reconciliation_residual": 0.0,
+    "crashed": false,
+    "finite_outputs": true,
+    "score_bounded": true,
+    "ending_change": -1500.0,
+    "health_change": -11.5,
+    "invariants_pass": true
+  },
+  {
+    "case": "C_essential_cost_plus_20pct",
+    "type": "deterministic",
+    "source": "baseline",
+    "warning": null,
+    "spending_total": 660.0,
+    "projected_min": 140.0,
+    "ending_balance": 3900.0,
+    "health_score": 76.16,
+    "alerts": [
+      "low_balance",
+      "emergency_savings"
+    ],
+    "reconciliation_residual": 0.0,
+    "crashed": false,
+    "finite_outputs": true,
+    "score_bounded": true,
+    "ending_change": -400.0,
+    "health_change": -0.82,
+    "invariants_pass": true
+  },
+  {
+    "case": "D_discretionary_surge_week",
+    "type": "future stress assumption, not accuracy",
+    "source": "baseline",
+    "warning": null,
+    "spending_total": 1300.0,
+    "projected_min": -200.0,
+    "ending_balance": 3600.0,
+    "health_score": 76.98,
+    "alerts": [
+      "low_balance",
+      "emergency_savings",
+      "payment_pressure"
+    ],
+    "reconciliation_residual": 0.0,
+    "crashed": false,
+    "finite_outputs": true,
+    "score_bounded": true,
+    "ending_change": -700.0,
+    "health_change": 0.0,
+    "invariants_pass": true
+  },
+  {
+    "case": "D2_observed_recent_surge",
+    "type": "ML out-of-distribution / history shock",
+    "source": "baseline",
+    "warning": "Spending occurs much more frequently than in training data; using an unvalidated rolling-average fallback instead of the synthetic-calendar model.",
+    "spending_total": 1184.35,
+    "projected_min": 352.87,
+    "ending_balance": 3715.65,
+    "health_score": 76.14,
+    "alerts": [
+      "low_balance",
+      "emergency_savings"
+    ],
+    "reconciliation_residual": 0.0,
+    "crashed": false,
+    "finite_outputs": true,
+    "score_bounded": true,
+    "ending_change": -584.35,
+    "health_change": -0.84,
+    "invariants_pass": true
+  },
+  {
+    "case": "E_delayed_paycheck",
+    "type": "deterministic",
+    "source": "baseline",
+    "warning": null,
+    "spending_total": 600.0,
+    "projected_min": 100.0,
+    "ending_balance": 100.0,
+    "health_score": 76.98,
+    "alerts": [
+      "low_balance",
+      "emergency_savings"
+    ],
+    "reconciliation_residual": 0.0,
+    "crashed": false,
+    "finite_outputs": true,
+    "score_bounded": true,
+    "ending_change": -4200.0,
+    "health_change": 0.0,
+    "invariants_pass": true
+  },
+  {
+    "case": "F_clustered_bills",
+    "type": "deterministic",
+    "source": "baseline",
+    "warning": null,
+    "spending_total": 600.0,
+    "projected_min": 500.0,
+    "ending_balance": 4300.0,
+    "health_score": 76.98,
+    "alerts": [
+      "emergency_savings"
+    ],
+    "reconciliation_residual": 0.0,
+    "crashed": false,
+    "finite_outputs": true,
+    "score_bounded": true,
+    "ending_change": 0.0,
+    "health_change": 0.0,
+    "invariants_pass": true
+  },
+  {
+    "case": "G_one_history_day",
+    "type": "ML out-of-distribution / cold start",
+    "source": "baseline",
+    "warning": "intelligence.forecast.forecast raised ValueError('Provide at least 29 consecutive daily observations for one customer')",
+    "spending_total": 6.16,
+    "projected_min": 698.46,
+    "ending_balance": 4893.84,
+    "health_score": 79.14,
+    "alerts": [
+      "emergency_savings"
+    ],
+    "reconciliation_residual": 0.0,
+    "crashed": false,
+    "finite_outputs": true,
+    "score_bounded": true,
+    "ending_change": 593.84,
+    "health_change": 2.16,
+    "invariants_pass": true
+  },
+  {
+    "case": "H_irregular_income_assumption",
+    "type": "deterministic known events; uncertainty unsupported",
+    "source": "baseline",
+    "warning": null,
+    "spending_total": 600.0,
+    "projected_min": 680.0,
+    "ending_balance": 3100.0,
+    "health_score": 76.98,
+    "alerts": [
+      "emergency_savings"
+    ],
+    "reconciliation_residual": 0.0,
+    "crashed": false,
+    "finite_outputs": true,
+    "score_bounded": true,
+    "ending_change": -1200.0,
+    "health_change": 0.0,
+    "invariants_pass": true
+  },
+  {
+    "case": "I_high_debt",
+    "type": "deterministic",
+    "source": "baseline",
+    "warning": null,
+    "spending_total": 600.0,
+    "projected_min": -2000.0,
+    "ending_balance": 1800.0,
+    "health_score": 22.95,
+    "alerts": [
+      "low_balance",
+      "emergency_savings",
+      "debt_burden",
+      "payment_pressure"
+    ],
+    "reconciliation_residual": 0.0,
+    "crashed": false,
+    "finite_outputs": true,
+    "score_bounded": true,
+    "ending_change": -2500.0,
+    "health_change": -54.03,
+    "invariants_pass": true
+  },
+  {
+    "case": "J_zero_refund_transfer",
+    "type": "ML distribution shift and accounting",
+    "source": "model",
+    "warning": null,
+    "spending_total": 9.67,
+    "projected_min": 700.0,
+    "ending_balance": 4890.33,
+    "health_score": 79.24,
+    "alerts": [
+      "emergency_savings"
+    ],
+    "reconciliation_residual": 0.0,
+    "crashed": false,
+    "finite_outputs": true,
+    "score_bounded": true,
+    "ending_change": 590.33,
+    "health_change": 2.26,
+    "invariants_pass": true
+  }
+]

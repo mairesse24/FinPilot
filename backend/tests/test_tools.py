@@ -13,7 +13,8 @@ def test_registry_specs_are_valid_function_schemas():
     specs = reg().specs()
     assert {s["function"]["name"] for s in specs} == {
         "get_accounts_summary", "get_health_score", "get_forecast",
-        "get_guardian_alerts", "run_simulation"}
+        "get_guardian_alerts", "run_simulation","get_economic_conditions","get_financial_assessment",
+        "get_economic_resilience","run_economic_simulation"}
     for s in specs:
         assert s["type"] == "function" and s["function"]["description"]
         assert s["function"]["parameters"]["type"] == "object"

@@ -1,6 +1,8 @@
-export type Meta = { source: string; as_of: string; warning: string | null };
+export type Notice = { code: string; context: string; category: 'critical' | 'data_limitation' | 'diagnostic'; message: string; technical_detail: string };
+export type Meta = { source: string; as_of: string; warning: string | null; notices?: Notice[]; forecast_reliability?: { method: string; status: string; validation: string; reasons: string[] } | null };
 export type Alert = {
   id: string;
+  rule?: string;
   title: string;
   severity: string;
   cause: string;
@@ -20,6 +22,7 @@ export type Dashboard = {
   meta: Meta;
 };
 export type Forecast = {
+  status?: "estimated" | "limited_history" | "abstained";
   days: number;
   safety_buffer: number;
   shortfall: boolean;
@@ -39,11 +42,12 @@ export type Context = {
   as_of: string;
   data_source: string;
   warnings: string[];
+  notices?: Notice[];
   loaded_at: string | null;
 };
 
 export async function get<T>(path: string, signal: AbortSignal): Promise<T> {
-  const response = await fetch(`/api/${path}`, { signal });
+  const response = await fetch(`/api/${path}`, { signal, cache: 'no-store' });
   if (!response.ok)
     throw new Error(
       `API ${response.status}: unable to load ${path.split("?")[0]}. Check backend configuration.`,

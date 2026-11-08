@@ -15,6 +15,28 @@ class Meta(BaseModel):
     as_of: date
     generated_at: datetime
     warning: str | None = None
+    notices: list['Notice'] = Field(default_factory=list)
+    forecast_reliability: 'ForecastReliability | None' = None
+
+
+class Notice(BaseModel):
+    code: str
+    context: str
+    category: Literal['critical', 'data_limitation', 'diagnostic']
+    message: str
+    technical_detail: str
+
+
+class ForecastReliability(BaseModel):
+    method: str
+    status: Literal['estimated', 'limited_history', 'abstained']
+    validation: Literal['unvalidated', 'synthetic_evaluated', 'unavailable']
+    reasons: list[str] = Field(default_factory=list)
+    support_check: dict = Field(default_factory=dict)
+    interval: str = 'Uncalibrated balance stress envelope; no coverage guarantee.'
+
+
+Meta.model_rebuild()
 
 
 class SpendingCut(BaseModel):

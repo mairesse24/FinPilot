@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import ConnectedDashboard from './ConnectedDashboard';
+import EconomicIntelligence from './EconomicIntelligence';
 import {
   ArrowRight,
   BarChart3,
@@ -714,7 +715,7 @@ export default function App() {
         </header>
 
         <div className="dashboard">
-{["Overview", "My Finances", "Forecasts", "Guardian", "Health Score"].includes(active) ? <ConnectedDashboard page={active} /> : active === "Overview" ? <>
+{["Economic Lab", "Health Score", "Digital Twin", "AI Co-Pilot"].includes(active) ? <EconomicIntelligence page={active} /> : ["Overview", "My Finances", "Forecasts", "Guardian", "FinPilot Wrapped"].includes(active) ? <ConnectedDashboard page={active} /> : active === "Overview" ? <>
           <section className="welcome">
             <div>
               <span className="eyebrow">Saturday, November 7</span>

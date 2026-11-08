@@ -1,0 +1,7 @@
+{
+  "seed": 20261003,
+  "profiles": 60,
+  "policy_sha256": "14ab1845bdccf80888b2ff6aa9108484f171281f460c3cc5b1f30f0ddee003c0",
+  "production_interval_parity": "PASS",
+  "fitting_performed": false
+}

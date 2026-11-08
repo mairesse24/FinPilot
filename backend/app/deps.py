@@ -1,4 +1,6 @@
 from datetime import date
+from datetime import timedelta
+from dataclasses import replace
 
 from fastapi import Depends, HTTPException, Query, Request
 
@@ -40,4 +42,12 @@ def get_profile(uid: str = Depends(get_user_id), repo: Repository = Depends(get_
     profile = repo.load_profile(uid, as_of)
     if profile is None:
         raise HTTPException(404, f"user '{uid}' not found")
-    return profile
+    return replace(profile,data_warnings=tuple(getattr(repo,'warnings',[])))
+
+
+def get_assessment_profile(p:FinancialProfile=Depends(get_profile),repo:Repository=Depends(get_repo)) -> FinancialProfile:
+    """Longer owned history for six-month diagnostics; legacy API lookback is unchanged."""
+    txs,total=repo.list_transactions(p.user.id,limit=20000,offset=0,
+        date_from=p.as_of-timedelta(days=366),date_to=p.as_of)
+    if total>len(txs):raise HTTPException(422,'Assessment history exceeds safe read limit; completeness is not established')
+    return replace(p,transactions=sorted(txs,key=lambda t:(t.date,t.id)))

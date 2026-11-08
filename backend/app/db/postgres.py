@@ -15,7 +15,7 @@ _USER = "id::text AS id, name, email, safety_buffer"
 _ACCOUNT = ("id::text AS id, user_id::text AS user_id, name, account_type, balance, apr, "
             "min_payment, credit_limit")
 _TX = "t.id::text AS id, t.account_id::text AS account_id, t.amount, t.category, t.date"
-_BILL = "id::text AS id, user_id::text AS user_id, name, amount, category, frequency, due_date"
+_BILL = "id::text AS id, user_id::text AS user_id, name, amount, category, frequency, due_date, to_jsonb(recurring_bills)->>'liability_account_id' AS liability_account_id"
 _INCOME = "id::text AS id, user_id::text AS user_id, name, amount, frequency, next_pay_date"
 
 
@@ -118,6 +118,10 @@ class PgRepository:
                 "due_date) VALUES (%s,%s,%s,%s,%s,%s,%s)",
                 [(b.id, b.user_id, b.name, b.amount, b.category, b.frequency, b.due_date)
                  for b in ds.bills])
+            for bill in ds.bills:
+                if bill.liability_account_id:
+                    cur.execute("UPDATE recurring_bills SET liability_account_id=%s::uuid WHERE id=%s::uuid",
+                                (bill.liability_account_id,bill.id))
             cur.executemany(
                 "INSERT INTO income_sources (id, user_id, name, amount, frequency, next_pay_date) "
                 "VALUES (%s,%s,%s,%s,%s,%s)",

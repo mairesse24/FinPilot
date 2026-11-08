@@ -50,6 +50,8 @@ def test_cut_only_touches_discretionary():
     assert abs(cut - 100) <= D("0.5")
 
 
-def test_empty_profile_simulation_is_zero_delta():
+def test_empty_profile_simulation_withholds_unknown_cash_delta():
     r = simulate(empty_profile(), SpendingCut(reduction_amount=D("100")))
-    assert set(r.delta.values()) == {0.0}
+    assert r.delta['end_balance_change'] is None
+    assert r.delta['low_balance_change'] is None
+    assert r.delta['health_score_change'] == 0

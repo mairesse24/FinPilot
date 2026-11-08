@@ -1,0 +1,45 @@
+{
+  "baseline": "reports/reliability/before/",
+  "source_transaction_sha256": "dc8f21d10b1b3a428f7ec69bacbe8ea288730f6ae591fb69be2904de9930805d",
+  "production_model_sha256_unchanged": {
+    "lower": "f05d1e72ecbb8e707f6ab77a60f159280838ce8246287658e159b5cc0cc1b949",
+    "median": "6ad216fc9b4231ea1084fb0279317d5812af7a98947a63d5d263cf42d3340ed4",
+    "upper": "3a679c1553ddf6562366b01c1e11c97237207449febb0c9f4352e91e757c35f4"
+  },
+  "calibration_policy": {
+    "nominal_positive_coverage": 0.8,
+    "overall_nominal_coverage": null,
+    "groups": {
+      "calendar_supported": {
+        "q": 0.013124845225881898,
+        "positive_rows": 96,
+        "profiles": 6
+      },
+      "frequent": {
+        "q": 0.1784012229116086,
+        "positive_rows": 589,
+        "profiles": 30
+      },
+      "irregular_sparse": {
+        "q": 1.939519768911356,
+        "positive_rows": 189,
+        "profiles": 30
+      }
+    },
+    "model_sha256": {
+      "lower": "f05d1e72ecbb8e707f6ab77a60f159280838ce8246287658e159b5cc0cc1b949",
+      "median": "6ad216fc9b4231ea1084fb0279317d5812af7a98947a63d5d263cf42d3340ed4",
+      "upper": "3a679c1553ddf6562366b01c1e11c97237207449febb0c9f4352e91e757c35f4"
+    },
+    "calibration_seeds": [
+      20261001
+    ],
+    "final_seed": 20261002,
+    "limitations": "Empirical positive-spending residual calibration; temporally dependent rows. No exchangeability or real-world coverage guarantee. Sparse mass at zero prevents overall exact 80% when zero and >=80% positives are both covered."
+  },
+  "test_suite": {
+    "passed": 182,
+    "skipped": 1,
+    "failures": 0
+  }
+}

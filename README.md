@@ -1,6 +1,19 @@
 # FinPilot (FinSight AI)
 
 AI-powered financial resilience platform for HackUTD 2026 (PNC 360° Financial Health Navigator).
+
+Latest reliability fixes and measured comparisons:
+[BEFORE_AFTER_EVALUATION.md](BEFORE_AFTER_EVALUATION.md).
+
+Economic Intelligence v2: add `FRED_API_KEY` privately to root `.env`, install
+`requirements-economy.txt`, then run
+`.venv/Scripts/python.exe -m scripts.refresh_intelligence`. Open **Economic Lab**
+or **Health Score** in the frontend to view dated real indicators, confirm the
+required financial inputs and run deterministic stress scenarios. The v2 score
+is withheld until inputs are sufficient; `/api/health` remains the explicitly
+legacy v1 score. Methodology and executed results are in
+[docs/ECONOMIC_CLASSIFICATION_METHODOLOGY.md](docs/ECONOMIC_CLASSIFICATION_METHODOLOGY.md)
+and [docs/FINANCIAL_SCORE_VALIDATION.md](docs/FINANCIAL_SCORE_VALIDATION.md).
 Flow: **Detect** (Guardian) → **Simulate** (Digital Twin) → **Recommend** (Copilot).
 All data is synthetic. Forecasts are prototype estimates. Nothing moves money.
 

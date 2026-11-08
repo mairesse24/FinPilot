@@ -42,6 +42,7 @@ class Bill:
     category: str
     frequency: str  # weekly | biweekly | monthly
     due_date: date
+    liability_account_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -62,3 +63,4 @@ class FinancialProfile:
     transactions: list[Transaction] = field(default_factory=list)
     bills: list[Bill] = field(default_factory=list)
     income_sources: list[IncomeSource] = field(default_factory=list)
+    data_warnings: tuple[str, ...] = ()

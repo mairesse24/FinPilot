@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -19,6 +20,7 @@ class ProjectedLow(BaseModel):
 
 
 class ForecastResult(BaseModel):
+    status: Literal["estimated", "limited_history", "abstained"] = "estimated"
     days: int
     series: list[ForecastPoint]
     projected_low: ProjectedLow | None

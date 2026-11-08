@@ -1,0 +1,38 @@
+[
+  {
+    "cohort": "final_independent",
+    "quantity": "model_minus_calendar_MAE",
+    "mean": -4.190511111111112,
+    "cluster_95_CI": [
+      -7.151068472222225,
+      -0.8694954166666681
+    ]
+  },
+  {
+    "cohort": "final_independent",
+    "quantity": "model_minus_rolling_MAE",
+    "mean": -0.8394888888888891,
+    "cluster_95_CI": [
+      -4.155175555555556,
+      2.9315072222222183
+    ]
+  },
+  {
+    "cohort": "final_pnc",
+    "quantity": "model_minus_calendar_MAE",
+    "mean": 0.23222222222222286,
+    "cluster_95_CI": [
+      -0.34594444444444455,
+      0.725481481481483
+    ]
+  },
+  {
+    "cohort": "final_pnc",
+    "quantity": "model_minus_rolling_MAE",
+    "mean": -125.45349999999998,
+    "cluster_95_CI": [
+      -190.43768518518516,
+      -76.7922962962963
+    ]
+  }
+]

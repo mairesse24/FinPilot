@@ -1,0 +1,17 @@
+series,publisher,units,frequency,adjustment,latest_observation,value,initial_release_date,knowledge_date
+CPIAUCSL,BLS,Index 1982-1984=100,Monthly,Seasonally Adjusted,2026-09-01,336.298,2026-10-14,2026-11-07
+CPILFESL,BLS,Index 1982-1984=100,Monthly,Seasonally Adjusted,2026-09-01,338.896,2026-10-14,2026-11-07
+PCEPI,BEA,Index 2017=100,Monthly,Seasonally Adjusted,2026-09-01,132.257,2026-10-29,2026-11-07
+UNRATE,BLS,Percent,Monthly,Seasonally Adjusted,2026-10-01,4.1,2026-11-06,2026-11-07
+ICSA,US Department of Labor,Number,"Weekly, Ending Saturday",Seasonally Adjusted,2026-10-31,189000.0,2026-11-05,2026-11-07
+FEDFUNDS,Federal Reserve Board,Percent,Monthly,Not Seasonally Adjusted,2026-10-01,3.88,2026-11-02,2026-11-07
+DGS10,Federal Reserve Board,Percent,Daily,Not Seasonally Adjusted,2026-11-05,4.84,,2026-11-07
+DGS2,Federal Reserve Board,Percent,Daily,Not Seasonally Adjusted,2026-11-05,4.46,,2026-11-07
+T10Y2Y,Federal Reserve Bank of St. Louis,Percent,Daily,Not Seasonally Adjusted,2026-11-06,0.35,,2026-11-07
+INDPRO,Federal Reserve Board,Index 2017=100,Monthly,Seasonally Adjusted,2026-09-01,103.9506,2026-10-16,2026-11-07
+RSAFS,US Census Bureau,Millions of Dollars,Monthly,Seasonally Adjusted,2026-09-01,745021.0,2026-10-15,2026-11-07
+GDPC1,BEA,Billions of Chained 2017 Dollars,Quarterly,Seasonally Adjusted Annual Rate,2026-07-01,24611.077,2026-10-29,2026-11-07
+BAMLH0A0HYM2,ICE Data Indices,Percent,"Daily, Close",Not Seasonally Adjusted,2026-11-05,3.48,2026-11-05,2026-11-07
+SAHMREALTIME,Claudia Sahm,Percentage Points,Monthly,Seasonally Adjusted,2026-10-01,0.0,2026-11-06,2026-11-07
+SP500,S&P Dow Jones Indices,Index,"Daily, Close",Not Seasonally Adjusted,2026-11-05,7353.73,,2026-11-07
+VIXCLS,CBOE,Index,"Daily, Close",Not Seasonally Adjusted,2026-11-05,28.18,,2026-11-07

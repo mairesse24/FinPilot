@@ -8,7 +8,7 @@ from tests.factories import AS_OF, UID, empty_profile, make_profile
 
 def test_weekday_profile_means():
     # 90 days back from AS_OF; put 10 on every Monday only
-    txs = [Transaction(f"m{i}", "a", D("-10"), "dining", AS_OF - timedelta(days=i))
+    txs = [Transaction(f"m{i}", "a-chk", D("-10"), "dining", AS_OF - timedelta(days=i))
            for i in range(90) if (AS_OF - timedelta(days=i)).weekday() == 0]
     means, sigma = weekday_spend_profile(make_profile(transactions=txs))
     assert means[0] == D("10") and means[1] == D("0") and sigma > 0
@@ -20,7 +20,7 @@ def test_series_length_matches_days():
 
 def test_band_widens_with_horizon():
     s = forecast(make_profile(transactions=[
-        Transaction("x", "a", D("-50"), "dining", AS_OF - timedelta(days=2))]), 30).series
+        Transaction("x", "a-chk", D("-50"), "dining", AS_OF - timedelta(days=2))]), 30).series
     widths = [x.high - x.low for x in s]
     assert widths[-1] > widths[0]
 
@@ -39,7 +39,7 @@ def test_shortfall_flag_vs_safety_buffer():
 
 def test_empty_profile_forecast_is_flat_and_no_shortfall_crash():
     f = forecast(empty_profile(), 7)
-    assert {s.projected_balance for s in f.series} == {D("0")}
+    assert f.series == [] and f.status == "abstained"
     assert f.shortfall is True  # 0 < default buffer; just must not crash
 
 

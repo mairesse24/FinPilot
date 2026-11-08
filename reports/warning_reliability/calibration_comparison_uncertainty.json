@@ -1,0 +1,20 @@
+[
+  {
+    "group": "frequent",
+    "profiles": 30,
+    "lightgbm_minus_rolling30_daily_mae": 12.35476666666667,
+    "customer_bootstrap95": [
+      6.638177777777779,
+      18.417171666666665
+    ]
+  },
+  {
+    "group": "irregular_sparse",
+    "profiles": 30,
+    "lightgbm_minus_rolling30_daily_mae": -8.390122222222223,
+    "customer_bootstrap95": [
+      -10.932498333333331,
+      -5.927208055555556
+    ]
+  }
+]

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { get, type Context, type Dashboard, type Forecast } from "./api";
 import "./connected.css";
+import ReliabilityNotices from "./ReliabilityNotices";
+import type { Notice } from "./api";
 
 const money = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
@@ -81,6 +83,7 @@ export default function ConnectedDashboard({ page }: { page: string }) {
       get<Context>("context", controller.signal),
     ])
       .then(([d, c]) => {
+        if (controller.signal.aborted) return;
         setDashboard(d);
         setContext(c);
       })
@@ -94,7 +97,7 @@ export default function ConnectedDashboard({ page }: { page: string }) {
     setForecast(null);
     setForecastError("");
     get<Forecast>(`forecast?days=${days}`, controller.signal)
-      .then(setForecast)
+      .then(f => { if (!controller.signal.aborted) setForecast(f); })
       .catch((e) => {
         if (!controller.signal.aborted) setForecastError(String(e.message));
       });
@@ -115,7 +118,7 @@ export default function ConnectedDashboard({ page }: { page: string }) {
   const savings = dashboard.accounts
     .filter((a) => a.account_type === "savings")
     .reduce((s, a) => s + a.balance, 0);
-  const alerts = dashboard.active_alerts;
+  const alerts = dashboard.active_alerts.filter(a => a.rule !== 'forecast_uncertain');
   return (
     <div className="live-finance">
       <section className="welcome">
@@ -130,21 +133,17 @@ export default function ConnectedDashboard({ page }: { page: string }) {
       </section>
       {context.loaded_at && (
         <p>
-          Bank snapshot loaded {new Date(context.loaded_at).toLocaleString()}. Restart backend to
-          refresh bank records.
+          Bank snapshot loaded {new Date(context.loaded_at).toLocaleString()}.
         </p>
       )}
-      {context.warnings.length > 0 && (
-        <details className="live-panel">
-          <summary>Data coverage and assumptions · {context.warnings.length} notices</summary>
-          {context.warnings.map((w) => (
-            <p className="live-warning" key={w}>
-              {w}
-            </p>
-          ))}
-        </details>
-      )}
-      {dashboard.meta.warning && <p className="live-warning">{dashboard.meta.warning}</p>}
+      <ReliabilityNotices groups={[
+        context.notices ?? [], dashboard.meta.notices ?? [], forecast?.meta.notices ?? [],
+        ...(!forecast?.meta.notices?.length && forecast?.status === "abstained" ? [[{
+          code: "forecast_unavailable", context: "analysis", category: "critical",
+          message: "Forecast abstained: more history is needed. Future balances are unavailable.",
+          technical_detail: forecast.meta.warning ?? "No observed history."
+        } as Notice]] : [])
+      ]} metas={[dashboard.meta, ...(forecast ? [forecast.meta] : [])]} />
       {page !== "Forecasts" && (
         <>
           <section className="live-grid">
@@ -212,7 +211,7 @@ export default function ConnectedDashboard({ page }: { page: string }) {
               ))}
             </article>
             <article className="live-panel">
-              <h2>Financial health</h2>
+              <h2>Financial health · legacy v1</h2>
               <strong className="live-value">{dashboard.health_score.toFixed(1)} / 100</strong>
               <p>Internal heuristic, not a credit score. Data gaps can affect this assessment.</p>
             </article>
@@ -252,13 +251,15 @@ export default function ConnectedDashboard({ page }: { page: string }) {
           </p>
         ) : !forecast ? (
           <p role="status">Calculating {days}-day forecast…</p>
+          ) : forecast.status === "abstained" ? (
+            <p>No balance path is shown because spending could not be estimated.</p>
         ) : (
           <>
             <p>
-              Engine: {forecast.meta.source} · As of {forecast.meta.as_of}. Scheduled income and
+              Estimate method: {forecast.meta.forecast_reliability?.method ?? forecast.meta.source} · As of {forecast.meta.as_of}. Scheduled income and
               bills are combined with predicted variable spending.
             </p>
-            {forecast.meta.warning && <p className="live-warning">{forecast.meta.warning}</p>}
+
             <div className="live-grid">
               <p>
                 Ending checking
@@ -277,7 +278,7 @@ export default function ConnectedDashboard({ page }: { page: string }) {
                 Safety buffer<strong className="live-value">{money(forecast.safety_buffer)}</strong>
               </p>
             </div>
-            {forecast.shortfall && (
+            {forecast.shortfall && (page === 'Forecasts' || !alerts.some(a => a.rule === 'low_projected_balance' || a.rule === 'low_balance')) && (
               <p className="live-warning" role="alert">
                 Cash-shortage warning: checking is projected below your safety buffer during this
                 horizon. Review scheduled obligations and test optional spending reductions.

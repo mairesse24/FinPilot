@@ -36,6 +36,8 @@ CREATE TABLE IF NOT EXISTS recurring_bills (
   due_date date NOT NULL
 );
 
+ALTER TABLE recurring_bills ADD COLUMN IF NOT EXISTS liability_account_id uuid REFERENCES accounts(id);
+
 CREATE TABLE IF NOT EXISTS income_sources (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,

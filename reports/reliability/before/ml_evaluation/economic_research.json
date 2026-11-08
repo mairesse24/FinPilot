@@ -1,0 +1,50 @@
+{
+  "as_of": "2026-10-31",
+  "feature_month": "2026-10-31",
+  "target_month": "2026-11-30",
+  "data_basis": "current-revised FRED history with conservative two-month macro lags",
+  "point_in_time_validated": false,
+  "limitations": [
+    "Current revised data can contain revisions unavailable at historical forecast dates.",
+    "Not a tradable backtest; no dividends, costs, or live execution.",
+    "Household results forecast national indicators, not an individual household or job loss.",
+    "Small monthly evaluation sample; no calibrated probabilities."
+  ],
+  "household": {
+    "next_inflation": {
+      "ridge_estimate_pct": 3.037,
+      "persistence_estimate_pct": 3.353,
+      "evaluation_months": 24,
+      "mae_percentage_points": 0.508,
+      "persistence_mae_percentage_points": 0.4655,
+      "beats_persistence": false,
+      "recommended_display": "persistence_baseline_until_point_in_time_validation",
+      "status": "research_only_pending_vintage_validation"
+    },
+    "next_unemployment": {
+      "ridge_estimate_pct": 3.766,
+      "persistence_estimate_pct": 4.1,
+      "evaluation_months": 24,
+      "mae_percentage_points": 0.5698,
+      "persistence_mae_percentage_points": 0.1,
+      "beats_persistence": false,
+      "recommended_display": "persistence_baseline_until_point_in_time_validation",
+      "status": "research_only_pending_vintage_validation"
+    }
+  },
+  "market": {
+    "target": "next calendar month S&P 500 price return > 0",
+    "experimental_up_probability": 0.6786,
+    "probability_calibrated": false,
+    "evaluation_months": 24,
+    "balanced_accuracy": 0.5,
+    "historical_prior_balanced_accuracy": 0.5,
+    "momentum_balanced_accuracy": 0.5,
+    "brier_score": 0.3016,
+    "historical_prior_brier_score": 0.2843,
+    "beats_baselines": false,
+    "direction": "abstain",
+    "reason": "Does not beat predeclared baseline gates; no supported directional signal."
+  },
+  "cache_sha256": "b9c4eaff27a55efd9925c930890037360e8ae052fde3b24dcf939b29f6226268"
+}
