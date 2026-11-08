@@ -30,7 +30,7 @@ R2 and R3 described the **old UI** (R3 quotes `legacy v1` and `forecast_unvalida
 - **Seven items that hurt the demo (P1):** duplicate pages, 5–6 s loads with bare "Loading…" text, an empty Economic Lab (caused by a git-ignored data file), conflicting health scores (one silently ignores emergency savings), a Health Score breakdown that contradicts its own score, slow or failing chat (Gemini), and engineering text still visible.
 - **Order matters:** redeploy the backend first, then the frontend. Deploying the new frontend onto the old backend breaks the Health Score page.
 
-Counts after consolidation: **3 P0, 7 P1, 13 P2, 7 P3** (30 findings), plus **5 already fixed in the merged build**, **5 design suggestions (not defects)** and **10 removed or corrected claims**.
+Counts after consolidation: **3 P0, 7 P1, 13 P2, 7 P3** (30 findings), plus **5 already fixed in the merged build**, **5 design suggestions (not defects)** and **12 removed or corrected claims**.
 
 Severity key: **P0** breaks or blocks the demo · **P1** hurts it noticeably · **P2** polish · **P3** housekeeping.
 Verification key: **Verified** (evidence gathered), **Partial**, **Unverified** (could not be checked).
