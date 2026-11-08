@@ -37,8 +37,8 @@ def chat(messages: list[ChatMessage], tools) -> ChatResult:
         mt = re.search(r"\$?\s*(\d[\d,]*(?:\.\d+)?)", text)
         if mt:
             amount = float(mt.group(1).replace(",", ""))
-        if not amount or amount <= 0:
-            reply = ("Tell me an amount, like \"what if I cut $200 a month?\", and I will "
+        if not amount or amount <= 0 or amount > 100000:
+            reply = ("Tell me a positive amount up to $100,000, like \"what if I cut $200?\", and I will "
                      "run the numbers.")
         else:
             r = use("run_simulation", {"reduction_amount": amount, "horizon_days": horizon},

@@ -7,6 +7,8 @@ All data is synthetic. Forecasts are prototype estimates. Nothing moves money.
 - Requirements: [docs/MVP-requirements.md](docs/MVP-requirements.md)
 - API contract and examples: [docs/api-contracts.md](docs/api-contracts.md), `docs/examples/`
 - Team handoff (frontend + AI/ML): [docs/handoff-member-3-and-1.md](docs/handoff-member-3-and-1.md)
+- Gemini Financial Copilot setup and testing: [docs/ai-copilot.md](docs/ai-copilot.md)
+- Copilot latency measurements: [docs/copilot-performance.md](docs/copilot-performance.md)
 - Supabase setup: [docs/supabase-setup.md](docs/supabase-setup.md)
 
 ## Run the backend

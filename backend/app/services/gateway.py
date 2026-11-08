@@ -7,6 +7,7 @@ from typing import Any, Callable, Literal
 from app.schemas.common import Meta
 
 log = logging.getLogger(__name__)
+PUBLIC_FALLBACK_WARNING = "Some insights are temporarily unavailable. Showing a backup estimate."
 
 
 @dataclass
@@ -32,15 +33,15 @@ class Gateway:
             if exc.name in (name, self.package):
                 fn = None
             else:
-                return self._fallback(baseline, args, kwargs, f"{name} failed to import: {exc}")
+                return self._fallback(baseline, args, kwargs, f"{name} import failed ({type(exc).__name__})")
         except Exception as exc:
-            return self._fallback(baseline, args, kwargs, f"{name} failed to import: {exc}")
+            return self._fallback(baseline, args, kwargs, f"{name} import failed ({type(exc).__name__})")
         if fn is None:
             return GatewayOutcome(baseline(*args, **kwargs), "baseline")
         try:
             value = fn(*args, **kwargs)
         except Exception as exc:
-            return self._fallback(baseline, args, kwargs, f"{name}.{func} raised {exc!r}")
+            return self._fallback(baseline, args, kwargs, f"{name}.{func} failed ({type(exc).__name__})")
         if expect is not None and not isinstance(value, expect):
             return self._fallback(baseline, args, kwargs,
                                   f"{name}.{func} returned {type(value).__name__}, "
@@ -50,7 +51,7 @@ class Gateway:
     @staticmethod
     def _fallback(baseline, args, kwargs, warning: str) -> GatewayOutcome:
         log.warning(warning)
-        return GatewayOutcome(baseline(*args, **kwargs), "baseline", warning)
+        return GatewayOutcome(baseline(*args, **kwargs), "baseline", PUBLIC_FALLBACK_WARNING)
 
 
 def make_meta(outcome: GatewayOutcome, as_of: date) -> Meta:

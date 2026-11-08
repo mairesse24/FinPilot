@@ -1,0 +1,177 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "as_of": "2026-11-08",
+  "repeats": 3,
+  "samples": [
+    {
+      "question": "health",
+      "sample": 1,
+      "success": true,
+      "source": "model",
+      "reply_characters": 409,
+      "total_s": 1.7216,
+      "model_s": 1.0134,
+      "composition_s": 0,
+      "tool_s": 0.0012,
+      "render_s": 0.0001,
+      "model_calls": 1,
+      "tool_executions": 2
+    },
+    {
+      "question": "health",
+      "sample": 2,
+      "success": true,
+      "source": "model",
+      "reply_characters": 409,
+      "total_s": 0.9576,
+      "model_s": 0.6486,
+      "composition_s": 0,
+      "tool_s": 0.0022,
+      "render_s": 0.0001,
+      "model_calls": 1,
+      "tool_executions": 2
+    },
+    {
+      "question": "health",
+      "sample": 3,
+      "success": true,
+      "source": "model",
+      "reply_characters": 409,
+      "total_s": 2.5436,
+      "model_s": 2.2399,
+      "composition_s": 0,
+      "tool_s": 0.0027,
+      "render_s": 0.0001,
+      "model_calls": 1,
+      "tool_executions": 2
+    },
+    {
+      "question": "risk",
+      "sample": 1,
+      "success": true,
+      "source": "model",
+      "reply_characters": 557,
+      "total_s": 1.0371,
+      "model_s": 0.729,
+      "composition_s": 0,
+      "tool_s": 0.0015,
+      "render_s": 0.0001,
+      "model_calls": 1,
+      "tool_executions": 1
+    },
+    {
+      "question": "risk",
+      "sample": 2,
+      "success": true,
+      "source": "model",
+      "reply_characters": 557,
+      "total_s": 0.9183,
+      "model_s": 0.6063,
+      "composition_s": 0,
+      "tool_s": 0.0027,
+      "render_s": 0.0001,
+      "model_calls": 1,
+      "tool_executions": 1
+    },
+    {
+      "question": "risk",
+      "sample": 3,
+      "success": true,
+      "source": "model",
+      "reply_characters": 557,
+      "total_s": 0.92,
+      "model_s": 0.6197,
+      "composition_s": 0,
+      "tool_s": 0.0012,
+      "render_s": 0.0001,
+      "model_calls": 1,
+      "tool_executions": 1
+    },
+    {
+      "question": "simulation",
+      "sample": 1,
+      "success": true,
+      "source": "model",
+      "reply_characters": 601,
+      "total_s": 0.9437,
+      "model_s": 0.6119,
+      "composition_s": 0,
+      "tool_s": 0.0039,
+      "render_s": 0.0001,
+      "model_calls": 1,
+      "tool_executions": 2
+    },
+    {
+      "question": "simulation",
+      "sample": 2,
+      "success": true,
+      "source": "model",
+      "reply_characters": 601,
+      "total_s": 1.0003,
+      "model_s": 0.6234,
+      "composition_s": 0,
+      "tool_s": 0.0086,
+      "render_s": 0.0001,
+      "model_calls": 1,
+      "tool_executions": 2
+    },
+    {
+      "question": "simulation",
+      "sample": 3,
+      "success": true,
+      "source": "model",
+      "reply_characters": 601,
+      "total_s": 0.9345,
+      "model_s": 0.5745,
+      "composition_s": 0,
+      "tool_s": 0.0035,
+      "render_s": 0,
+      "model_calls": 1,
+      "tool_executions": 2
+    }
+  ],
+  "summary": {
+    "health": {
+      "successes": 3,
+      "median_s": 1.7216,
+      "median_model_calls": 1,
+      "median_model_s": 1.0134,
+      "median_tool_s": 0.0022,
+      "median_composition_s": 0,
+      "attempt_median_s": 1.7216,
+      "attempt_range_s": [
+        0.9576,
+        2.5436
+      ],
+      "failures": 0
+    },
+    "risk": {
+      "successes": 3,
+      "median_s": 0.92,
+      "median_model_calls": 1,
+      "median_model_s": 0.6197,
+      "median_tool_s": 0.0015,
+      "median_composition_s": 0,
+      "attempt_median_s": 0.92,
+      "attempt_range_s": [
+        0.9183,
+        1.0371
+      ],
+      "failures": 0
+    },
+    "simulation": {
+      "successes": 3,
+      "median_s": 0.9437,
+      "median_model_calls": 1,
+      "median_model_s": 0.6119,
+      "median_tool_s": 0.0039,
+      "median_composition_s": 0,
+      "attempt_median_s": 0.9437,
+      "attempt_range_s": [
+        0.9345,
+        1.0003
+      ],
+      "failures": 0
+    }
+  }
+}

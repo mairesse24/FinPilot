@@ -5,3 +5,4 @@ pydantic-settings
 psycopg[binary,pool]
 pytest
 httpx
+google-genai==2.34.0
