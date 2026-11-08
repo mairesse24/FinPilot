@@ -45,14 +45,16 @@ def load_customer(customer_id='C001', path=PNC):
     income = monthly(recent.flow_class == 'income')
     deposits = recent[recent.flow_class == 'income']
     paydays = sorted(set(int(x) for x in deposits.posted_date.dt.day))
+    from .ledger_projection import ledger_assumptions
+    cash_assumptions = ledger_assumptions(tx, as_of)
     return {'customer_id': customer_id, 'as_of': as_of.date().isoformat(),
             'checking_balance': float(accounts.loc[accounts.account_type == 'checking', 'balance'].sum()),
             'savings_balance': float(accounts.loc[accounts.account_type == 'savings', 'balance'].sum()),
             'monthly_income': round(income, 2), 'monthly_variable_spending': round(variable, 2),
             'monthly_debt_payments': round(debt, 2), 'bills': bills,
             'paydays': paydays or [1, 15], 'safety_buffer': 500.0,
-            'budget': None, 'source': 'PNC synthetic ledger',
+            'budget': None, 'source': 'PNC synthetic ledger', **cash_assumptions,
             'assumptions': ['Income routed to checking for projection; savings kept separate.',
                             'Monthly bills inferred from last 90 days; backend should supply actual schedules.',
-                            'Card purchases modeled as immediate cash outflows; card payments excluded to avoid duplication.',
-                            'Other debt payments use snapshot amounts; external calibration transfers excluded.']}
+                            'Consumption is scaled to its historically checking-paid share; card repayments are separate scheduled outflows.',
+                            'Recurring external cash movements inferred from past months are separate from income/consumption and may not recur.']}

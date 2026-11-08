@@ -1,5 +1,20 @@
 import { expect, test } from "@playwright/test";
 
+test("missing history shows abstention without fabricated balances", async ({ page }) => {
+  await page.route("**/api/forecast?days=*", route => route.fulfill({ contentType: "application/json", body: JSON.stringify({
+    status: "abstained", days: 30, series: [], projected_low: null, safety_buffer: 500, shortfall: false,
+    assumptions: [], meta: { source: "baseline", as_of: "2026-11-07", warning: "Forecast abstained: provide transaction history." }
+  }) }));
+  // Dashboard calculation can include a cold model import. Wait for the actual
+  // dependency instead of racing its response against the five-second assertion.
+  await Promise.all([
+    page.waitForResponse(r => r.url().endsWith('/api/dashboard') && r.status() === 200),
+    page.goto("/")
+  ]);
+  await expect(page.getByRole("alert").filter({ hasText: "Forecast abstained" })).toBeVisible();
+  await expect(page.getByText("Ending checking", { exact: true })).toHaveCount(0);
+});
+
 test("dashboard matches API and forecast controls fetch each horizon", async ({
   page,
   request,

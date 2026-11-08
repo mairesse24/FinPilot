@@ -14,6 +14,7 @@ class Alert(BaseModel):
     numbers: dict[str, float | str]
     recommended_action: str
     suggested_scenario: SpendingCut | None = None
+    economic_scenario: dict | None = None
 
 
 class GuardianResult(BaseModel):

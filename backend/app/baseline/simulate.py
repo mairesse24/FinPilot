@@ -36,9 +36,9 @@ def apply_spending_cut(p: FinancialProfile, cut: SpendingCut) -> FinancialProfil
 def _outcome(p: FinancialProfile, fc: ForecastResult) -> ScenarioOutcome:
     return ScenarioOutcome(
         projected_low=fc.projected_low,
-        end_balance=fc.series[-1].projected_balance if fc.series else ZERO,
+        end_balance=fc.series[-1].projected_balance if fc.series else None,
         health_score=compute_health_score(p).score,
-        alerts=evaluate(p, fc), series=fc.series)
+        alerts=evaluate(p, fc), series=fc.series,forecast_reliability=fc.meta.forecast_reliability)
 
 
 def simulate(p: FinancialProfile, cut: SpendingCut) -> SimulationResult:
@@ -58,9 +58,8 @@ def simulate(p: FinancialProfile, cut: SpendingCut) -> SimulationResult:
     low_b = base.projected_low.balance if base.projected_low else ZERO
     low_s = scen.projected_low.balance if scen.projected_low else ZERO
     delta = {
-        "low_balance_change": round(float(low_s - low_b), 2),
-        "end_balance_change": round(float(scen.end_balance - base.end_balance), 2),
+        "low_balance_change": round(float(low_s - low_b), 2) if base.projected_low and scen.projected_low else None,
+        "end_balance_change": round(float(scen.end_balance - base.end_balance), 2) if base.end_balance is not None and scen.end_balance is not None else None,
         "health_score_change": round(scen.health_score - base.health_score, 1),
     }
-    return SimulationResult(baseline=base, scenario=scen, delta=delta, meta=Meta(
-        source="baseline", as_of=p.as_of, generated_at=datetime.now(timezone.utc)))
+    return SimulationResult(baseline=base, scenario=scen, delta=delta, meta=base_fc.meta)

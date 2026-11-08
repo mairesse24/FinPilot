@@ -1,0 +1,67 @@
+{
+  "training_daily": {
+    "days": 12456,
+    "zero_day_fraction": 0.8304431599229287,
+    "positive_day_mean": 558.9184375,
+    "daily_mean": 94.76844412331407,
+    "daily_p95": 643.25
+  },
+  "nessie_daily": {
+    "days": 120,
+    "zero_day_fraction": 0.6666666666666666,
+    "positive_day_mean": 59.0,
+    "daily_mean": 19.666666666666668,
+    "daily_p95": 112.0
+  },
+  "nessie_recent125": {
+    "days": 120,
+    "zero_day_fraction": 0.6666666666666666,
+    "positive_day_mean": 59.0,
+    "daily_mean": 19.666666666666668,
+    "daily_p95": 112.0
+  },
+  "training_profile": {
+    "zero_day_fraction_min": 0.8329938900203666,
+    "zero_day_fraction_max": 0.8329938900203666,
+    "fallback_margin": 0.15,
+    "note": "Heuristic support check, not a validated distribution-shift detector."
+  },
+  "normalized_transaction_category_counts": {
+    "other": 40,
+    "income": 8
+  },
+  "normalized_outflows_by_category": {
+    "other": 2360.0
+  },
+  "training_variable_category_amount_share": {
+    "dining": 0.11149716629216935,
+    "groceries": 0.3485542381154945,
+    "other_spending": 0.3169493919253919,
+    "shopping": 0.11150203737477483,
+    "transport": 0.11149716629216935
+  },
+  "import_notices": [
+    "Nessie sandbox snapshot; restart the API to refresh balances and history.",
+    "Internal transfers, credit-card activity and cash withdrawals are excluded from cash-spending history.",
+    "Loan balances require explicit confirmed outstanding principal; original loan amounts are not assumed to be current debt.",
+    "Loan payment dates must be supplied as bills; loan monthly_payment alone is not a payment calendar.",
+    "Checking deposits are shown as inflows, not verified salary. Unmapped purchases use category other. Map historical scheduled-bill payments to fixed categories to avoid double counting them in variable spending. Card and savings activity are excluded from spending totals."
+  ],
+  "limitations": [
+    "One configured synthetic customer, not a representative independent customer cohort.",
+    "Category mappings do not prove completeness. Account balances cannot be backtested from an incomplete movement ledger.",
+    "No model or threshold is selected from these outcomes; fallback remains unvalidated for real customer use."
+  ],
+  "training_transaction_frequency": {
+    "variable_transactions": 2520,
+    "transactions_per_customer_day": 0.2023121387283237,
+    "customers": 24,
+    "calendar_history_days_each": 519
+  },
+  "nessie_transaction_frequency": {
+    "variable_transactions": 40,
+    "transactions_per_day": 0.3333333333333333,
+    "transactions_per_positive_day": 1,
+    "unclassified_variable_amount_fraction": 1.0
+  }
+}

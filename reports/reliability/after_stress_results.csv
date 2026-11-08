@@ -1,0 +1,13 @@
+case,type,source,warning,spending_total,projected_min,ending_balance,health_score,alerts,reconciliation_residual,crashed,finite_outputs,score_bounded,ending_change,health_change,invariants_pass
+BASE,reference,baseline,,600.0,500.0,4300.0,76.98,['emergency_savings'],0.0,False,True,True,0.0,0.0,True
+A_income_minus_30pct,deterministic,baseline,,600.0,500.0,3040.0,76.98,['emergency_savings'],0.0,False,True,True,-1260.0,0.0,True
+B_emergency_1500,deterministic,baseline,,600.0,-1000.0,2800.0,65.48,"['low_balance', 'emergency_savings', 'payment_pressure']",0.0,False,True,True,-1500.0,-11.5,True
+C_essential_cost_plus_20pct,deterministic,baseline,,660.0,140.0,3900.0,76.16,"['low_balance', 'emergency_savings']",0.0,False,True,True,-400.0,-0.82,True
+D_discretionary_surge_week,"future stress assumption, not accuracy",baseline,,1300.0,-200.0,3600.0,76.98,"['low_balance', 'emergency_savings', 'payment_pressure']",0.0,False,True,True,-700.0,0.0,True
+D2_observed_recent_surge,ML out-of-distribution / history shock,baseline,Spending occurs much more frequently than in training data; using an unvalidated rolling-average fallback instead of the synthetic-calendar model.,1184.35,352.87,3715.65,76.14,"['low_balance', 'emergency_savings']",0.0,False,True,True,-584.35,-0.84,True
+E_delayed_paycheck,deterministic,baseline,,600.0,100.0,100.0,76.98,"['low_balance', 'emergency_savings']",0.0,False,True,True,-4200.0,0.0,True
+F_clustered_bills,deterministic,baseline,,600.0,500.0,4300.0,76.98,['emergency_savings'],0.0,False,True,True,0.0,0.0,True
+G_one_history_day,ML out-of-distribution / cold start,baseline,"intelligence.forecast.forecast raised ValueError('Provide at least 29 consecutive daily observations for one customer'); Only 1 observed history days. Repeating the observed-day mean is an uncertain planning assumption, not a validated forecast; earlier missing days are not zeros. Stress bounds are deliberately broad and uncalibrated.",600.0,500.0,4300.0,79.14,"['emergency_savings', 'forecast_uncertain']",0.0,False,True,True,0.0,2.16,True
+H_irregular_income_assumption,deterministic known events; uncertainty unsupported,baseline,,600.0,680.0,3100.0,76.98,['emergency_savings'],0.0,False,True,True,-1200.0,0.0,True
+I_high_debt,deterministic,baseline,,600.0,-2000.0,1800.0,22.95,"['low_balance', 'emergency_savings', 'debt_burden', 'payment_pressure']",0.0,False,True,True,-2500.0,-54.03,True
+J_zero_refund_transfer,ML distribution shift and accounting,model,,9.67,700.0,4890.33,79.24,['emergency_savings'],0.0,False,True,True,590.33,2.26,True

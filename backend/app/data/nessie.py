@@ -24,6 +24,7 @@ class Schedule(BaseModel):
     frequency: str = Field(pattern="^(weekly|biweekly|monthly)$")
     date: date
     category: str = "other"
+    liability_account_id: str | None = None
 
 
 class Schedules(BaseModel):
@@ -101,7 +102,8 @@ def import_customer(client, customer_id, as_of, schedules=None):
                 continue
             ds.accounts.append(Account(loan_id, uid, loan.get('description') or f"{loan.get('type', 'Unknown')} loan",
                                        'loan', money(schedules.loan_balances[lid])))
-            warnings.append("Loan payment dates must be supplied as bills; loan monthly_payment alone is not a payment calendar.")
+            if not any(b.liability_account_id==loan_id for b in schedules.bills):
+                warnings.append("Loan payment dates must be supplied as bills; loan monthly_payment alone is not a payment calendar.")
         for endpoint, sign in (("purchases", -1), ("withdrawals", -1), ("deposits", 1)):
             for row in client.get(f"/accounts/{aid}/{endpoint}"):
                 if row.get("status") != "completed":
@@ -133,7 +135,7 @@ def import_customer(client, customer_id, as_of, schedules=None):
                 if schedules and rid in schedules.transaction_categories:
                     from app.calc.categories import FIXED, VARIABLE
                     category = schedules.transaction_categories[rid]
-                    if category not in FIXED | VARIABLE | {"income", "transfer"}:
+                    if category not in FIXED | VARIABLE | {"income", "transfer", "refund"}:
                         raise ValueError("Unsupported transaction category in schedule file")
                     if category == "transfer":
                         continue
@@ -144,12 +146,17 @@ def import_customer(client, customer_id, as_of, schedules=None):
         for i, s in enumerate(schedules.income):
             ds.income_sources.append(IncomeSource(f"income-{i}", uid, s.name, s.amount, s.frequency, s.date))
         for i, s in enumerate(schedules.bills):
-            ds.bills.append(Bill(f"bill-{i}", uid, s.name, s.amount, s.category, s.frequency, s.date))
+            if s.liability_account_id and s.liability_account_id not in {a.id for a in ds.accounts if a.account_type in {'loan','credit_card'}}:
+                raise ValueError('Schedule debt bill must link to an imported liability')
+            ds.bills.append(Bill(f"bill-{i}", uid, s.name, s.amount, s.category, s.frequency, s.date,s.liability_account_id))
     if not ds.income_sources:
         warnings.append("No confirmed future income schedule; forecast assumes no future deposits.")
     if not ds.bills:
         warnings.append("No confirmed future bills; forecast omits unprovided obligations.")
-    warnings.append("Checking deposits are shown as inflows, not verified salary. Unmapped purchases use category other. Map historical scheduled-bill payments to fixed categories to avoid double counting them in variable spending. Card and savings activity are excluded from spending totals.")
+    if any(t.amount>0 and t.category=='income' for t in ds.transactions):
+        warnings.append("Checking deposits are shown as inflows, not verified salary.")
+    if any(t.amount<0 and t.category=='other' for t in ds.transactions):
+        warnings.append("Unmapped purchases use category other. Map historical scheduled-bill payments to fixed categories to avoid double counting them in variable spending.")
     return ds, list(dict.fromkeys(warnings))
 
 

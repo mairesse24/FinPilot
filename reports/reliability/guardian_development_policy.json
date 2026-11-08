@@ -1,0 +1,8 @@
+{
+  "margins": {
+    "7": 0,
+    "30": 0
+  },
+  "selection": "Development F1, precision >= .5, ties smaller margin; $2000 buffer. Final labels never used.",
+  "deployment": "Research-only: cash-ledger calibration does not establish validity for Nessie profiles."
+}

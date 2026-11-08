@@ -13,6 +13,10 @@ def build_dashboard(p: FinancialProfile, gateway: Gateway) -> DashboardResult:
              for d, b in m.bill_occurrences(p, 14)]
     guardian = get_guardian(p, gateway)
     health = get_health(p, gateway)
+    warnings=list(dict.fromkeys(w for w in (guardian.meta.warning,health.meta.warning) if w))
+    from app.services.notices import merge_notices
+    meta=guardian.meta.model_copy(update={'warning':'; '.join(warnings) if warnings else None,
+                                        'notices':merge_notices(guardian.meta.notices,health.meta.notices)})
     return DashboardResult(
         net_worth=m.net_worth(p), assets=m.assets(p), liabilities=m.liabilities(p),
         accounts=[AccountOut(id=a.id, name=a.name, account_type=a.account_type,
@@ -21,4 +25,4 @@ def build_dashboard(p: FinancialProfile, gateway: Gateway) -> DashboardResult:
         by_category=[CategorySpend(category=c, amount=v) for c, v in cats],
         upcoming_bills=sorted(bills, key=lambda b: b.due_date),
         health_score=health.score, active_alerts=guardian.alerts,
-        meta=guardian.meta)
+        meta=meta)

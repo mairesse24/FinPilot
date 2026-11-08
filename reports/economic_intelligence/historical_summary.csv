@@ -1,0 +1,7 @@
+as_of,period,status,dimensions,Sahm_computed,Sahm_official,GDP_qoq_annualized,signals
+2008-10-31,financial crisis,Mixed Signals,4,1.2666666666666657,,-0.2521615647424591,PCE inflation above 2% objective; PCE inflation accelerating; Sahm recession indicator triggered; Real GDP contraction; Industrial output decline; Nominal retail decline
+2009-03-31,financial crisis trough period,Mixed Signals,4,2.7666666666666657,,-6.342410313483649,Sahm recession indicator triggered; Real GDP contraction; Industrial output decline; Nominal retail decline
+2020-04-30,COVID shock,Mixed Signals,5,0.3000000000000007,0.3,-4.78309545289668,Claims rising relative to prior weeks; Real GDP contraction; Industrial output decline; Nominal retail decline; VIX above prior 90th percentile
+2022-06-30,inflation acceleration,Multiple pressure signals,5,-0.06666666666666554,-0.07,-1.5734003230561067,PCE inflation above 2% objective; PCE inflation accelerating; Claims rising relative to prior weeks; Real GDP contraction; Policy rate rising; VIX above prior 90th percentile
+2023-07-31,monetary tightening,Mixed Signals,5,0.06666666666666687,0.07,2.414286672823285,PCE inflation above 2% objective; Industrial output decline; Yield curve inverted; Policy rate rising
+2017-06-30,comparison expansion period,Mixed Signals,5,-0.13333333333333375,,1.4230779090002699,Policy rate rising

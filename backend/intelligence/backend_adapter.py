@@ -12,6 +12,9 @@ import pandas as pd
 
 def _meta(profile, source='model', warning=None):
     from app.schemas.common import Meta
+    if (any(b.category=='debt_payment' and not b.liability_account_id for b in profile.bills)
+        and any(a.min_payment for a in profile.accounts if a.account_type in ('credit_card','loan'))):
+        warning = (warning+'; ' if warning else '')+'Unlinked debt bills and account minimums overlap ambiguously; debt burden uses an aggregate floor. Link bills to liability_account_id for exact attribution.'
     return Meta(source=source, as_of=profile.as_of, generated_at=datetime.now(timezone.utc), warning=warning)
 
 
@@ -37,7 +40,8 @@ def _history(profile):
     start = max(min(t.date for t in profile.transactions), profile.as_of-timedelta(days=179))
     dates = pd.date_range(start, profile.as_of)
     amounts = {}
-    for tx in profile.transactions:
+    from app.calc.metrics import checking_variable_transactions
+    for tx in checking_variable_transactions(profile):
         if tx.amount < 0 and tx.category in VARIABLE and start <= tx.date <= profile.as_of:
             amounts[tx.date] = amounts.get(tx.date, Decimal(0))-tx.amount
     return pd.DataFrame({'customer_id': profile.user.id, 'date': dates,
@@ -49,8 +53,8 @@ def _customer(profile):
     from app.calc.categories import VARIABLE
     _validate_profile(profile)
     start = profile.as_of-timedelta(days=30)
-    spend = sum((-t.amount for t in profile.transactions if start < t.date <= profile.as_of
-                 and t.amount < 0 and t.category in VARIABLE), Decimal(0))
+    spend = sum((-t.amount for t in metrics.checking_variable_transactions(profile)
+                 if start < t.date <= profile.as_of), Decimal(0))
     bills = sum((b.amount for _, b in metrics.bill_occurrences(profile, 30)), Decimal(0))
     return {'customer_id': profile.user.id, 'as_of': profile.as_of.isoformat(),
         'checking_balance': float(metrics.cash_balance(profile)),
@@ -74,12 +78,13 @@ def health_profile(profile):
     return HealthResult(score=raw['score'], components=components,
         strengths=[f'{c.name}: {c.score:g}/100' for c in components if c.score >= 75],
         weaknesses=[f'{c.name}: {c.score:g}/100' for c in components if c.score < 50],
-        meta=_meta(profile, warning='Member 3 prototype score; unavailable components are omitted and weights renormalized. See engineering audit.'))
+        meta=_meta(profile, warning='Prototype health score: unavailable components are omitted and weights renormalized. This is not a credit score.'))
 
 
 def _project(profile, path):
     from app.calc.projection import project_balance
     from app.schemas.forecast import ForecastPoint, ForecastResult, ProjectedLow
+    from app.schemas.common import ForecastReliability
     rows = {pd.Timestamp(r['date']).date(): r for r in path['daily']}
     days = len(rows)
     quantize = lambda value: value.quantize(Decimal('.01'))
@@ -94,16 +99,25 @@ def _project(profile, path):
     return ForecastResult(days=days, series=points,
         projected_low=ProjectedLow(date=low.date, balance=low.projected_balance) if low else None,
         safety_buffer=profile.user.safety_buffer, shortfall=bool(low and low.projected_balance < profile.user.safety_buffer),
-        assumptions=[f"Member 3 variable-spending method: {path['model']}.",
+        assumptions=[f"Variable-spending method: {path['model']}.",
             'Income and bills follow the backend profile schedules using Decimal cash arithmetic.',
             'Backend category vocabulary differs from PNC training data; inference may use a warned baseline fallback.',
             path.get('uncertainty', 'Bounds are uncalibrated stress envelopes, not balance probabilities.'),
             'Synthetic prototype; original engineering-audit findings remain relevant.'], evaluation=None,
-        meta=_meta(profile, 'model' if path['model'] == 'lightgbm' else 'baseline', warning))
+        meta=_meta(profile, 'model' if path['model'] == 'lightgbm' else 'baseline', warning).model_copy(update={
+            'forecast_reliability':ForecastReliability(
+                method=path['model'],status='estimated',validation='unvalidated' if path.get('support_check',{}).get('outside_training_frequency') or path['model']!='lightgbm' else 'synthetic_evaluated',
+                reasons=['pattern_shift'] if path.get('support_check',{}).get('outside_training_frequency') else ['synthetic_only'],
+                support_check=path.get('support_check',{}))}))
 
 
 def forecast_profile(profile, days):
     from .forecasting import forecast_spending
+    # Calendar support cannot be checked on short history. Use the existing
+    # observed-day baseline, not a possibly incompatible calendar-trained model.
+    from app.baseline.forecast import forecast as baseline
+    if not profile.transactions or len(_history(profile))<90:
+        return baseline(profile,days)
     return _project(profile, forecast_spending(_history(profile), days))
 
 
@@ -132,6 +146,10 @@ def guardian_profile(profile, forecast):
             title=a['id'].replace('_', ' ').title(), cause=a['explanation'], numbers=numbers,
             recommended_action=a.get('guidance', 'Compare the suggested spending scenario while preserving essential payments.'),
             suggested_scenario=scenario))
+    if forecast.status in ('abstained','limited_history'):
+        result.append(Alert(id=f'forecast_uncertain:{profile.as_of}',rule='forecast_uncertain',severity='medium',
+            title='Cash forecast is uncertain',cause=forecast.meta.warning or 'History is incomplete.',numbers={},
+            recommended_action='Confirm upcoming income, bills and a spending budget; do not interpret missing history as zero spending.'))
     return result
 
 
@@ -139,6 +157,9 @@ def simulate_profile(profile, cut):
     from app.baseline.simulate import apply_spending_cut
     from app.schemas.simulate import ScenarioOutcome, SimulationResult
     from .forecasting import forecast_spending
+    if not profile.transactions or len(_history(profile))<90:
+        from app.baseline.simulate import simulate
+        return simulate(profile,cut)
     if cut.category is not None:
         raise ValueError('Category-specific forecast cuts are not implemented by this adapter')
     days = max(30, cut.horizon_days)
@@ -157,10 +178,11 @@ def simulate_profile(profile, cut):
     scen = _project(altered, scenario_path)
     def outcome(p, fc):
         return ScenarioOutcome(projected_low=fc.projected_low, end_balance=fc.series[-1].projected_balance,
-                               health_score=health_profile(p).score, alerts=guardian_profile(p, fc), series=fc.series)
+                               health_score=health_profile(p).score, alerts=guardian_profile(p, fc), series=fc.series,
+                               forecast_reliability=fc.meta.forecast_reliability)
     b, s = outcome(profile, base), outcome(altered, scen)
     return SimulationResult(baseline=b, scenario=s,
         delta={'low_balance_change': round(float(s.projected_low.balance-b.projected_low.balance), 2),
                'end_balance_change': round(float(s.end_balance-b.end_balance), 2),
                'health_score_change': round(s.health_score-b.health_score, 2)},
-        meta=_meta(profile, base.meta.source, base.meta.warning))
+        meta=base.meta)

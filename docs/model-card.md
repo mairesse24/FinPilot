@@ -1,5 +1,35 @@
 # FinPilot prototype model card
 
+## Reliability update
+
+Dashboard warning investigation: [WARNING_RELIABILITY_REPORT.md](WARNING_RELIABILITY_REPORT.md).
+Runtime quality routing now avoids calendar-trained LightGBM for fewer than 90
+observed history days, where the frequency support check cannot run. Backend uses
+the observed-history baseline; dictionary forecasts use rolling-28. Both remain
+unvalidated and disclose uncertainty. Existing >=90-day frequency safeguard and
+model weights remain unchanged. This is conservative eligibility routing, not a
+claim of improved accuracy. A single historical synthetic Nessie block and existing
+separate synthetic calibration comparisons do not validate real-customer outcomes.
+
+The original training/point-forecast results below remain historical measurements.
+See [BEFORE_AFTER_EVALUATION.md](../BEFORE_AFTER_EVALUATION.md) for the executed
+reliability evaluation and immutable baseline snapshot. Trained model weights,
+feature schema and source final-test records remain unchanged.
+
+Checking projections now distinguish consumption from card settlement, use
+origin-only per-payday/bill estimates in the PNC adapter, and represent recurring
+signed external movements separately from income and spending. These movements
+are inferred from past months and may not recur. Generic backend forecasts exclude
+card purchases from checking-spending history; scheduled repayments remain cash
+outflows. Unlinked debt obligations are disclosed as an aggregate floor.
+
+Cold-start fallback uses observed days only, with an explicit limited-history
+warning; absent/short-zero history abstains. This is not proof of forecast accuracy.
+Posthoc residual bands are fitted on separate calibration data, targeted at 80%
+positive-spending coverage. They are model-hash bound, empirically evaluated and
+not universally calibrated 80% intervals. Frequent-spending coverage remains below
+target. Model-file changes invalidate the calibration policy until it is refitted.
+
 ## Data and target
 
 PNC synthetic account history: 30 fictional customers, 24 months (2024-11-01 through 2026-10-31), 21,225 ledger entries. Daily target sums `expense` entries in groceries, transport, dining, shopping and other_spending. Missing daily activity is explicitly zero. Housing and utilities become scheduled bills. Internal transfers, external calibration transfers and noncash interest are excluded from the ML target. Credit-card consumption is counted once, not counted again as card repayment. This approximates cash timing of new card spending; it is not an exact statement-payment forecast.

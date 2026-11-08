@@ -17,6 +17,13 @@ from tests.factories import AS_OF, UID, empty_profile, make_profile
 EMPTY_UID = "u-empty"
 
 
+@pytest.fixture(autouse=True)
+def isolated_economic_cache(monkeypatch):
+    # Financial route tests must not depend on a developer's downloaded macro cache.
+    from app.services import economic_intelligence
+    monkeypatch.setattr(economic_intelligence,'cached',lambda *args,**kwargs:{'series':{},'errors':{'test':'isolated cache'},'synthetic':False})
+
+
 def to_dataset(*profiles) -> SeedDataset:
     ds = SeedDataset()
     for p in profiles:

@@ -1,0 +1,6 @@
+{
+  "account_continuity_violations_cents": 0,
+  "internal_transfer_pairs": 4110,
+  "internal_transfer_wealth_residual_violations": 0,
+  "cash_replay_limitation": "Existing ledger is internally reconciled but artificially calibrated; not real bank ground truth"
+}

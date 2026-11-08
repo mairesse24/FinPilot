@@ -16,6 +16,9 @@ def simulate(customer, spending, scenario, indicators=None):
         number(value, key, maximum=1 if key.endswith('_pct') else None)
     c, path = deepcopy(customer), deepcopy(spending)
     c['monthly_income'] *= 1-scenario.get('income_reduction_pct', 0)
+    if 'income_schedule' in c:
+        for event in c['income_schedule']:
+            event['amount'] *= 1-scenario.get('income_reduction_pct', 0)
     c['checking_balance'] -= scenario.get('emergency_expense', 0)
     cut = min(c['monthly_variable_spending'], scenario.get('monthly_spending_cut', 0))
     inflation = 1+scenario.get('cost_of_living_pct', 0)

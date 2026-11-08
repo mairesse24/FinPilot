@@ -24,6 +24,16 @@ def validate_customer(c):
             raise ValueError('bill day must be 1..31')
     if c.get('budget') is not None:
         number(c['budget'], 'budget', minimum=.01)
+    if 'cash_variable_fraction' in c:
+        number(c['cash_variable_fraction'], 'cash_variable_fraction', maximum=1)
+    for event in c.get('income_schedule', []):
+        number(event['amount'], 'income schedule amount')
+        if type(event['day']) is not int or not 1 <= event['day'] <= 31:
+            raise ValueError('income schedule day must be 1..31')
+    for event in c.get('cash_movement_schedule', []):
+        number(event['amount'], 'cash movement amount', minimum=-1e12)
+        if type(event['day']) is not int or not 1 <= event['day'] <= 31:
+            raise ValueError('cash movement day must be 1..31')
     if 'savings_floor' in c:
         number(c['savings_floor'], 'savings_floor')
     if 'monthly_savings_transfer' in c:

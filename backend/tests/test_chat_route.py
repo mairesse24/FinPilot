@@ -11,7 +11,7 @@ def ask(c, text):
 
 def test_chat_health_question_quotes_real_score(client):
     score = round(client.get("/api/health").json()["score"], 1)
-    r = ask(client, "What is my health score?")
+    r = ask(client, "What is my legacy health score?")
     assert r.status_code == 200 and f"{score:g}" in r.json()["reply"]
     assert r.json()["tool_calls"][0]["name"] == "get_health_score"
 

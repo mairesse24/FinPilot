@@ -26,6 +26,7 @@ def chat_messages(messages, tools):
     if not key or not model:
         raise ValueError(f'{prefix} key/model not configured; backend baseline remains available')
     specs = [s['function'] for s in tools.specs()]
+    system=SYSTEM+' Use get_financial_assessment for FinPilot v2; get_health_score is legacy v1. A withheld score is unknown, never zero. Economic indicators require source observation and knowledge dates. Do not present descriptive regimes or stress assumptions as market forecasts or event probabilities. User-confirmed facts are not independently verified bank evidence.'
     allowed = {s['name'] for s in specs}
     records, evidence = [], []
 
@@ -49,7 +50,7 @@ def chat_messages(messages, tools):
         context = [{'role': m.role, 'content': m.content} for m in messages]
         with OpenAI(api_key=key, timeout=30, max_retries=0) as client:
             for _ in range(4):
-                response = client.responses.create(model=model, instructions=SYSTEM, input=context,
+                response = client.responses.create(model=model, instructions=system, input=context,
                     tools=[{'type': 'function', **s, 'strict': False} for s in specs], store=False, max_output_tokens=2048)
                 context.extend(response.output)
                 calls = [item for item in response.output if item.type == 'function_call']
@@ -64,7 +65,7 @@ def chat_messages(messages, tools):
         from google.genai import types
         context = [types.Content(role='user' if m.role == 'user' else 'model',
                    parts=[types.Part.from_text(text=m.content)]) for m in messages]
-        settings = types.GenerateContentConfig(system_instruction=SYSTEM, max_output_tokens=2048,
+        settings = types.GenerateContentConfig(system_instruction=system, max_output_tokens=2048,
             tools=[types.Tool(function_declarations=[types.FunctionDeclaration(name=s['name'],
                 description=s['description'], parameters_json_schema=s['parameters']) for s in specs])],
             automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True))

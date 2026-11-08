@@ -3,6 +3,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from app.schemas.common import Meta
+from intelligence.personal_finance import FinancialFacts
 
 
 class ChatMessage(BaseModel):
@@ -12,6 +13,7 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: list[ChatMessage] = Field(min_length=1, max_length=20)
+    financial_facts: FinancialFacts | None = None
 
 
 class ToolCallRecord(BaseModel):

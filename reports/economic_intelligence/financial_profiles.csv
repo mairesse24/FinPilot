@@ -1,0 +1,12 @@
+profile,score,completeness,Emergency preparedness,Cash-flow sustainability,Debt-payment affordability,Payment readiness,emergency_months,monthly_surplus,credit_utilization,income_monthly_cv
+base,67.47,1.0,5.26,64.62,100.0,100.0,0.3157894736842105,1900.0,,
+high_income_high_debt,35.07,1.0,0.0,59.11,50.0,31.17,0.0,3700.0,,
+low_income_strong_savings,91.13,1.0,100.0,64.52,100.0,100.0,12.0,900.0,,
+high_income_no_emergency_savings,70.98,1.0,0.0,83.92,100.0,100.0,0.0,9700.0,,
+low_income_manageable,68.63,1.0,10.0,64.52,100.0,100.0,0.6,900.0,,
+irregular_income_large_reserves,91.16,1.0,100.0,64.62,100.0,100.0,6.315789473684211,1900.0,,0.8295594292220282
+high_card_utilization,66.56,1.0,5.0,63.64,97.62,100.0,0.3,1800.0,0.9,
+strong_savings_poor_payment_timing,64.59,1.0,90.79,64.62,100.0,2.94,5.447368421052632,1900.0,,
+negative_cash_flow,61.18,1.0,5.26,39.47,100.0,100.0,0.3157894736842105,-800.0,,
+missing_financial_inputs,,0.0,,,,,,,,
+confirmed_zero_income,,0.75,5.26,0.0,,100.0,0.3157894736842105,-2300.0,,

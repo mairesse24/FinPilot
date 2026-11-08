@@ -1,0 +1,11 @@
+group,profiles,days,method,daily_mae
+frequent,30,900,serving,43.59435555555555
+frequent,30,900,lightgbm,55.681777777777775
+frequent,30,900,calendar_average,51.43427777777779
+frequent,30,900,rolling_30,43.32701111111111
+frequent,30,900,previous_week,60.94722222222222
+irregular_sparse,30,900,serving,20.136900000000004
+irregular_sparse,30,900,lightgbm,20.136900000000004
+irregular_sparse,30,900,calendar_average,28.94071111111111
+irregular_sparse,30,900,rolling_30,28.52702222222222
+irregular_sparse,30,900,previous_week,30.452166666666667

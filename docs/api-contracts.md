@@ -9,6 +9,11 @@ Example files below are real baseline responses for the demo customer (as_of 202
 | GET | `/healthz` | none | `{status, database}` | n/a |
 | GET | `/api/dashboard` | `user_id` | `DashboardResult` | `examples/dashboard.json` |
 | GET | `/api/context` | `user_id` | `{user: {id, name}, as_of, data_source, warnings, loaded_at, synthetic}` | Source metadata; no secrets |
+| GET | `/api/economy` | `user_id` | Dated indicators, features, dimensions, source errors, evidence coverage | Cached real data; no implicit refresh |
+| GET | `/api/financial-health` | `user_id` | Explicitly versioned v2 assessment; missing facts withhold score | Legacy `/api/health` unchanged |
+| POST | `/api/financial-health/assess` | `{facts: FinancialFacts}` | V2 score/components/completeness/metrics | Confirmed assumptions, not bank writes |
+| POST | `/api/resilience` | `{facts: FinancialFacts}` | Separate personal assessment, economy and contextual/financial alerts | No macro penalty applied to score |
+| POST | `/api/economic-simulate` | `{facts, scenario: EconomicScenario}` | Before/after cash plans, scores, alerts, explanations, net-worth change | Deterministic 30-day planning |
 | GET | `/api/accounts` | `user_id` | `AccountsResult` | `examples/accounts.json` |
 | GET | `/api/transactions` | `user_id, limit(1-500), offset, from, to, category` | `TransactionsResult` | `examples/transactions.json` |
 | GET | `/api/health` | `user_id` | `HealthResult` | `examples/health.json` |
@@ -19,10 +24,45 @@ Example files below are real baseline responses for the demo customer (as_of 202
 
 Schema classes live in `backend/app/schemas/`.
 
+Economic/financial v2 request classes live in `intelligence/personal_finance.py`
+and `intelligence/resilience.py`. Facts are per-request, explicitly confirmed
+assumptions; they are not persisted. New assessment routes may read up to one
+year of the authenticated/demo-scoped repository history for six-month income
+diagnostics. Legacy profile lookbacks and score definitions are preserved.
+`POST /api/chat` accepts optional `financial_facts` with the same schema and
+passes them to scoped calculation tools. Unqualified score questions now name
+v2 explicitly; asking for a legacy score preserves the v1 calculation.
+No tool accepts a different customer's identifier. This remains a synthetic-data
+prototype; demo selection is not production authentication.
+
+Forecast responses now include `status`: `estimated`, `limited_history`, or
+`abstained`. An abstained response has an empty `series` and null `projected_low`;
+clients must not replace missing future balances with zero or current cash.
+Limited-history estimates carry explicit warnings and uncalibrated stress ranges.
+The copilot's forecast tool also returns status and warning text.
+
+Domain bills can optionally specify `liability_account_id` to avoid counting
+repayment schedules and account minimums twice. Unlinked legacy debt observations
+produce an explicitly warned aggregate floor; exact attribution requires linkage.
+Apply the additive `recurring_bills.liability_account_id` migration in
+`backend/app/db/schema.sql` before writing linked bills to PostgreSQL.
+
 ## Detect -> Simulate link
 
 Each Guardian `Alert` may carry `suggested_scenario` (a `SpendingCut`: `type`, `reduction_amount`, `horizon_days`, `category`). The frontend lets the user edit `reduction_amount` and POSTs it unchanged in shape as `{"scenario": <suggested_scenario>}` to `/api/simulate`. `SimulationResult` returns `baseline` and `scenario` outcomes (`projected_low`, `end_balance`, `health_score`, `alerts`, `series`) and `delta` (`low_balance_change`, `end_balance_change`, `health_score_change`). Demo: alert projects a low of $367.08 on 2026-11-17; a $200 cut over 10 days lifts it to $567.08 (above the $500 buffer), so the alert clears.
 
 ## `meta` semantics
+
+Warning UX update: `meta.notices` contains stable `code`, `context`, `category`
+(`critical`, `data_limitation`, `diagnostic`), friendly `message` and original
+`technical_detail`. Deduplicate by code/context. `/api/context` adds the same
+structured notices for banking coverage; legacy warning strings remain compatible.
+`meta.forecast_reliability` is preserved across forecasts, Guardian, dashboard and
+simulations and carries method/status/validation/reasons/support/interval limits.
+Validation labels are `unvalidated`, `synthetic_evaluated`, `unavailable`; none
+means validated real-customer accuracy. Non-forecast assessments declare no forecast
+dependency. `ScenarioOutcome.end_balance` and cash deltas may be null when no path
+can be estimated; never render these as zero. Financial responses are `no-store`.
+See [warning investigation](WARNING_RELIABILITY_REPORT.md) for conditions and evidence.
 
 Every result carries `meta`: `source` is `"model"` when the Member 1 `intelligence` module produced the result and `"baseline"` when the built-in fallback did; `is_prototype_estimate` is always true (UI must show "prototype estimate" wording); `as_of` is the data date; `generated_at` is the response timestamp; `warning` is non-null when a model module failed or returned an invalid type and the baseline was substituted. Chat tools are read-only and chat replies quote tool numbers verbatim.

@@ -15,6 +15,13 @@ def create_app(repo: Repository | None = None, settings: Settings | None = None)
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins,
                        allow_methods=["*"], allow_headers=["*"])
 
+    @app.middleware('http')
+    async def financial_cache_policy(request,call_next):
+        response=await call_next(request)
+        if request.url.path.startswith('/api/'):
+            response.headers['Cache-Control']='no-store'
+        return response
+
     @app.get("/healthz")
     def healthz():
         try:

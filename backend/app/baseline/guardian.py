@@ -17,6 +17,11 @@ def _round_up_50(v: Decimal) -> Decimal:
 
 
 def _low_balance(p: FinancialProfile, f: ForecastResult) -> Alert | None:
+    if f.projected_low is None and any(a.account_type=='checking' for a in p.accounts) and m.cash_balance(p)<f.safety_buffer:
+        return Alert(id=f'current_low_balance:{p.as_of}',rule='current_low_balance',severity='high',
+            title='Current checking is below your buffer',cause='The observed balance is already below your chosen safety buffer; no reliable future forecast is available.',
+            numbers={'current':float(m.cash_balance(p)),'safety_buffer':float(f.safety_buffer)},
+            recommended_action='Review confirmed upcoming obligations and available cash before optional purchases.')
     if not f.shortfall or f.projected_low is None:
         return None
     low, buf = f.projected_low.balance, f.safety_buffer
@@ -75,4 +80,9 @@ def _emergency(p: FinancialProfile) -> Alert | None:
 
 def evaluate(p: FinancialProfile, forecast: ForecastResult) -> list[Alert]:
     alerts = [a for a in (_low_balance(p, forecast), _debt_burden(p), _emergency(p)) if a]
+    if forecast.status in ("abstained","limited_history"):
+        alerts.append(Alert(id=f"forecast_uncertain:{p.as_of}",rule="forecast_uncertain",severity="medium",
+            title="Not enough history for a reliable cash forecast",
+            cause=forecast.meta.warning or "Spending history is incomplete.",numbers={},
+            recommended_action="Confirm upcoming income, bills and a spending budget before relying on projected balances."))
     return sorted(alerts, key=lambda a: _ORDER[a.severity])

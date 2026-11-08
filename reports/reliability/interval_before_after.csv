@@ -1,0 +1,13 @@
+cohort,group,stage,level,n,coverage,width
+final_independent,frequent,before,all,900,0.7966666666666666,117.34578888888888
+final_independent,frequent,before,positive,545,0.6642201834862386,120.17236697247706
+final_independent,frequent,after,all,900,0.8344444444444444,131.07545555555555
+final_independent,frequent,after,positive,545,0.726605504587156,133.7906605504587
+final_independent,irregular_sparse,before,all,900,0.7844444444444445,2.3922444444444446
+final_independent,irregular_sparse,before,positive,171,0.005847953216374269,1.5997660818713453
+final_independent,irregular_sparse,after,all,900,0.9666666666666667,152.40282222222223
+final_independent,irregular_sparse,after,positive,171,0.8538011695906432,150.45210526315788
+final_pnc,calendar_supported,before,all,540,0.9425925925925925,12.06687037037037
+final_pnc,calendar_supported,before,positive,90,0.6555555555555556,72.33555555555556
+final_pnc,calendar_supported,after,all,540,0.9629629629629629,16.81974074074074
+final_pnc,calendar_supported,after,positive,90,0.7777777777777778,80.48333333333333

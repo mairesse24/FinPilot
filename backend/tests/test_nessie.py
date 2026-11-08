@@ -129,3 +129,31 @@ def test_loan_uses_confirmed_remaining_principal_not_original_amount():
     assert ds.accounts[1].account_type == 'loan'
     assert ds.accounts[1].balance == 500
     assert ds.accounts[1].min_payment is None  # scheduled bills own the actual due dates
+
+
+def test_schedule_liability_link_is_preserved_and_foreign_link_rejected():
+    body={'customer_id':'c1','bills':[{'name':'Card payment','amount':35,'frequency':'monthly',
+           'date':'2026-11-09','category':'debt_payment','liability_account_id':'a3'}]}
+    ds,_=import_customer(fixture_client(),'c1',AS_OF,Schedules.model_validate(body))
+    assert ds.bills[0].liability_account_id=='a3'
+    body['bills'][0]['liability_account_id']='foreign'
+    with pytest.raises(ValueError,match='imported liability'):
+        import_customer(fixture_client(),'c1',AS_OF,Schedules.model_validate(body))
+
+
+def test_refunds_transfers_fixed_bills_and_card_activity_do_not_inflate_variable_spending():
+    from app.calc.metrics import checking_variable_transactions,window_inflow
+    def purchase(key,account='a1',amount=100):
+        return {'_id':key,'payer_id':account,'purchase_date':'2026-11-06','amount':amount,'status':'completed'}
+    fixture={'/accounts/a1/purchases':[purchase('rent'),purchase('transfer'),purchase('variable',amount=12)],
+             '/accounts/a3/purchases':[purchase('card','a3')],
+             '/accounts/a1/withdrawals':[{'_id':'atm','transaction_date':'2026-11-06','amount':50,'status':'completed'}],
+             '/accounts/a1/deposits':[{'_id':'refund','transaction_date':'2026-11-06','amount':9,'status':'completed'}]}
+    schedules=Schedules.model_validate({'customer_id':'c1','transaction_categories':{
+        'purchases:rent':'rent','purchases:transfer':'transfer','deposits:refund':'refund'}})
+    ds,warnings=import_customer(fixture_client(fixture),'c1',AS_OF,schedules)
+    p=InMemoryRepository(ds).load_profile('c1',AS_OF)
+    assert sum(-t.amount for t in checking_variable_transactions(p))==12
+    assert window_inflow(p,30)==0 # mapped refund is not salary/income
+    assert any('ATM withdrawals excluded' in w for w in warnings)
+    assert not any('Checking deposits are shown' in w for w in warnings)
