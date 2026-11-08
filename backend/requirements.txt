@@ -1,7 +1,8 @@
-fastapi
-uvicorn[standard]
-pydantic>=2
-pydantic-settings
-psycopg[binary,pool]
-pytest
-httpx
+fastapi==0.162.2
+uvicorn[standard]==0.54.0
+pydantic==2.14.3
+pydantic-settings==2.16.2
+psycopg[binary,pool]==3.3.8
+psycopg-pool==3.3.3
+pytest==9.2.0
+httpx==0.28.1

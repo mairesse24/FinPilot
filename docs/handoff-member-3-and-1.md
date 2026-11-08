@@ -1,6 +1,6 @@
 # Backend Handoff for Member 1 (Frontend) and Member 3 (AI/ML)
 
-Status: backend foundation in progress. Data shapes are readable at `/openapi.json` (and `/docs` in a browser) as soon as the app runs. Real example responses will be added to `docs/examples/` and `docs/api-contracts.md` after the endpoints work.
+Status: backend MVP is built and **live**: https://finsight-api-7odx.onrender.com (browse `/docs` for a clickable API page; open `/healthz` a few minutes before a demo because the free server sleeps when idle). Data shapes: `/openapi.json`. Real example responses: `docs/examples/`; endpoint table: `docs/api-contracts.md`. The live demo date is pinned to 2026-11-07, so the story is always: checking $2,400 → Guardian warns of a $367 low on Nov 17 → a $200 cut lifts it to $567.
 
 ## Member 1 (Frontend)
 

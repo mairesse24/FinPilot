@@ -42,7 +42,7 @@ If `backend/.env` is ever missing, run this from the repo root: `cp backend/.env
 
 ## 4. Create the tables
 
-> **Not yet available:** `schema.sql` and the seed script are created during implementation (about minute 35–75 of the build). Stop after step 3 for now; the build agent will do steps 4 and 5 for you or tell you exactly what to click.
+> **Shortcut:** steps 4 and 5 can be done in one command, which creates the tables from `backend/app/db/schema.sql` and loads the demo data: `cd backend && .venv/bin/python -m scripts.seed_database --apply-schema --reset`. The manual SQL-editor route below also works.
 
 1. In the dashboard, open **SQL Editor** → **New query**.
 2. Paste the full contents of `backend/app/db/schema.sql` (created by the implementation plan) and click **Run**.
