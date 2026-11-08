@@ -75,7 +75,12 @@ def import_customer(client, customer_id, as_of, schedules=None):
     customer = client.get(f"/customers/{uid}")
     if customer.get("_id") != uid:
         raise ValueError("Nessie returned another customer")
-    ds = SeedDataset(users=[User(uid, f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip(), "")])
+    customer_name = f"{customer.get('first_name', '')} {customer.get('last_name', '')}".strip()
+    # Older seeded sandbox profiles used a product label as the customer's surname.
+    # Keep the stable Nessie customer ID, but present the demo persona as a real name.
+    if customer_name == "Alex FinPilot Demo":
+        customer_name = "Alex Rivera"
+    ds = SeedDataset(users=[User(uid, customer_name, "")])
     warnings = ["Nessie sandbox snapshot; restart the API to refresh balances and history.",
                 "Internal transfers, credit-card activity and cash withdrawals are excluded from cash-spending history.",
                 "Loan balances require explicit confirmed outstanding principal; original loan amounts are not assumed to be current debt."]

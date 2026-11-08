@@ -37,6 +37,12 @@ def fixture_client(overrides=None):
     return NessieClient('fake-key', client=httpx.Client(transport=httpx.MockTransport(handle)))
 
 
+def test_legacy_demo_customer_uses_persona_name():
+    customer = {'_id': 'c1', 'first_name': 'Alex', 'last_name': 'FinPilot Demo'}
+    ds, _ = import_customer(fixture_client({'/customers/c1': customer}), 'c1', AS_OF)
+    assert ds.users[0].name == 'Alex Rivera'
+
+
 def test_nessie_normalization_and_api_horizons():
     ds, warnings = import_customer(fixture_client(), 'c1', AS_OF)
     assert [t.amount for t in ds.transactions] == [Decimal('-10.25'), Decimal('100')]

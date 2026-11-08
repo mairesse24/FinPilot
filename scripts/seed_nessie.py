@@ -52,7 +52,7 @@ def seed(settings, configure=False, checking_balance=DEFAULT_CHECKING_BALANCE):
         return result_id
     try:
         address = {'street_number': '100', 'street_name': 'Demo Lane', 'city': 'Richardson', 'state': 'TX', 'zip': '75080'}
-        uid = create('customer', '/customers', {'first_name': 'Alex', 'last_name': 'FinPilot Demo', 'address': address})
+        uid = create('customer', '/customers', {'first_name': 'Alex', 'last_name': 'Rivera', 'address': address})
         checking = create('checking', f'/customers/{uid}/accounts', {'type': 'Checking', 'nickname': 'FinPilot Demo Checking', 'rewards': 0, 'balance': checking_balance})
         abc_checking = create('checking-abc', f'/customers/{uid}/accounts', {'type': 'Checking', 'nickname': 'ABC Bank Checking', 'rewards': 0, 'balance': 5000})
         xyz_checking = create('checking-xyz', f'/customers/{uid}/accounts', {'type': 'Checking', 'nickname': 'XYZ Bank Checking', 'rewards': 0, 'balance': 20000})
