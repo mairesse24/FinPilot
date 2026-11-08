@@ -33,6 +33,7 @@ class Schedules(BaseModel):
     income: list[Schedule] = []
     bills: list[Schedule] = []
     transaction_categories: dict[str, str] = {}
+    default_checking_purchase_category: str | None = None
     loan_balances: dict[str, Decimal] = {}
 
 
@@ -132,9 +133,14 @@ def import_customer(client, customer_id, as_of, schedules=None):
                     warnings.append("Card activity excluded from checking forecast: repayment schedules must be supplied explicitly.")
                     continue
                 category = "other" if sign < 0 else "income"
-                if schedules and rid in schedules.transaction_categories:
+                mapped = None
+                if schedules:
+                    mapped = schedules.transaction_categories.get(rid)
+                    if mapped is None and sign < 0:
+                        mapped = schedules.default_checking_purchase_category
+                if mapped is not None:
                     from app.calc.categories import FIXED, VARIABLE
-                    category = schedules.transaction_categories[rid]
+                    category = mapped
                     if category not in FIXED | VARIABLE | {"income", "transfer", "refund"}:
                         raise ValueError("Unsupported transaction category in schedule file")
                     if category == "transfer":

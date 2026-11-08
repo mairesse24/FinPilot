@@ -15,7 +15,7 @@ def test_duplicate_warnings_have_stable_codes_and_context():
     combined=merge_notices(a,b)
     assert len(combined)==1
     assert combined[0].code=='forecast_pattern_shift'
-    assert combined[0].category=='critical'
+    assert combined[0].category=='data_limitation'
     assert 'LightGBM' not in combined[0].message
     assert SHIFT in combined[0].technical_detail
     assert len(merge_notices(a,notices_for([SHIFT],'another-customer')))==2

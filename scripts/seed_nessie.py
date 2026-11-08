@@ -63,11 +63,12 @@ def seed(settings, configure=False):
                 'medium': 'balance', 'transaction_date': str(as_of - timedelta(days=1 + i * 14)),
                 'amount': 2100, 'status': 'completed', 'description': 'Synthetic biweekly paycheck'})
         schedules = {'customer_id': uid, 'loan_balances': {loan: 5000},
+                     'default_checking_purchase_category': 'shopping',
                      'income': [{'name': 'Synthetic biweekly paycheck', 'amount': 2100, 'frequency': 'biweekly', 'date': str(as_of + timedelta(days=11))}],
                      'bills': [{'name': 'Demo rent', 'amount': 1500, 'frequency': 'monthly', 'date': str(as_of + timedelta(days=4)), 'category': 'rent'},
                                {'name': 'Demo utilities', 'amount': 120, 'frequency': 'monthly', 'date': str(as_of + timedelta(days=6)), 'category': 'utilities'},
                                {'name': 'Demo card minimum', 'amount': 35, 'frequency': 'monthly', 'date': str(as_of + timedelta(days=8)), 'category': 'debt_payment'},
-                               {'name': 'Demo auto loan payment', 'amount': 150, 'frequency': 'monthly', 'date': str(as_of + timedelta(days=9)), 'category': 'debt_payment'}]}
+                               {'name': 'Demo auto loan payment', 'amount': 150, 'frequency': 'monthly', 'date': str(as_of + timedelta(days=9)), 'category': 'debt_payment', 'liability_account_id': f'loan:{loan}'}]}
         SCHEDULES.write_text(json.dumps(schedules, indent=2))
         if configure:
             for key, value in {'DATA_SOURCE': 'nessie', 'NESSIE_CUSTOMER_ID': uid,

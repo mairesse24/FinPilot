@@ -103,6 +103,15 @@ def test_explicit_schedules_and_fixed_payment_categories():
     assert ds.bills[0].due_date == date(2026, 11, 9)
 
 
+def test_explicit_default_category_classifies_seeded_checking_purchases():
+    schedules = Schedules.model_validate({
+        'customer_id': 'c1', 'default_checking_purchase_category': 'shopping',
+    })
+    ds, warnings = import_customer(fixture_client(), 'c1', AS_OF, schedules)
+    assert ds.transactions[0].category == 'shopping'
+    assert not any('Unmapped purchases' in warning for warning in warnings)
+
+
 def test_overdrawn_checking_is_preserved_not_clamped():
     accounts = [{'_id': 'a1', 'customer_id': 'c1', 'type': 'Checking', 'balance': -100}]
     ds, _ = import_customer(fixture_client({'/customers/c1/accounts': accounts}), 'c1', AS_OF)

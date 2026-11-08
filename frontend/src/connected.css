@@ -67,6 +67,12 @@
   padding: 12px;
   background: #f59e0b0c;
 }
+.estimate-notices { color: #94a3b8; font-size: 13px; }
+.estimate-notices details { margin: 0; }
+.estimate-notices summary { width: fit-content; cursor: pointer; color: #8fa1b8; }
+.estimate-details { margin-top: 10px; padding: 12px 14px; border: 1px solid #263345; border-radius: 10px; background: #0d121a; }
+.estimate-details p { margin: 5px 0; }
+.snapshot-time { margin: -12px 0 0; font-size: 12px; color: #718198 !important; }
 .live-panel figure {
   margin: 20px 0;
 }

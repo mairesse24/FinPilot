@@ -8,6 +8,13 @@ import type { Notice } from "./api";
 const money = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
 
+const methodLabel = (method?: string) => ({
+  moving_average_28: "Recent 28-day spending average",
+  rolling_average: "Recent spending average",
+  lightgbm: "LightGBM spending model",
+  baseline: "Baseline estimate",
+}[method ?? ""] ?? "Spending estimate");
+
 function BalanceChart({ forecast }: { forecast: Forecast }) {
   const rows = forecast.series;
   if (!rows.length) return <p>No forecast available.</p>;
@@ -147,7 +154,7 @@ export default function ConnectedDashboard({ page }: { page: string }) {
         <button onClick={() => setRetry((r) => r + 1)}>Reload analysis</button>
       </section>
       {context.loaded_at && (
-        <p>Bank snapshot loaded {new Date(context.loaded_at).toLocaleString()}.</p>
+        <p className="snapshot-time">Last bank-data sync: {new Date(context.loaded_at).toLocaleString()}</p>
       )}
       <ReliabilityNotices
         groups={[
@@ -233,7 +240,6 @@ export default function ConnectedDashboard({ page }: { page: string }) {
             <p>
               Spending - last 30 days <strong>{money(dashboard.spending_30d)}</strong>
             </p>
-            <small>Deposits are not verified salary.</small>
           </div>
           <section className="live-grid two">
             <article className="live-panel">
@@ -293,9 +299,9 @@ export default function ConnectedDashboard({ page }: { page: string }) {
               ))}
             </article>
             <article className="live-panel">
-              <h2>Financial health · legacy v1</h2>
+              <h2>Financial health snapshot</h2>
               <strong className="live-value">{dashboard.health_score.toFixed(1)} / 100</strong>
-              <p>Internal heuristic, not a credit score. Data gaps can affect this assessment.</p>
+              <p>Estimate based on currently available account, spending and payment data.</p>
             </article>
           </section>
           <section className="live-panel">
@@ -338,8 +344,8 @@ export default function ConnectedDashboard({ page }: { page: string }) {
         ) : (
           <>
             <p>
-              Estimate method: {forecast.meta.forecast_reliability?.method ?? forecast.meta.source}{" "}
-              · As of {forecast.meta.as_of}. Scheduled income and bills are combined with predicted
+              Estimate method: {methodLabel(forecast.meta.forecast_reliability?.method)}{" "}
+              · As of {forecast.meta.as_of}. Scheduled income and bills are combined with estimated
               variable spending.
             </p>
 
