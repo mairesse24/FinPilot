@@ -27,6 +27,9 @@ type Health = {
   observed_score_explanation: string;
   observed_score_confidence: "low" | "medium" | "high";
   observed_score_limitations: string[];
+  observed_components?: Component[];
+  observed_metrics?: Record<string, number | string | null>;
+  observed_withheld_reasons?: string[];
   components: Component[];
   metrics: Record<string, number | string | null>;
   warnings: string[];
@@ -65,6 +68,20 @@ type Context = {
   economic_conditions: Economy;
   alerts: Exposure[];
   financial_alerts?: { id: string; cause: string; action: string }[];
+  economic_impact?: {
+    available: boolean;
+    reason?: string;
+    inflation_rate_pct?: number;
+    classification_active?: boolean;
+    monthly_essential_baseline?: number;
+    monthly_essential_stress?: number;
+    additional_burn_30d?: number;
+    additional_burn_90d?: number;
+    baseline_score?: number | null;
+    stress_score?: number | null;
+    score_change?: number | null;
+    method?: string;
+  };
   note: string;
 };
 type Cash = {
@@ -373,6 +390,21 @@ export default function EconomicIntelligence({ page }: { page: string }) {
       : (health.score ?? health.observed_score)
     : null;
   const scoreIsObserved = Boolean(health && (dirty || health.score == null));
+  const displayedComponents = health
+    ? scoreIsObserved
+      ? (health.observed_components ?? health.components)
+      : health.components
+    : [];
+  const displayedMetrics = health
+    ? scoreIsObserved
+      ? (health.observed_metrics ?? health.metrics)
+      : health.metrics
+    : {};
+  const displayedWithheld = health
+    ? scoreIsObserved
+      ? (health.observed_withheld_reasons ?? health.withheld_reasons)
+      : health.withheld_reasons
+    : [];
   const headlineScore = scoreIsObserved && !dirty && v1 ? v1.score : displayedScore;
   const cutDefaults = fin.dashboard?.active_alerts.find((a) => a.suggested_scenario)?.suggested_scenario ?? null;
   const cutPanel = <SpendingCutSimulator defaults={cutDefaults} buffer={fin.forecast?.safety_buffer ?? null} />;
@@ -710,7 +742,25 @@ export default function EconomicIntelligence({ page }: { page: string }) {
           </button>
         </div>
       )}
-      {!dirty && (
+      {context?.economic_impact?.available && (
+        <div className="economic-score-impact">
+          <div>
+            <span>Baseline estimate</span>
+            <strong>{displayedScore?.toFixed(2) ?? "—"}</strong>
+          </div>
+          <span aria-hidden="true">→</span>
+          <div>
+            <span>Inflation-stress estimate</span>
+            <strong>{context.economic_impact.stress_score?.toFixed(2) ?? "—"}</strong>
+          </div>
+          <p>
+            Applying {context.economic_impact.inflation_rate_pct?.toFixed(2)}% PCE inflation to
+            modeled essential costs changes the score by {context.economic_impact.score_change?.toFixed(2) ?? "—"}
+            points. This is a stress scenario, not a replacement for the baseline.
+          </p>
+        </div>
+      )}
+      {!dirty && !scoreIsObserved && (
         <p>
           {scoreIsObserved && v1
             ? "This score combines every factor FinPilot can measure from your imported accounts, bills and spending. Confirm your inputs below for a more precise assessment."
@@ -742,7 +792,7 @@ export default function EconomicIntelligence({ page }: { page: string }) {
       {!dirty && !(scoreIsObserved && v1) && (
         <details open={health.score != null}>
           <summary>Score breakdown</summary>
-          {health.components.map((c) => (
+          {displayedComponents.map((c) => (
             <article key={c.name} className="breakdown-row">
               <div className="breakdown-head">
                 <strong>{c.name}</strong>
@@ -767,17 +817,16 @@ export default function EconomicIntelligence({ page }: { page: string }) {
       {!dirty && !(scoreIsObserved && v1) && (
         <details>
           <summary>Financial metrics and missing inputs</summary>
-          {Object.entries(health.metrics).map(([k, v]) => (
+          {Object.entries(displayedMetrics).map(([k, v]) => (
             <p key={k}>
               {k.replace(/_/g, " ")}: {v === null ? "Unknown / not measurable" : String(v)}
             </p>
           ))}
-          {health.withheld_reasons.map((w) => (
+          {displayedWithheld.map((w) => (
             <p key={w}>{w}</p>
           ))}
         </details>
       )}
-      {!dirty && !(scoreIsObserved && v1) && health.warnings.map((w) => <p key={w}>{w}</p>)}
     </section>
   );
   const resiliencePanel = (
@@ -812,6 +861,39 @@ export default function EconomicIntelligence({ page }: { page: string }) {
           No personalized economic exposure statement is supported by the current indicators and
           confirmed inputs. This is not a safety guarantee.
         </p>
+      )}
+    </section>
+  );
+  const economicImpactPanel = (
+    <section className="live-panel economic-impact-panel">
+      <h2>Inflation impact on your cash flow</h2>
+      {!context?.economic_impact?.available ? (
+        <p>{context?.economic_impact?.reason ?? "Economic impact is unavailable."}</p>
+      ) : (
+        <>
+          <p>
+            This applies the current PCE rate to modeled essential expenses. It does not inflate
+            debt principal, transfers, or every purchase category.
+          </p>
+          <div className="live-grid">
+            <article className="impact-metric">
+              <span>Essential spending</span>
+              <strong>{currency(context.economic_impact.monthly_essential_baseline ?? 0)}</strong>
+              <small>Current modeled 30-day amount</small>
+            </article>
+            <article className="impact-metric">
+              <span>Additional 30-day burn</span>
+              <strong>+{currency(context.economic_impact.additional_burn_30d ?? 0)}</strong>
+              <small>At {context.economic_impact.inflation_rate_pct?.toFixed(2)}% PCE sensitivity</small>
+            </article>
+            <article className="impact-metric">
+              <span>Additional 90-day burn</span>
+              <strong>+{currency(context.economic_impact.additional_burn_90d ?? 0)}</strong>
+              <small>If the stressed monthly level persists</small>
+            </article>
+          </div>
+          <p className="impact-method">{context.economic_impact.method}</p>
+        </>
       )}
     </section>
   );
@@ -919,25 +1001,12 @@ export default function EconomicIntelligence({ page }: { page: string }) {
               Net worth change
               <strong className="live-value">{currency(simulation.net_worth_change)}</strong>
             </p>
-            <p>
-              Score: {simulation.before.health.score ?? "withheld"} →{" "}
-              {simulation.after.health.score ?? "withheld"}
-            </p>
           </div>
           <CashChart result={simulation} />
           <p>
             Minimum checking: {currency(simulation.before.cash_plan.minimum_checking)} →{" "}
             {currency(simulation.after.cash_plan.minimum_checking)}
           </p>
-          <p>
-            Emergency months: {simulation.before.health.metrics.emergency_months ?? "unknown"} →{" "}
-            {simulation.after.health.metrics.emergency_months ?? "unknown"}
-          </p>
-          {simulation.score_changes.map((c, i) => (
-            <p key={"change-" + i}>
-              {c.component}: {c.before ?? "withheld"} → {c.after ?? "withheld"}. {c.explanation}
-            </p>
-          ))}
           {simulation.after.guardian_alerts.map((a, i) => (
             <p key={i} className="live-warning">
               {a.cause}
@@ -972,18 +1041,19 @@ export default function EconomicIntelligence({ page }: { page: string }) {
     health: healthPanel,
     resilience: resiliencePanel,
     economy: economyPanel,
+    economicImpact: economicImpactPanel,
     chat: chatPanel,
     cut: cutPanel,
   };
   // Each page shows only what belongs to it (previously all four pages repeated the same panels).
   const panelOrder =
     page === "Digital Twin"
-      ? ["cut", "simulation", "inputs", "resilience"]
+      ? ["cut", "simulation"]
       : page === "Health Score"
         ? ["health", "inputs"]
         : page === "AI Co-Pilot"
-          ? ["chat", "inputs"]
-          : ["economy", "resilience"];
+          ? ["chat"]
+          : ["economy", "economicImpact", "resilience"];
   return (
     <div className="live-finance economy-page">
       <section className="welcome">

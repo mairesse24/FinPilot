@@ -6,6 +6,7 @@ import ReliabilityNotices from "./ReliabilityNotices";
 import AccountDetails from "./AccountDetails";
 import { useFinance, useHealthScore, useSlow } from "./financeStore";
 import { ForecastPanel, GuardianPanel, PageSkeleton, fmtDate, fmtDateLong, money, sourceLabel } from "./dashboardParts";
+import LiveTransactionDemo from "./LiveTransactionDemo";
 
 const subtitles: Record<string, string> = {
   Overview: "Your accounts, cash flow and upcoming obligations in one place.",
@@ -197,7 +198,10 @@ export default function ConnectedDashboard({ page }: { page: string }) {
           <h1>{page === "Overview" ? `Welcome, ${context.user.name}` : page}</h1>
           <p>{subtitles[page] ?? subtitles.Overview}</p>
         </div>
-        <button onClick={f.reload}>Reload analysis</button>
+        <div className="welcome-actions">
+          {page === "Overview" && <LiveTransactionDemo accounts={dashboard.accounts} />}
+          <button onClick={f.reload}>Reload analysis</button>
+        </div>
       </section>
       {context.loaded_at && <p className="snapshot-time">Last bank-data sync: {new Date(context.loaded_at).toLocaleString()}</p>}
       <ReliabilityNotices

@@ -70,6 +70,14 @@ export default function App() {
     return () => window.removeEventListener("hashchange", sync);
   }, []);
   useEffect(() => {
+    const receiveDemoAlert = (event: Event) => {
+      const alert = (event as CustomEvent<Alert>).detail;
+      if (alert) setDemoAlert(alert);
+    };
+    window.addEventListener("finpilot:demo-alert", receiveDemoAlert);
+    return () => window.removeEventListener("finpilot:demo-alert", receiveDemoAlert);
+  }, []);
+  useEffect(() => {
     const c = new AbortController();
     get<Context>("context", c.signal)
       .then(setContext)

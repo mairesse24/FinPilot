@@ -54,10 +54,16 @@ def seed(settings, configure=False, checking_balance=DEFAULT_CHECKING_BALANCE):
         address = {'street_number': '100', 'street_name': 'Demo Lane', 'city': 'Richardson', 'state': 'TX', 'zip': '75080'}
         uid = create('customer', '/customers', {'first_name': 'Alex', 'last_name': 'FinPilot Demo', 'address': address})
         checking = create('checking', f'/customers/{uid}/accounts', {'type': 'Checking', 'nickname': 'FinPilot Demo Checking', 'rewards': 0, 'balance': checking_balance})
+        abc_checking = create('checking-abc', f'/customers/{uid}/accounts', {'type': 'Checking', 'nickname': 'ABC Bank Checking', 'rewards': 0, 'balance': 5000})
+        xyz_checking = create('checking-xyz', f'/customers/{uid}/accounts', {'type': 'Checking', 'nickname': 'XYZ Bank Checking', 'rewards': 0, 'balance': 20000})
         create('savings', f'/customers/{uid}/accounts', {'type': 'Savings', 'nickname': 'Emergency Savings', 'rewards': 0, 'balance': 600})
-        create('card', f'/customers/{uid}/accounts', {'type': 'Credit Card', 'nickname': 'Demo Card', 'rewards': 0, 'balance': 420})
+        create('savings-xyz', f'/customers/{uid}/accounts', {'type': 'Savings', 'nickname': 'XYZ High-Yield Savings', 'rewards': 0, 'balance': 12000})
+        create('card', f'/customers/{uid}/accounts', {'type': 'Credit Card', 'nickname': 'Demo Rewards Card', 'rewards': 0, 'balance': 420})
+        create('card-travel', f'/customers/{uid}/accounts', {'type': 'Credit Card', 'nickname': 'ABC Travel Card', 'rewards': 0, 'balance': 1850})
         loan = create('loan', f'/accounts/{checking}/loans', {'type': 'auto', 'status': 'approved',
                       'credit_score': 700, 'monthly_payment': 150, 'amount': 5000, 'description': 'Synthetic auto loan'})
+        mortgage = create('loan-mortgage', f'/accounts/{xyz_checking}/loans', {'type': 'home', 'status': 'approved',
+                          'credit_score': 700, 'monthly_payment': 1450, 'amount': 185000, 'description': 'Synthetic home mortgage'})
         merchant = create('merchant', '/merchants', {'name': 'FinPilot Synthetic Store', 'address': address, 'geocode': {'lat': 32.985, 'lng': -96.75}})
         for i in range(40):
             when = as_of - timedelta(days=119 - i * 3)
@@ -69,13 +75,14 @@ def seed(settings, configure=False, checking_balance=DEFAULT_CHECKING_BALANCE):
             create(f'payroll-{i}', f'/accounts/{checking}/deposits', {
                 'medium': 'balance', 'transaction_date': str(as_of - timedelta(days=1 + i * 14)),
                 'amount': 2100, 'status': 'completed', 'description': 'Synthetic biweekly paycheck'})
-        schedules = {'customer_id': uid, 'loan_balances': {loan: 5000},
+        schedules = {'customer_id': uid, 'loan_balances': {loan: 5000, mortgage: 185000},
                      'default_checking_purchase_category': 'shopping',
                      'income': [{'name': 'Synthetic biweekly paycheck', 'amount': 2100, 'frequency': 'biweekly', 'date': str(as_of + timedelta(days=11))}],
                      'bills': [{'name': 'Demo rent', 'amount': 1500, 'frequency': 'monthly', 'date': str(as_of + timedelta(days=4)), 'category': 'rent'},
                                {'name': 'Demo utilities', 'amount': 120, 'frequency': 'monthly', 'date': str(as_of + timedelta(days=6)), 'category': 'utilities'},
                                {'name': 'Demo card minimum', 'amount': 35, 'frequency': 'monthly', 'date': str(as_of + timedelta(days=8)), 'category': 'debt_payment'},
-                               {'name': 'Demo auto loan payment', 'amount': 150, 'frequency': 'monthly', 'date': str(as_of + timedelta(days=9)), 'category': 'debt_payment', 'liability_account_id': f'loan:{loan}'}]}
+                               {'name': 'Demo auto loan payment', 'amount': 150, 'frequency': 'monthly', 'date': str(as_of + timedelta(days=9)), 'category': 'debt_payment', 'liability_account_id': f'loan:{loan}'},
+                               {'name': 'Demo mortgage payment', 'amount': 1450, 'frequency': 'monthly', 'date': str(as_of + timedelta(days=12)), 'category': 'debt_payment', 'liability_account_id': f'loan:{mortgage}'}]}
         SCHEDULES.write_text(json.dumps(schedules, indent=2))
         if configure:
             for key, value in {'DATA_SOURCE': 'nessie', 'NESSIE_CUSTOMER_ID': uid,
@@ -94,7 +101,7 @@ def main():
                         help='Opening checking balance for the fictional customer (default 6500)')
     args = parser.parse_args()
     if not args.apply:
-        print('Dry run: creates one fictional customer, 3 accounts, an auto loan, 1 merchant, 40 synthetic purchases and 8 historical deposits. Use --apply to create them in Nessie sandbox.')
+        print('Dry run: creates one fictional customer, 7 bank/card accounts, two loans, 1 merchant, 40 synthetic purchases and 8 historical deposits. Use --apply to create them in Nessie sandbox.')
         return
     try:
         seed(Settings(), args.configure, args.checking_balance)
