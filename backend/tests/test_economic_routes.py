@@ -18,6 +18,17 @@ def test_new_routes_are_real_and_legacy_score_is_preserved(client):
     assert 'not a prediction' in impact['method']
 
 
+def test_committed_deployment_snapshot_provides_economic_indicators():
+    from intelligence.economic_data import cached
+    from intelligence.regimes import classify
+    snapshot=cached()
+    economy=classify(snapshot,snapshot['as_of'])
+    assert economy['status']!='Insufficient Data'
+    assert economy['features']['CPIAUCSL_yoy_pct'] is not None
+    assert economy['features']['PCEPI_yoy_pct'] is not None
+    assert all(dimension['available'] for dimension in economy['dimensions'])
+
+
 def test_scoped_economic_stress_and_facts(client):
     from app.calc.models import Bill
     from decimal import Decimal
