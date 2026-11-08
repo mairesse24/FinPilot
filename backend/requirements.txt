@@ -1,13 +1,14 @@
-fastapi
-uvicorn[standard]
-pydantic>=2
-pydantic-settings
-psycopg[binary,pool]
+fastapi==0.162.2
+uvicorn[standard]==0.54.0
+pydantic==2.14.3
+pydantic-settings==2.16.2
+psycopg[binary,pool]==3.3.8
+psycopg-pool==3.3.3
 pymongo==4.19.0
 dnspython==2.9.2
 mongomock==4.3.0
-pytest
-httpx
+pytest==9.2.0
+httpx==0.28.1
 
 # Member 3 dependencies; keep backend dependencies above and root CLI files intact.
 -r ../requirements-copilot.txt

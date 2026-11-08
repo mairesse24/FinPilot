@@ -42,7 +42,7 @@ If `backend/.env` is ever missing, run this from the repo root: `cp backend/.env
 
 ## 4. Create the tables
 
-> **Not yet available:** `schema.sql` and the seed script are created during implementation (about minute 35–75 of the build). Stop after step 3 for now; the build agent will do steps 4 and 5 for you or tell you exactly what to click.
+> **Note:** MongoDB Atlas is now the main database (see `docs/mongodb-setup.md`). Supabase is kept as a backup. The seed script loads Supabase only when no MongoDB address is configured.
 
 1. In the dashboard, open **SQL Editor** → **New query**.
 2. Paste the full contents of `backend/app/db/schema.sql` (created by the implementation plan) and click **Run**.
