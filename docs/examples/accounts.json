@@ -1,0 +1,22 @@
+{
+  "accounts": [
+    {
+      "id": "7bcfb771-de37-5ec6-8ac2-1fc09996471a",
+      "name": "Everyday Checking",
+      "account_type": "checking",
+      "balance": 2400.0
+    },
+    {
+      "id": "bdab55fe-dab3-52be-a6a4-6f61586a7100",
+      "name": "Savings",
+      "account_type": "savings",
+      "balance": 600.0
+    },
+    {
+      "id": "932393b9-c86f-5f32-a41f-f53f0e571512",
+      "name": "Rewards Card",
+      "account_type": "credit_card",
+      "balance": 420.0
+    }
+  ]
+}

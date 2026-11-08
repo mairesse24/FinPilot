@@ -1,0 +1,506 @@
+{
+  "baseline": {
+    "projected_low": {
+      "date": "2026-11-17",
+      "balance": 367.08
+    },
+    "end_balance": 3753.23,
+    "health_score": 60.4,
+    "alerts": [
+      {
+        "id": "low_projected_balance:2026-11-07",
+        "rule": "low_projected_balance",
+        "severity": "medium",
+        "title": "Checking balance projected to dip below your safety buffer",
+        "cause": "Checking holds $2,400.00 today but is projected to fall to $367.08 on Nov 17, below your $500.00 safety buffer.",
+        "numbers": {
+          "current": 2400.0,
+          "projected_low": 367.08,
+          "safety_buffer": 500.0,
+          "low_date": "2026-11-17"
+        },
+        "recommended_action": "Trim about $150 of discretionary spending over the next 10 days to stay above the buffer.",
+        "suggested_scenario": {
+          "type": "spending_cut",
+          "reduction_amount": 150.0,
+          "horizon_days": 10,
+          "category": null
+        }
+      },
+      {
+        "id": "low_emergency_savings:2026-11-07",
+        "rule": "low_emergency_savings",
+        "severity": "medium",
+        "title": "Emergency savings are thin",
+        "cause": "Liquid savings of $3,000.00 cover 1.4 months of essential spending ($2,170.00/month); 3 months is the usual target.",
+        "numbers": {
+          "liquid_balance": 3000.0,
+          "monthly_essentials": 2170.0,
+          "months_covered": 1.38
+        },
+        "recommended_action": "Build a cash reserve of at least three months of essentials.",
+        "suggested_scenario": null
+      }
+    ],
+    "series": [
+      {
+        "date": "2026-11-08",
+        "projected_balance": 2362.0,
+        "low": 2356.31,
+        "high": 2367.69,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-11-09",
+        "projected_balance": 2324.0,
+        "low": 2315.96,
+        "high": 2332.04,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-11-10",
+        "projected_balance": 2286.77,
+        "low": 2276.92,
+        "high": 2296.62,
+        "predicted_spend": 37.23
+      },
+      {
+        "date": "2026-11-11",
+        "projected_balance": 746.77,
+        "low": 735.4,
+        "high": 758.14,
+        "predicted_spend": 40.0
+      },
+      {
+        "date": "2026-11-12",
+        "projected_balance": 707.54,
+        "low": 694.82,
+        "high": 720.25,
+        "predicted_spend": 39.23
+      },
+      {
+        "date": "2026-11-13",
+        "projected_balance": 543.54,
+        "low": 529.61,
+        "high": 557.47,
+        "predicted_spend": 44.0
+      },
+      {
+        "date": "2026-11-14",
+        "projected_balance": 496.31,
+        "low": 481.26,
+        "high": 511.35,
+        "predicted_spend": 47.23
+      },
+      {
+        "date": "2026-11-15",
+        "projected_balance": 442.31,
+        "low": 426.22,
+        "high": 458.39,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-11-16",
+        "projected_balance": 404.31,
+        "low": 387.25,
+        "high": 421.37,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-11-17",
+        "projected_balance": 367.08,
+        "low": 349.09,
+        "high": 385.06,
+        "predicted_spend": 37.23
+      },
+      {
+        "date": "2026-11-18",
+        "projected_balance": 2427.08,
+        "low": 2408.22,
+        "high": 2445.94,
+        "predicted_spend": 40.0
+      },
+      {
+        "date": "2026-11-19",
+        "projected_balance": 2387.85,
+        "low": 2368.15,
+        "high": 2407.54,
+        "predicted_spend": 39.23
+      },
+      {
+        "date": "2026-11-20",
+        "projected_balance": 2343.85,
+        "low": 2323.34,
+        "high": 2364.35,
+        "predicted_spend": 44.0
+      },
+      {
+        "date": "2026-11-21",
+        "projected_balance": 2296.62,
+        "low": 2275.34,
+        "high": 2317.89,
+        "predicted_spend": 47.23
+      },
+      {
+        "date": "2026-11-22",
+        "projected_balance": 2258.62,
+        "low": 2236.59,
+        "high": 2280.64,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-11-23",
+        "projected_balance": 2220.62,
+        "low": 2197.87,
+        "high": 2243.36,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-11-24",
+        "projected_balance": 2183.38,
+        "low": 2159.94,
+        "high": 2206.83,
+        "predicted_spend": 37.23
+      },
+      {
+        "date": "2026-11-25",
+        "projected_balance": 2143.38,
+        "low": 2119.26,
+        "high": 2167.51,
+        "predicted_spend": 40.0
+      },
+      {
+        "date": "2026-11-26",
+        "projected_balance": 2104.15,
+        "low": 2079.37,
+        "high": 2128.94,
+        "predicted_spend": 39.23
+      },
+      {
+        "date": "2026-11-27",
+        "projected_balance": 2060.15,
+        "low": 2034.72,
+        "high": 2085.58,
+        "predicted_spend": 44.0
+      },
+      {
+        "date": "2026-11-28",
+        "projected_balance": 2012.92,
+        "low": 1986.86,
+        "high": 2038.98,
+        "predicted_spend": 47.23
+      },
+      {
+        "date": "2026-11-29",
+        "projected_balance": 1974.92,
+        "low": 1948.25,
+        "high": 2001.59,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-11-30",
+        "projected_balance": 1936.92,
+        "low": 1909.65,
+        "high": 1964.19,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-12-01",
+        "projected_balance": 1899.69,
+        "low": 1871.83,
+        "high": 1927.55,
+        "predicted_spend": 37.23
+      },
+      {
+        "date": "2026-12-02",
+        "projected_balance": 3959.69,
+        "low": 3931.26,
+        "high": 3988.12,
+        "predicted_spend": 40.0
+      },
+      {
+        "date": "2026-12-03",
+        "projected_balance": 3920.46,
+        "low": 3891.47,
+        "high": 3949.46,
+        "predicted_spend": 39.23
+      },
+      {
+        "date": "2026-12-04",
+        "projected_balance": 3876.46,
+        "low": 3846.91,
+        "high": 3906.01,
+        "predicted_spend": 44.0
+      },
+      {
+        "date": "2026-12-05",
+        "projected_balance": 3829.23,
+        "low": 3799.14,
+        "high": 3859.32,
+        "predicted_spend": 47.23
+      },
+      {
+        "date": "2026-12-06",
+        "projected_balance": 3791.23,
+        "low": 3760.61,
+        "high": 3821.85,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-12-07",
+        "projected_balance": 3753.23,
+        "low": 3722.09,
+        "high": 3784.38,
+        "predicted_spend": 38.0
+      }
+    ]
+  },
+  "scenario": {
+    "projected_low": {
+      "date": "2026-11-17",
+      "balance": 567.08
+    },
+    "end_balance": 3953.23,
+    "health_score": 60.4,
+    "alerts": [
+      {
+        "id": "low_emergency_savings:2026-11-07",
+        "rule": "low_emergency_savings",
+        "severity": "medium",
+        "title": "Emergency savings are thin",
+        "cause": "Liquid savings of $3,000.00 cover 1.4 months of essential spending ($2,170.00/month); 3 months is the usual target.",
+        "numbers": {
+          "liquid_balance": 3000.0,
+          "monthly_essentials": 2170.0,
+          "months_covered": 1.38
+        },
+        "recommended_action": "Build a cash reserve of at least three months of essentials.",
+        "suggested_scenario": null
+      }
+    ],
+    "series": [
+      {
+        "date": "2026-11-08",
+        "projected_balance": 2382.0,
+        "low": 2376.31,
+        "high": 2387.69,
+        "predicted_spend": 18.0
+      },
+      {
+        "date": "2026-11-09",
+        "projected_balance": 2364.0,
+        "low": 2355.96,
+        "high": 2372.04,
+        "predicted_spend": 18.0
+      },
+      {
+        "date": "2026-11-10",
+        "projected_balance": 2346.77,
+        "low": 2336.92,
+        "high": 2356.62,
+        "predicted_spend": 17.23
+      },
+      {
+        "date": "2026-11-11",
+        "projected_balance": 826.77,
+        "low": 815.4,
+        "high": 838.14,
+        "predicted_spend": 20.0
+      },
+      {
+        "date": "2026-11-12",
+        "projected_balance": 807.54,
+        "low": 794.82,
+        "high": 820.25,
+        "predicted_spend": 19.23
+      },
+      {
+        "date": "2026-11-13",
+        "projected_balance": 663.54,
+        "low": 649.61,
+        "high": 677.47,
+        "predicted_spend": 24.0
+      },
+      {
+        "date": "2026-11-14",
+        "projected_balance": 636.31,
+        "low": 621.26,
+        "high": 651.35,
+        "predicted_spend": 27.23
+      },
+      {
+        "date": "2026-11-15",
+        "projected_balance": 602.31,
+        "low": 586.22,
+        "high": 618.39,
+        "predicted_spend": 18.0
+      },
+      {
+        "date": "2026-11-16",
+        "projected_balance": 584.31,
+        "low": 567.25,
+        "high": 601.37,
+        "predicted_spend": 18.0
+      },
+      {
+        "date": "2026-11-17",
+        "projected_balance": 567.08,
+        "low": 549.09,
+        "high": 585.06,
+        "predicted_spend": 17.23
+      },
+      {
+        "date": "2026-11-18",
+        "projected_balance": 2627.08,
+        "low": 2608.22,
+        "high": 2645.94,
+        "predicted_spend": 40.0
+      },
+      {
+        "date": "2026-11-19",
+        "projected_balance": 2587.85,
+        "low": 2568.15,
+        "high": 2607.54,
+        "predicted_spend": 39.23
+      },
+      {
+        "date": "2026-11-20",
+        "projected_balance": 2543.85,
+        "low": 2523.34,
+        "high": 2564.35,
+        "predicted_spend": 44.0
+      },
+      {
+        "date": "2026-11-21",
+        "projected_balance": 2496.62,
+        "low": 2475.34,
+        "high": 2517.89,
+        "predicted_spend": 47.23
+      },
+      {
+        "date": "2026-11-22",
+        "projected_balance": 2458.62,
+        "low": 2436.59,
+        "high": 2480.64,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-11-23",
+        "projected_balance": 2420.62,
+        "low": 2397.87,
+        "high": 2443.36,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-11-24",
+        "projected_balance": 2383.38,
+        "low": 2359.94,
+        "high": 2406.83,
+        "predicted_spend": 37.23
+      },
+      {
+        "date": "2026-11-25",
+        "projected_balance": 2343.38,
+        "low": 2319.26,
+        "high": 2367.51,
+        "predicted_spend": 40.0
+      },
+      {
+        "date": "2026-11-26",
+        "projected_balance": 2304.15,
+        "low": 2279.37,
+        "high": 2328.94,
+        "predicted_spend": 39.23
+      },
+      {
+        "date": "2026-11-27",
+        "projected_balance": 2260.15,
+        "low": 2234.72,
+        "high": 2285.58,
+        "predicted_spend": 44.0
+      },
+      {
+        "date": "2026-11-28",
+        "projected_balance": 2212.92,
+        "low": 2186.86,
+        "high": 2238.98,
+        "predicted_spend": 47.23
+      },
+      {
+        "date": "2026-11-29",
+        "projected_balance": 2174.92,
+        "low": 2148.25,
+        "high": 2201.59,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-11-30",
+        "projected_balance": 2136.92,
+        "low": 2109.65,
+        "high": 2164.19,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-12-01",
+        "projected_balance": 2099.69,
+        "low": 2071.83,
+        "high": 2127.55,
+        "predicted_spend": 37.23
+      },
+      {
+        "date": "2026-12-02",
+        "projected_balance": 4159.69,
+        "low": 4131.26,
+        "high": 4188.12,
+        "predicted_spend": 40.0
+      },
+      {
+        "date": "2026-12-03",
+        "projected_balance": 4120.46,
+        "low": 4091.47,
+        "high": 4149.46,
+        "predicted_spend": 39.23
+      },
+      {
+        "date": "2026-12-04",
+        "projected_balance": 4076.46,
+        "low": 4046.91,
+        "high": 4106.01,
+        "predicted_spend": 44.0
+      },
+      {
+        "date": "2026-12-05",
+        "projected_balance": 4029.23,
+        "low": 3999.14,
+        "high": 4059.32,
+        "predicted_spend": 47.23
+      },
+      {
+        "date": "2026-12-06",
+        "projected_balance": 3991.23,
+        "low": 3960.61,
+        "high": 4021.85,
+        "predicted_spend": 38.0
+      },
+      {
+        "date": "2026-12-07",
+        "projected_balance": 3953.23,
+        "low": 3922.09,
+        "high": 3984.38,
+        "predicted_spend": 38.0
+      }
+    ]
+  },
+  "delta": {
+    "low_balance_change": 200.0,
+    "end_balance_change": 200.0,
+    "health_score_change": 0.0
+  },
+  "meta": {
+    "source": "baseline",
+    "is_prototype_estimate": true,
+    "as_of": "2026-11-07",
+    "generated_at": "2026-11-08T00:32:31.478294Z",
+    "warning": null
+  }
+}
