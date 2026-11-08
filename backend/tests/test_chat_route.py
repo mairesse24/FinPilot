@@ -22,7 +22,7 @@ def test_chat_simulation_question_quotes_real_delta():
     low = sim["scenario"]["projected_low"]["balance"]
     r = ask(c, "what if I cut $200?").json()
     assert f"${low:,.2f}" in r["reply"] and "prototype estimate" in r["reply"]
-    assert r["tool_calls"][0]["name"] == "run_simulation"
+    assert r["tool_calls"][-1]["name"] == "run_simulation"
 
 
 def test_chat_help_for_unknown_question(client):
