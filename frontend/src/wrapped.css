@@ -1,0 +1,88 @@
+.wrapped-shell { position: relative; margin: -28px -34px; background: #090d13; overflow: hidden; }
+.wrapped-story { height: calc(100vh - 64px); overflow-y: auto; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+.wrapped-slide { position: relative; min-height: calc(100vh - 64px); scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; gap: 22px; padding: clamp(48px, 8vw, 112px) clamp(32px, 10vw, 150px); overflow: hidden; }
+.wrapped-slide::before { content: ""; position: absolute; width: 520px; height: 520px; border-radius: 50%; right: -220px; top: -250px; background: radial-gradient(circle, #48cfb020, transparent 67%); pointer-events: none; }
+.wrapped-slide:nth-child(even) { background: linear-gradient(135deg, #0d141b 0%, #0b1017 70%); }
+.wrapped-slide h1, .wrapped-slide h2 { margin: 0; max-width: 850px; font-size: clamp(42px, 7vw, 86px); line-height: .98; letter-spacing: -.055em; }
+.wrapped-slide h2 { font-size: clamp(36px, 5vw, 68px); }
+.wrapped-kicker { display: flex; align-items: center; gap: 9px; color: #69dcc1; font-size: 12px; font-weight: 700; letter-spacing: .18em; }
+.wrapped-lede { max-width: 700px; margin: 0; color: #aebac9; font-size: clamp(17px, 2vw, 23px); line-height: 1.55; }
+.wrapped-hero { background: radial-gradient(circle at 82% 24%, #174c4366, transparent 35%), linear-gradient(145deg, #0c1119, #090d13); }
+.wrapped-hero-value { display: grid; width: fit-content; gap: 3px; }
+.wrapped-hero-value span, .wrapped-caption, .wrapped-source { color: #8795a8; }
+.wrapped-hero-value strong, .wrapped-big-number { font-size: clamp(48px, 8vw, 96px); line-height: 1; letter-spacing: -.055em; color: #f5f8fb; }
+.wrapped-hero-value small { color: #97a5b7; font-size: 14px; }
+.wrapped-source { margin: 0; font-size: 12px; text-transform: capitalize; }
+.wrapped-next, .wrapped-actions button { display: inline-flex; width: fit-content; align-items: center; gap: 9px; padding: 12px 17px; border: 1px solid #4ed7b8; border-radius: 999px; background: #48cfb0; color: #07110f; font-weight: 700; }
+.wrapped-duo, .wrapped-economic-grid, .wrapped-outlook { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; width: min(900px, 100%); }
+.wrapped-duo article, .wrapped-economic-grid article { display: grid; gap: 8px; padding: clamp(22px, 4vw, 38px); border: 1px solid #293646; border-radius: 20px; background: #111823cc; }
+.wrapped-duo svg { color: #59d8ba; }
+.wrapped-duo span, .wrapped-economic-grid span, .wrapped-outlook span, .wrapped-debt-grid span { color: #95a4b7; }
+.wrapped-duo strong, .wrapped-economic-grid strong { font-size: clamp(29px, 4vw, 48px); letter-spacing: -.04em; }
+.wrapped-duo small, .wrapped-economic-grid small, .wrapped-outlook small { color: #7d8ba0; }
+.wrapped-insight { max-width: 850px; margin: 0; padding-left: 16px; border-left: 2px solid #48cfb0; color: #aebac9; font-size: 17px; line-height: 1.55; }
+.wrapped-insight strong { color: #edf5f3; }
+.wrapped-debt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 260px)); gap: 14px; }
+.wrapped-debt-grid div { display: grid; gap: 4px; padding: 18px; border-top: 1px solid #344256; }
+.wrapped-debt-grid strong { font-size: 25px; }
+.wrapped-caption { margin: -15px 0 0; font-size: 12px; }
+.wrapped-categories { display: grid; gap: 13px; width: min(760px, 100%); }
+.wrapped-category-row { display: grid; gap: 6px; }
+.wrapped-category-row > div { display: flex; justify-content: space-between; gap: 24px; text-transform: capitalize; }
+.wrapped-bar { height: 7px; overflow: hidden; border-radius: 99px; background: #222c39; }
+.wrapped-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #48cfb0, #7de4cc); }
+.wrapped-score-layout { display: grid; grid-template-columns: auto minmax(0, 560px); gap: 38px; align-items: center; }
+.wrapped-score { --score: 0; width: clamp(170px, 23vw, 245px); aspect-ratio: 1; padding: 12px; border-radius: 50%; background: conic-gradient(#48cfb0 calc(var(--score) * 1%), #253140 0); }
+.wrapped-score.watch { background: conic-gradient(#f5b94c calc(var(--score) * 1%), #253140 0); }
+.wrapped-score.risk { background: conic-gradient(#ef6b63 calc(var(--score) * 1%), #253140 0); }
+.wrapped-score > div { height: 100%; display: grid; place-content: center; text-align: center; border-radius: 50%; background: #0d131c; }
+.wrapped-score strong { display: block; font-size: clamp(40px, 6vw, 66px); letter-spacing: -.06em; }
+.wrapped-score span { color: #9aa9bb; }
+.wrapped-score-layout h3 { font-size: 25px; margin: 0 0 10px; }
+.wrapped-score-layout p { color: #a8b5c5; line-height: 1.6; }
+.wrapped-economic-grid article strong { color: #eef5f4; }
+.wrapped-advice { display: flex; gap: 14px; max-width: 900px; padding: 20px; border: 1px solid #315247; border-radius: 16px; background: #14302873; }
+.wrapped-advice svg { flex: 0 0 auto; color: #67ddc1; }
+.wrapped-advice p { margin: 5px 0 0; color: #b8c5d1; line-height: 1.5; }
+.wrapped-outlook > div { display: grid; gap: 7px; padding: 20px 0; border-top: 1px solid #344256; }
+.wrapped-outlook strong { font-size: clamp(27px, 4vw, 45px); }
+.wrapped-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.wrapped-actions a { padding: 12px 17px; border: 1px solid #344256; border-radius: 999px; color: #c6d0dc; }
+.wrapped-restart { width: fit-content; display: inline-flex; align-items: center; gap: 7px; padding: 8px 0; border: 0; background: none; color: #8999ac; }
+.wrapped-finale .estimate-notices { width: min(850px, 100%); }
+.wrapped-finale .estimate-details { max-height: 150px; overflow-y: auto; }
+.wrapped-progress { position: absolute; z-index: 3; right: 20px; top: 50%; transform: translateY(-50%); display: grid; gap: 8px; }
+.wrapped-progress button { width: 20px; height: 20px; display: grid; place-content: center; padding: 0; border: 0; background: transparent; }
+.wrapped-progress span { width: 6px; height: 6px; border-radius: 99px; background: #536073; transition: .2s; }
+.wrapped-progress button.active span { height: 22px; background: #57d9ba; }
+.wrapped-autoplay { position: fixed; z-index: 26; top: 88px; left: 216px; }
+.wrapped-autoplay button { display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px; border: 1px solid #4f647a; border-radius: 999px; background: #0b111bf2; box-shadow: 0 5px 20px #0008; color: #d4dee9; font-size: 12px; }
+.wrapped-autoplay button:hover { border-color: #55d7b9; color: #eef8f5; }
+.wrapped-timer-track { position: fixed; z-index: 25; top: 68px; right: 0; left: 196px; height: 8px; overflow: hidden; background: #263445; box-shadow: 0 2px 10px #000c; }
+.wrapped-timer { --slide-duration: 7000ms; width: 100%; height: 100%; transform-origin: left; background: linear-gradient(90deg, #22cda7, #8df3d8); box-shadow: 0 0 12px #48cfb0; animation: wrapped-countdown var(--slide-duration) linear forwards; }
+.wrapped-timer.held { animation-play-state: paused; }
+@keyframes wrapped-countdown { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.wrapped-state { min-height: 55vh; display: grid; place-content: center; justify-items: center; text-align: center; gap: 14px; }
+.wrapped-state button { padding: 10px 14px; border: 1px solid #405066; border-radius: 8px; background: #17202d; color: white; }
+@media (max-width: 800px) {
+  .wrapped-shell { margin: -20px -18px; }
+  .wrapped-story, .wrapped-slide { height: calc(100vh - 60px); min-height: calc(100vh - 60px); }
+  .wrapped-slide { padding: 58px 28px 72px; gap: 17px; }
+  .wrapped-duo, .wrapped-economic-grid, .wrapped-outlook { grid-template-columns: 1fr; gap: 10px; }
+  .wrapped-duo article, .wrapped-economic-grid article { padding: 18px; }
+  .wrapped-score-layout { grid-template-columns: 1fr; gap: 20px; }
+  .wrapped-score { width: 160px; }
+  .wrapped-progress { right: 8px; }
+  .wrapped-autoplay { top: 86px; left: 14px; }
+}
+.nav-collapsed .wrapped-timer-track { left: 72px; }
+.nav-collapsed .wrapped-autoplay { left: 92px; }
+@media (max-width: 880px) {
+  .wrapped-timer-track,
+  .nav-collapsed .wrapped-timer-track { left: 0; }
+  .wrapped-autoplay,
+  .nav-collapsed .wrapped-autoplay { left: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wrapped-story { scroll-behavior: auto; }
+}
