@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
 
     database_url: str | None = None
+    mongodb_uri: str | None = None
+    mongodb_db: str = "finpilot"
     cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:3000"]
     demo_user_id: str = DEMO_USER_ID
     intelligence_mode: Literal["auto", "baseline"] = "auto"

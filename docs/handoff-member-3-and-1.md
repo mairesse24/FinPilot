@@ -1,6 +1,6 @@
 # Backend Handoff for Member 1 (Frontend) and Member 3 (AI/ML)
 
-Status: backend foundation in progress. Data shapes are readable at `/openapi.json` (and `/docs` in a browser) as soon as the app runs. Real example responses will be added to `docs/examples/` and `docs/api-contracts.md` after the endpoints work.
+Status: backend MVP is built and **live**: https://finpilot-o0gj.onrender.com (browse `/docs` for a clickable API page; open `/healthz` a few minutes before a demo because the free server sleeps when idle). The database is MongoDB Atlas (Supabase is the backup). Data shapes: `/openapi.json`. Example responses: `docs/examples/`; endpoint table: `docs/api-contracts.md`. The demo date is pinned to 2026-11-07.
 
 ## Member 1 (Frontend)
 
