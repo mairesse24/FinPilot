@@ -54,7 +54,7 @@ def test_emergency_savings_severity_levels():
                                       Account("a-sav", UID, "S", "savings", D(x))])
     # essentials ~ 20/day groceries = ~600/mo
     assert alerts(sav("100"))["low_emergency_savings"].severity == "high"
-    assert alerts(sav("1100"))["low_emergency_savings"].severity == "medium"
+    assert alerts(sav("800"))["low_emergency_savings"].severity == "medium"
     assert "low_emergency_savings" not in alerts(sav("5000"))
 
 
