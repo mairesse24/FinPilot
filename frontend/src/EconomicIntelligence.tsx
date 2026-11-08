@@ -901,8 +901,8 @@ export default function EconomicIntelligence({ page }: { page: string }) {
     <section className="live-panel">
       <h2>Try a what-if scenario</h2>
       <p>
-        Choose a change and compare your baseline with the hypothetical outcome. Confirm the
-        financial inputs below for a complete cash plan.
+        Choose a change and compare your baseline with the hypothetical outcome. For a complete
+        cash plan, confirm your inputs on the <a href="#/health-score">Health Score</a> page.
       </p>
       {error && errorScope === "simulation" && <ErrorSummary message={error} />}
       <select
