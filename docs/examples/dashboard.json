@@ -1,0 +1,122 @@
+{
+  "net_worth": 2580.0,
+  "assets": 3000.0,
+  "liabilities": 420.0,
+  "accounts": [
+    {
+      "id": "7bcfb771-de37-5ec6-8ac2-1fc09996471a",
+      "name": "Everyday Checking",
+      "account_type": "checking",
+      "balance": 2400.0
+    },
+    {
+      "id": "bdab55fe-dab3-52be-a6a4-6f61586a7100",
+      "name": "Savings",
+      "account_type": "savings",
+      "balance": 600.0
+    },
+    {
+      "id": "932393b9-c86f-5f32-a41f-f53f0e571512",
+      "name": "Rewards Card",
+      "account_type": "credit_card",
+      "balance": 420.0
+    }
+  ],
+  "income_30d": 4200.0,
+  "spending_30d": 2846.0,
+  "by_category": [
+    {
+      "category": "rent",
+      "amount": 1500.0
+    },
+    {
+      "category": "groceries",
+      "amount": 446.0
+    },
+    {
+      "category": "dining",
+      "amount": 332.0
+    },
+    {
+      "category": "entertainment",
+      "amount": 252.0
+    },
+    {
+      "category": "utilities",
+      "amount": 120.0
+    },
+    {
+      "category": "transportation",
+      "amount": 96.0
+    },
+    {
+      "category": "shopping",
+      "amount": 84.0
+    },
+    {
+      "category": "subscriptions",
+      "amount": 16.0
+    }
+  ],
+  "upcoming_bills": [
+    {
+      "name": "Rent",
+      "amount": 1500.0,
+      "due_date": "2026-11-11"
+    },
+    {
+      "name": "Utilities",
+      "amount": 120.0,
+      "due_date": "2026-11-13"
+    },
+    {
+      "name": "Streaming",
+      "amount": 16.0,
+      "due_date": "2026-11-15"
+    }
+  ],
+  "health_score": 62.4,
+  "active_alerts": [
+    {
+      "id": "low_projected_balance:2026-11-07",
+      "rule": "low_projected_balance",
+      "severity": "medium",
+      "title": "Checking balance projected to dip below your safety buffer",
+      "cause": "Checking holds $2,400.00 today but is projected to fall to $367.08 on Nov 17, below your $500.00 safety buffer.",
+      "numbers": {
+        "current": 2400.0,
+        "projected_low": 367.08,
+        "safety_buffer": 500.0,
+        "low_date": "2026-11-17"
+      },
+      "recommended_action": "Trim about $150 of discretionary spending over the next 10 days to stay above the buffer.",
+      "suggested_scenario": {
+        "type": "spending_cut",
+        "reduction_amount": 150.0,
+        "horizon_days": 10,
+        "category": null
+      }
+    },
+    {
+      "id": "low_emergency_savings:2026-11-07",
+      "rule": "low_emergency_savings",
+      "severity": "medium",
+      "title": "Emergency savings are thin",
+      "cause": "Liquid savings of $3,000.00 cover 1.4 months of essential spending ($2,170.00/month); 3 months is the usual target.",
+      "numbers": {
+        "liquid_balance": 3000.0,
+        "monthly_essentials": 2170.0,
+        "months_covered": 1.38
+      },
+      "recommended_action": "Build a cash reserve of at least three months of essentials.",
+      "suggested_scenario": null
+    }
+  ],
+  "meta": {
+    "source": "baseline",
+    "is_prototype_estimate": true,
+    "as_of": "2026-11-07",
+    "generated_at": "2026-11-08T00:33:45.747786Z",
+    "warning": null
+  }
+}

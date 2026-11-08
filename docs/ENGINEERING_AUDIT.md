@@ -2,6 +2,8 @@
 
 Audit date: **November 7, 2026 (America/Chicago)**. FinSight and ForeCastle are historical names; the implementation is named FinPilot.
 
+Historical scope note: this audit describes the intelligence-only workspace before the later backend-mvp integration. See `TEAM_INTEGRATION.md` for the merged API and adapter verification. Findings below have not been retrospectively rewritten as fixed; backend integration alone does not resolve their financial/model concerns.
+
 ## 1. Scope, evidence, and verdict
 
 This is an audit of the actual working directory, not an assessment based on the proposal. First-party source, scripts, tests, requirements, contracts, saved model metadata and generated examples were inspected. The relevant PNC ledger, its accounting helpers and upstream reconciliation tests were also inspected. Ignored upstream UI/agent examples are distinguished from active FinPilot functionality. This is not a line-by-line audit of every installed dependency, upstream notebook, or third-party demo, nor a vulnerability-database scan.

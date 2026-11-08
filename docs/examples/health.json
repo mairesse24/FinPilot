@@ -1,0 +1,80 @@
+{
+  "score": 62.4,
+  "components": [
+    {
+      "key": "cash_flow",
+      "name": "Cash flow",
+      "weight": 25.0,
+      "score": 100.0,
+      "metrics": {
+        "inflow_30d": 4200.0,
+        "outflow_30d": 2846.0,
+        "inflow_outflow_ratio": 1.476
+      },
+      "explanation": "Over the last 30 days $4,200.00 came in vs $2,846.00 went out (ratio 1.48)."
+    },
+    {
+      "key": "emergency",
+      "name": "Emergency fund",
+      "weight": 25.0,
+      "score": 23.0,
+      "metrics": {
+        "liquid": 3000.0,
+        "monthly_essentials": 2170.0,
+        "months_covered": 1.38
+      },
+      "explanation": "Liquid savings of $3,000.00 cover 1.4 months of essentials ($2,170.00/month)."
+    },
+    {
+      "key": "debt",
+      "name": "Debt burden",
+      "weight": 20.0,
+      "score": 100.0,
+      "metrics": {
+        "monthly_debt_payments": 35.0,
+        "monthly_income": 4500.0,
+        "debt_to_income": 0.008
+      },
+      "explanation": "Debt payments of $35.00 are 1% of $4,500.00 monthly income."
+    },
+    {
+      "key": "discipline",
+      "name": "Spending discipline",
+      "weight": 15.0,
+      "score": 13.0,
+      "metrics": {
+        "variable_spend_90d": 3650.0,
+        "discretionary_spend_90d": 2000.0,
+        "discretionary_share": 0.548
+      },
+      "explanation": "Discretionary items are 55% of $3,650.00 variable spending over 90 days."
+    },
+    {
+      "key": "readiness",
+      "name": "Bill readiness",
+      "weight": 15.0,
+      "score": 64.5,
+      "metrics": {
+        "cash": 2400.0,
+        "bills_due_30d": 1636.0,
+        "cover_ratio": 1.47
+      },
+      "explanation": "Checking holds $2,400.00 against $1,636.00 of bills due in 30 days (1.5x)."
+    }
+  ],
+  "strengths": [
+    "Cash flow is strong (100/100): Over the last 30 days $4,200.00 came in vs $2,846.00 went out (ratio 1.48).",
+    "Debt burden is strong (100/100): Debt payments of $35.00 are 1% of $4,500.00 monthly income."
+  ],
+  "weaknesses": [
+    "Emergency fund needs attention (23/100): Liquid savings of $3,000.00 cover 1.4 months of essentials ($2,170.00/month).",
+    "Spending discipline needs attention (13/100): Discretionary items are 55% of $3,650.00 variable spending over 90 days."
+  ],
+  "meta": {
+    "source": "baseline",
+    "is_prototype_estimate": true,
+    "as_of": "2026-11-07",
+    "generated_at": "2026-11-08T00:33:45.765970Z",
+    "warning": null
+  }
+}

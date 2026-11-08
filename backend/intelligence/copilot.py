@@ -35,7 +35,10 @@ def _numbers(text):
     return {float(m.replace(',', '')) for m in re.findall(r'(?<!\w)-?\d[\d,]*(?:\.\d+)?', text)}
 
 
-def chat(message, customer, spending, analysis, client=None, model=None, max_rounds=4, provider=None):
+def chat(message, customer, spending=None, analysis=None, client=None, model=None, max_rounds=4, provider=None):
+    if isinstance(message, list) and hasattr(customer, 'specs') and hasattr(customer, 'call'):
+        from .registry_copilot import chat_messages
+        return chat_messages(message, customer)
     if not isinstance(message, str) or not 1 <= len(message) <= 8000:
         raise ValueError('Message must contain 1..8000 characters')
     if analysis['customer_id'] != customer['customer_id']:

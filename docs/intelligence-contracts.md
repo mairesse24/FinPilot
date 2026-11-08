@@ -1,0 +1,101 @@
+# Member 2 integration contract
+
+Proposed Python boundary, ready to wrap in Member 2's Pydantic models. Endpoint names follow the team blueprint; this package does not register HTTP routes.
+
+| Team endpoint | Intelligence function / response |
+| --- | --- |
+| `GET /api/health` | `analyze(...)["health"]` |
+| `GET /api/forecast?days=30` | `analyze(..., days=30)["forecast"]` |
+| `GET /api/guardian` | `analyze(...)["guardian"]` |
+| `GET /api/economy` | `economic_pressure(customer, indicators)` |
+| `POST /api/simulate` | `simulate(customer, forecast, scenario, indicators)` |
+| `POST /api/chat` | `chat(message, customer, forecast, analysis)` |
+
+All amounts are USD, rounded to cents at JSON boundaries. This prototype uses floating point internally; Member 2 should store money as PostgreSQL NUMERIC. Dates are ISO calendar dates. Every response should be scoped by the backend's authenticated identity. Map `ValueError` to an HTTP 422 response with a useful validation message.
+
+## Normalized customer
+
+```json
+{
+  "customer_id": "demo", "as_of": "2026-10-31",
+  "checking_balance": 2400, "savings_balance": 100,
+  "monthly_income": 3000, "monthly_variable_spending": 900,
+  "monthly_debt_payments": 600,
+  "bills": [{"name": "rent", "amount": 2000, "day": 3},
+            {"name": "debt_payments", "amount": 600, "day": 10}],
+  "paydays": [15, 28], "safety_buffer": 500, "budget": null,
+  "assumptions": ["Synthetic data; scheduled income routed to checking."]
+}
+```
+
+`monthly_debt_payments` is a score metric, not an additional cash deduction. Include actual debt cash outflows in `bills` exactly once. Include housing/utilities in `bills`; exclude them from the variable-spending target. A bill on day 31 is clamped to month end. Monthly income is split evenly across unique supplied payday dates. `budget` means a monthly variable-spending budget; use null when unknown.
+
+`history` is a Pandas DataFrame with `customer_id`, `date` (datetime), and `spending` (finite, nonnegative USD). It must contain exactly one customer, one row per consecutive date, zero-filled nonspending days, at least 29 days and end on `as_of`. For synthetic data, customer identity can be relabeled to a demo fixture as long as scope remains unambiguous. Production training/serving needs consistent category and cash timing conventions.
+
+Forecast output has `model`, `days`, `daily`, `minimum_balance`, `starting_balance`, `ending_balance`, `uncertainty`, `assumptions`. Daily points have `date`, `spending`, `lower`, `upper`, `income`, `bills`, `balance`, `balance_lower`, `balance_upper`. Minimum includes the initial checking balance. Horizon supports any integer 1..90, including 7/30/90.
+
+Health output has `score`, `components`, `observed_weight` and an explanatory `note`. Components carry name, original weight, score, metric and formula. Unknown components are null and the total renormalizes available weights. Do not render missing input as poor financial behavior.
+
+Guardian alerts have stable `id`, severity (`critical`, `high`, `medium`), `explanation`, numeric `evidence` and `suggested_simulation`. Rules are heuristics, not probabilities. Budget overruns are not statistical anomaly detection. Low balance uses the central path; confidence envelopes do not produce probability claims.
+
+## Simulation body
+
+```json
+{"monthly_spending_cut": 200}
+```
+
+Supported optional keys: `income_reduction_pct` and `cost_of_living_pct` are fractions 0..1; `emergency_expense`, `monthly_spending_cut`, `monthly_savings_transfer`, `extra_debt_payment` are nonnegative USD. Unknown keys, NaN and infinities are rejected. Spending cuts are distributed proportionately across forecast spending within each month, prorated for partial months and capped at available spending. Inflation applies to variable spending only. Savings transfers occur on day 5; extra debt payments on day 10. No account changes are persisted. The response includes full `before`, `after`, `ending_balance_change`, `savings_path`, scenario and assumptions.
+
+## Economic input
+
+```json
+{"as_of": "2026-10-31", "inflation_yoy_pct": 4.0,
+ "policy_rate_pct": 4.0, "unemployment_pct": 5.0,
+ "source": "EXAMPLE ONLY — not an observed FRED snapshot"}
+```
+
+Units are percentage points, unlike scenario fractions. Member 2 should compute CPI year-over-year from dated CPI observations and supply all three indicators with source and observation dates as available. No input returns `available: false`, not fabricated current values. Snapshot freshness and fetching belong to Member 2.
+
+Copilot output has `mode`, `answer`, `tool_results`; OpenAI mode also includes numeric-validation metadata. Offline mode is a fixed explanation of current analysis, not a conversational LLM. Live output checks numeric tokens against tool results, which does not prove semantic correctness. Display calculated structured results alongside narration.
+
+Complete payload examples: `data/synthetic/demo.json`, generated by `python -m scripts.demo`.
+
+## Gemini provider
+
+`chat(..., provider='gemini')` uses `GEMINI_API_KEY` and `GEMINI_MODEL`. `provider='offline'` returns a key-free fixed summary; `provider='openai'` retains the earlier alternative. If no argument is supplied, `COPILOT_PROVIDER` selects the provider (legacy default: OpenAI). Gemini configuration errors are explicit; they do not silently masquerade as live answers.
+
+Gemini tools: `get_dashboard` returns the supplied normalized customer and verified analysis, `get_analysis` returns analysis only, `simulate` evaluates a hypothetical change. None accepts a customer ID from the model. Member 2 must authorize and scope all three input objects to the current user and ensure they represent the same snapshot; the chatbot does not query the database itself. This implementation is single-turn: future multi-turn memory needs bounded, user-scoped session handling. Transaction/category questions beyond the normalized snapshot require additional tools.
+
+## Forecast horizons and savings alerts
+
+`service.analyze_horizons(customer, history)` returns `{"7": analysis, "30": analysis, "90": analysis}`. All three use prefixes of one 90-day spending path; dates and shared path points match exactly. Display horizon totals and uncertainty assumptions alongside daily charts.
+
+New optional customer fields:
+
+```json
+{"savings_floor": 1000, "fund_shortfalls_from_savings": true, "monthly_savings_transfer": 100}
+```
+
+The default policy keeps savings unchanged except for explicitly configured deposits. With `fund_shortfalls_from_savings: true`, a hypothetical checking deficit withdraws the smaller of the deficit and available savings. Savings cannot become negative; any remaining deficit stays in checking. This assumption never initiates an actual transfer. Recurring savings deposits debit checking and credit savings on day 5. Account totals reconcile without counting transfers as spending.
+
+Forecast points now include `savings_balance`, `savings_withdrawal`, `savings_deposit`, `combined_liquid_balance`. Forecast summaries include `minimum_savings`, `ending_savings`, `reserve_policy`. Balance stress envelopes use the central path's hypothetical reserve transfers; they are not independently funded alternative reserve paths. The score still describes starting circumstances, not the future savings path.
+
+Guardian returns `savings_below_floor` when starting/projected savings is strictly below the configured floor. Its evidence includes first breach date, minimum savings, threshold and reserve policy. All alerts include `event_key` (customer/rule/breach date), `days_until_breach`, and `delivery: in_app_candidate`. Member 2 can persist/deduplicate these events and Member 1 can render notifications. This module creates alert objects; no email/SMS, scheduler or notification delivery is implemented.
+
+## Economic research contract
+
+`economic_outlook.research_outlook(raw, as_of)` accepts a sorted, unique DatetimeIndex DataFrame with `CPIAUCSL`, `UNRATE`, `FEDFUNDS`, `SP500` columns. Data must be actual sourced observations, never generated customer history. Missing observations remain missing; incomplete calendar months are excluded from training features. Macro features use conservative two-month observation lags; model-label eligibility also accounts for macro publication delays.
+
+The response separates `household` national inflation/unemployment regression results from `market` next-calendar-month S&P 500 direction classification. Each has expanding-window evaluation and predeclared baselines. It records `point_in_time_validated: false` because the public CSV cache contains revised history rather than ALFRED vintages. Stock direction remains `abstain`, even if a retrospective score improves. Do not turn the uncalibrated research probability into a buy/sell recommendation or pass it to Guardian as a personal risk probability.
+
+`scripts.fetch_economy` is an explicit research-cache downloader for Member 3 evaluation, not a backend ingestion service. Member 2 still owns scheduled FRED refresh, credentials if using the API, freshness checks, release timestamps and production serving. The CSV download path requires no FRED API key. See `docs/economic-research.md` for evaluation and provenance.
+
+## Observed conditions and exposure-based alerts
+
+Forecasts now expose `warnings`, `requested_model` and `support_check`. A detected mismatch with training spending frequency can select `model: moving_average_28` instead of LightGBM; display the warning and actual serving model. The support check is a heuristic, not a reliability guarantee. Guardian also returns `projected_spending_above_budget` when a complete future calendar month exceeds 120% of the supplied monthly variable-spending budget, with month total and threshold-crossing date. Partial months are not extrapolated into this alert. See `docs/stress-testing.md` and the CSV cases for validation details.
+
+`economy.conditions` now separates observed economy/market classifications from the research predictions. Dates must be supplied per metric in `indicators.observation_dates`. Additional snapshot fields: `unemployment_change_3m_pp`, `market_return_3m_pct`, `market_drawdown_252d_pct`. `scripts.economy.indicator_snapshot()` derives these from cached observations. Missing/stale/future values yield unknown labels, not safe conditions.
+
+New optional customer exposure fields: `variable_rate_debt_balance`, `high_interest_debt_balance`, `equity_exposure`, `planned_equity_withdrawal_90d` (nonnegative USD). Guardian checks conditions together with these inputs, cash forecasts and liquid coverage. Condition-driven alerts include guidance and tradeoffs. Unknown exposure fields are listed in `economy.personalization_missing_fields`; the absence of an alert is not proof of no exposure. Severity now also permits `info` for optional scenario comparisons.
+
+`additional_monthly_expense` is an optional simulation parameter (nonnegative USD); it adds a recurring illustrative expense on day 10 without altering actual debt terms. Analysis rejects economic snapshots dated after the financial customer `as_of`. Full policy and run examples: `docs/conditions-and-guidance.md`.

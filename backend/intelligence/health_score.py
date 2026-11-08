@@ -36,3 +36,9 @@ def health_score(c):
     return {'score': round(sum(x['score']*x['weight'] for x in available)/weight, 2) if weight else None,
             'components': components, 'observed_weight': round(weight, 2),
             'note': 'Prototype wellness heuristic, not a credit score. Missing components are excluded and weights renormalized. Stability currently measures surplus, not income volatility.'}
+
+
+def compute_health_score(profile):
+    """backend-mvp typed gateway entry; preserves health_score(customer)."""
+    from .backend_adapter import health_profile
+    return health_profile(profile)

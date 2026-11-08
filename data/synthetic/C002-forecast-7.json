@@ -52,45 +52,61 @@
         "date": "2026-11-01",
         "spending": 0.0,
         "lower": 0.0,
-        "upper": 10.91,
+        "upper": 0.0,
         "income": 2556.39,
         "bills": 0,
         "balance": 6563.75,
-        "balance_lower": 6552.84,
-        "balance_upper": 6563.75
+        "balance_lower": 6563.75,
+        "balance_upper": 6563.75,
+        "savings_balance": 17991.23,
+        "savings_withdrawal": 0.0,
+        "savings_deposit": 0.0,
+        "combined_liquid_balance": 24554.97
       },
       {
         "date": "2026-11-02",
         "spending": 0.0,
         "lower": 0.0,
-        "upper": 15.92,
+        "upper": 0.0,
         "income": 0.0,
         "bills": 0,
         "balance": 6563.75,
-        "balance_lower": 6536.92,
-        "balance_upper": 6563.75
+        "balance_lower": 6563.75,
+        "balance_upper": 6563.75,
+        "savings_balance": 17991.23,
+        "savings_withdrawal": 0.0,
+        "savings_deposit": 0.0,
+        "combined_liquid_balance": 24554.97
       },
       {
         "date": "2026-11-03",
         "spending": 0.0,
         "lower": 0.0,
-        "upper": 15.92,
+        "upper": 0.0,
         "income": 0.0,
         "bills": 1319.19,
         "balance": 5244.56,
-        "balance_lower": 5201.81,
-        "balance_upper": 5244.56
+        "balance_lower": 5244.56,
+        "balance_upper": 5244.56,
+        "savings_balance": 17991.23,
+        "savings_withdrawal": 0.0,
+        "savings_deposit": 0.0,
+        "combined_liquid_balance": 23235.78
       },
       {
         "date": "2026-11-04",
-        "spending": 241.43,
-        "lower": 203.68,
-        "upper": 243.47,
+        "spending": 231.31,
+        "lower": 219.67,
+        "upper": 244.71,
         "income": 0.0,
         "bills": 0,
-        "balance": 5003.12,
-        "balance_lower": 4958.34,
-        "balance_upper": 5040.88
+        "balance": 5013.24,
+        "balance_lower": 4999.85,
+        "balance_upper": 5024.89,
+        "savings_balance": 17991.23,
+        "savings_withdrawal": 0.0,
+        "savings_deposit": 0.0,
+        "combined_liquid_balance": 23004.47
       },
       {
         "date": "2026-11-05",
@@ -99,9 +115,13 @@
         "upper": 0.0,
         "income": 0.0,
         "bills": 0,
-        "balance": 5003.12,
-        "balance_lower": 4958.34,
-        "balance_upper": 5040.88
+        "balance": 5013.24,
+        "balance_lower": 4999.85,
+        "balance_upper": 5024.89,
+        "savings_balance": 17991.23,
+        "savings_withdrawal": 0.0,
+        "savings_deposit": 0.0,
+        "combined_liquid_balance": 23004.47
       },
       {
         "date": "2026-11-06",
@@ -110,9 +130,13 @@
         "upper": 0.0,
         "income": 0.0,
         "bills": 0,
-        "balance": 5003.12,
-        "balance_lower": 4958.34,
-        "balance_upper": 5040.88
+        "balance": 5013.24,
+        "balance_lower": 4999.85,
+        "balance_upper": 5024.89,
+        "savings_balance": 17991.23,
+        "savings_withdrawal": 0.0,
+        "savings_deposit": 0.0,
+        "combined_liquid_balance": 23004.47
       },
       {
         "date": "2026-11-07",
@@ -121,16 +145,32 @@
         "upper": 0.0,
         "income": 0.0,
         "bills": 0,
-        "balance": 5003.12,
-        "balance_lower": 4958.34,
-        "balance_upper": 5040.88
+        "balance": 5013.24,
+        "balance_lower": 4999.85,
+        "balance_upper": 5024.89,
+        "savings_balance": 17991.23,
+        "savings_withdrawal": 0.0,
+        "savings_deposit": 0.0,
+        "combined_liquid_balance": 23004.47
       }
     ],
+    "requested_model": "lightgbm",
+    "warnings": [],
+    "support_check": {
+      "outside_training_frequency": false,
+      "history_zero_day_fraction": 0.84,
+      "validated": false
+    },
+    "point_estimate": "recursive daily median",
+    "aggregation_note": "Summed daily medians are a planning total, not an expected total or calibrated quantile of horizon spending.",
     "uncertainty": "Daily empirical 10th/90th quantiles; accumulated bounds are stress envelopes, not calibrated balance intervals.",
     "synthetic": true,
     "starting_balance": 4007.36,
     "minimum_balance": 4007.36,
-    "ending_balance": 5003.12,
+    "ending_balance": 5013.24,
+    "minimum_savings": 17991.23,
+    "ending_savings": 17991.23,
+    "reserve_policy": "no_savings_funding",
     "assumptions": [
       "Income routed to checking for projection; savings kept separate.",
       "Monthly bills inferred from last 90 days; backend should supply actual schedules.",
@@ -141,6 +181,15 @@
   "economy": {
     "available": false,
     "index": null,
+    "conditions": {
+      "policy_version": "conditions-v1",
+      "economy": {
+        "label": "unknown"
+      },
+      "market": {
+        "label": "unknown"
+      }
+    },
     "reason": "Awaiting dated FRED snapshot from backend"
   },
   "guardian": []

@@ -1,0 +1,8 @@
+{
+  "scenario": {
+    "type": "spending_cut",
+    "reduction_amount": 200,
+    "horizon_days": 10,
+    "category": null
+  }
+}

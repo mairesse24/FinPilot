@@ -74,3 +74,9 @@ def detect_risks(c, forecast, health, economy=None):
             alerts[-1]['guidance'] = candidate['guidance']
             alerts[-1]['tradeoff'] = candidate['tradeoff']
     return alerts
+
+
+def evaluate(profile, forecast):
+    """backend-mvp typed gateway entry; preserves detect_risks dictionaries."""
+    from .backend_adapter import guardian_profile
+    return guardian_profile(profile, forecast)

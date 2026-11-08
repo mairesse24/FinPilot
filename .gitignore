@@ -12,3 +12,5 @@ coverage/
 vendor/
 artifacts/models/
 data/economy/fred.csv
+venv/
+.DS_Store

@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic>=2
+pydantic-settings
+psycopg[binary,pool]
+pytest
+httpx
+
+# Member 3 dependencies; keep backend dependencies above and root CLI files intact.
+-r ../requirements-copilot.txt
