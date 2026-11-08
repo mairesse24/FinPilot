@@ -13,6 +13,11 @@ Scope: investigation, evaluation and report only. No website changes and no fixe
 
 Line numbers in this report come from the judge's evaluation unless marked "re-checked".
 
+### Scope notes from the project owner (2026-11-08)
+
+- **Reference build:** the latest version is the app run locally after syncing with `origin/test` (`a80b246`) at `http://127.0.0.1:5180/#/overview`. Its frontend code is identical to the "merged UI" used in this report (checked by comparing the two folders). Findings marked old-build apply only to the deployed Netlify sites.
+- **Wrapped is out of scope for fixes.** No change is planned to the FinPilot Wrapped story page. Related observations are recorded as suggestions in [FUTURE-IMPROVEMENTS.md](FUTURE-IMPROVEMENTS.md) item 13. In this report, Wrapped is mentioned only as a difference between builds (C-04) and as a data-loading example (C-05).
+
 ### Which build each report looked at (this explains most disagreements)
 
 | Build | Where | What it is |

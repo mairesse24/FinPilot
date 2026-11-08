@@ -74,3 +74,12 @@ Status key: **OPEN** = not done. **DEMO-RISK** = could hurt a live demo. **LATER
 ## 12. Frontend hosting — OPEN
 
 - Deployed manually with Netlify Drop (see `docs/frontend-deploy.md`); redeploy by rebuilding and dropping `dist` again. Move to a Git-connected deploy (auto-build on push) once the repo owner can authorize it.
+
+## 13. FinPilot Wrapped — suggestions only, no changes planned — OPEN, LATER
+
+Decision (2026-11-08): the Wrapped story page (`frontend/src/FinPilotWrapped.tsx`, commit `5e3645f`) looks good and is **not** being changed. These are observations to revisit after the demo. Only the opening slide ("Your FinPilot snapshot", net worth, "Start the story", "Manual mode") was viewed; the other slides, the manual mode and phone widths were not walked.
+
+- **Load time against the live backend:** the page fetches its own `context`, `economy`, `dashboard` and `forecast`; it was ready after about 7 s on the live backend (about 2 s locally). A shared data cache (see `INVESTIGATION-REPORT-CONSOLIDATED.md` C-05) would remove most of the wait.
+- **Loading state:** "Building your financial story…" is a plain text line; a skeleton or progress hint would feel faster.
+- **Route alias:** `#/wrapped` renders the Overview content (breadcrumb "Workspace / Overview"); the working route is `#/finpilot-wrapped`. An alias would avoid a broken-looking link.
+- **Untested:** the remaining slides, manual mode, keyboard use, phone layout, and behavior when the API is down.
