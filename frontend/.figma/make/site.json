@@ -1,0 +1,10 @@
+{
+  "description": "FinPilot helps people understand their finances, forecast cash flow, spot potential risks, and test scenarios with personalized, data-grounded guidance.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

@@ -9,6 +9,10 @@ node_modules/
 .next/
 coverage/
 .coverage
+frontend/test-results/
+frontend/playwright-report/
+data/synthetic/nessie-local.json
+data/synthetic/nessie-schedules-local.json
 vendor/
 artifacts/models/
 data/economy/fred.csv

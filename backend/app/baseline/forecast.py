@@ -63,7 +63,7 @@ def forecast(p: FinancialProfile, days: int,
         shortfall=bool(low and low.balance < buffer),
         assumptions=[
             "Variable spending is projected from the weekday average of the trailing 90 days.",
-            "The low/high band is an approximate 80% interval that widens with the horizon.",
+            "The low/high band is an uncalibrated heuristic stress envelope that widens with the horizon; it does not establish 80% coverage.",
             "Based on simulated data - prototype estimate.",
         ],
         evaluation=None,

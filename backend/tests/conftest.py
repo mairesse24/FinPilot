@@ -1,4 +1,9 @@
 from datetime import date
+import os
+
+# app.main constructs its default repository at import time. Never let a local
+# developer .env trigger live banking calls during test collection.
+os.environ["DATA_SOURCE"] = "demo"
 
 import pytest
 from fastapi.testclient import TestClient
@@ -26,7 +31,7 @@ def to_dataset(*profiles) -> SeedDataset:
 @pytest.fixture
 def settings() -> Settings:
     """Never reads the developer's .env."""
-    return Settings(_env_file=None, database_url=None, demo_user_id=UID,
+    return Settings(_env_file=None, data_source="demo", database_url=None, demo_user_id=UID,
                     intelligence_mode="baseline", as_of_date=AS_OF)
 
 

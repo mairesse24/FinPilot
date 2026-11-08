@@ -9,7 +9,7 @@ from app.routes import include_all
 
 def create_app(repo: Repository | None = None, settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
-    app = FastAPI(title="FinSight AI API")
+    app = FastAPI(title="FinPilot API")
     app.state.settings = settings
     app.state.repo = repo or build_repo(settings)
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins,

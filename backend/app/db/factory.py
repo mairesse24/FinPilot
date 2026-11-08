@@ -12,20 +12,28 @@ log = logging.getLogger(__name__)
 
 def build_repo(settings: Settings) -> Repository:
     """Postgres when DATABASE_URL is set and app.db.postgres exists; else in-memory demo data."""
+    if settings.data_source == "nessie":
+        from app.data.nessie import build_nessie_repo
+        return build_nessie_repo(settings)
+    warnings = []
     if settings.database_url:
         try:
             pg = importlib.import_module("app.db.postgres")
             repo = pg.PgRepository(settings.database_url)
             if repo.ping():
                 log.warning("repository: postgres")
+                repo.source = "configured PostgreSQL"
                 return repo
             log.warning("Postgres not reachable; using in-memory demo data")
         except Exception as exc:  # never crash startup for lack of a database
             log.warning("Postgres unavailable (%s); using in-memory demo data", type(exc).__name__)
+        warnings.append("Configured PostgreSQL unavailable; generated demo records are being served.")
     as_of = settings.as_of_date or date.today()
     ds = SeedDataset()
     for part in (build_demo_customer(as_of), build_random_customers(as_of, n=2, seed=42)):
         for name in ("users", "accounts", "transactions", "bills", "income_sources"):
             getattr(ds, name).extend(getattr(part, name))
     log.warning("repository: memory")
-    return InMemoryRepository(ds)
+    repo = InMemoryRepository(ds)
+    repo.source, repo.warnings = "generated demo", warnings
+    return repo

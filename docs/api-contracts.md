@@ -8,6 +8,7 @@ Example files below are real baseline responses for the demo customer (as_of 202
 |---|---|---|---|---|
 | GET | `/healthz` | none | `{status, database}` | n/a |
 | GET | `/api/dashboard` | `user_id` | `DashboardResult` | `examples/dashboard.json` |
+| GET | `/api/context` | `user_id` | `{user: {id, name}, as_of, data_source, warnings, loaded_at, synthetic}` | Source metadata; no secrets |
 | GET | `/api/accounts` | `user_id` | `AccountsResult` | `examples/accounts.json` |
 | GET | `/api/transactions` | `user_id, limit(1-500), offset, from, to, category` | `TransactionsResult` | `examples/transactions.json` |
 | GET | `/api/health` | `user_id` | `HealthResult` | `examples/health.json` |

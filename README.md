@@ -4,6 +4,12 @@ AI-powered financial resilience platform for HackUTD 2026 (PNC 360° Financial H
 Flow: **Detect** (Guardian) → **Simulate** (Digital Twin) → **Recommend** (Copilot).
 All data is synthetic. Forecasts are prototype estimates. Nothing moves money.
 
+The integrated React frontend is in `frontend/`. Start the backend from the root
+with `.venv/Scripts/python.exe -m uvicorn app.main:app --app-dir backend --reload`,
+then run `npm.cmd run dev` in `frontend/` and open `http://localhost:5173`.
+See [frontend + Nessie setup](docs/FRONTEND_INTEGRATION.md) for credentials,
+synthetic sandbox seeding, supported data and validation commands.
+
 - Requirements: [docs/MVP-requirements.md](docs/MVP-requirements.md)
 - API contract and examples: [docs/api-contracts.md](docs/api-contracts.md), `docs/examples/`
 - Team handoff (frontend + AI/ML): [docs/handoff-member-3-and-1.md](docs/handoff-member-3-and-1.md)

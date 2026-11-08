@@ -27,7 +27,9 @@ def get_as_of(settings: Settings = Depends(get_settings_dep)) -> date:
 def get_user_id(user_id: str | None = Query(None),
                 settings: Settings = Depends(get_settings_dep),
                 repo: Repository = Depends(get_repo)) -> str:
-    uid = user_id or settings.demo_user_id
+    uid = user_id or (settings.nessie_customer_id if settings.data_source == "nessie" else settings.demo_user_id)
+    if settings.data_source == "nessie" and uid != settings.nessie_customer_id:
+        raise HTTPException(404, "Customer not available in this sandbox session")
     if repo.get_user(uid) is None:
         raise HTTPException(404, f"user '{uid}' not found")
     return uid
