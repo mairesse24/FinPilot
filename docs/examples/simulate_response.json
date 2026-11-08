@@ -5,7 +5,7 @@
       "balance": 367.08
     },
     "end_balance": 3753.23,
-    "health_score": 60.4,
+    "health_score": 62.4,
     "alerts": [
       {
         "id": "low_projected_balance:2026-11-07",
@@ -261,7 +261,7 @@
       "balance": 567.08
     },
     "end_balance": 3953.23,
-    "health_score": 60.4,
+    "health_score": 65.7,
     "alerts": [
       {
         "id": "low_emergency_savings:2026-11-07",
@@ -494,13 +494,13 @@
   "delta": {
     "low_balance_change": 200.0,
     "end_balance_change": 200.0,
-    "health_score_change": 0.0
+    "health_score_change": 3.3
   },
   "meta": {
     "source": "baseline",
     "is_prototype_estimate": true,
     "as_of": "2026-11-07",
-    "generated_at": "2026-11-08T00:32:31.478294Z",
+    "generated_at": "2026-11-08T00:33:45.781482Z",
     "warning": null
   }
 }
