@@ -5,6 +5,7 @@ connection or transfers. All values are synthetic and intended for API demos.
 """
 import argparse
 import json
+import math
 import sys
 from datetime import date, timedelta
 from pathlib import Path
@@ -20,9 +21,15 @@ STATE = ROOT / 'data' / 'synthetic' / 'nessie-local.json'
 SCHEDULES = ROOT / 'data' / 'synthetic' / 'nessie-schedules-local.json'
 
 
-def seed(settings, configure=False):
+DEFAULT_CHECKING_BALANCE = 6500
+
+
+def seed(settings, configure=False, checking_balance=DEFAULT_CHECKING_BALANCE):
     if not settings.nessie_api_key:
         raise ValueError('Set NESSIE_API_KEY in root .env first')
+    if (isinstance(checking_balance, bool) or not isinstance(checking_balance, (int, float))
+            or not math.isfinite(checking_balance) or checking_balance < 0):
+        raise ValueError('checking_balance must be a finite, nonnegative number')
     state = json.loads(STATE.read_text()) if STATE.exists() else {'created': {}, 'as_of': str(settings.as_of_date or date.today())}
     as_of = date.fromisoformat(state['as_of'])
     client = NessieClient(settings.nessie_api_key, settings.nessie_base_url)
@@ -46,7 +53,7 @@ def seed(settings, configure=False):
     try:
         address = {'street_number': '100', 'street_name': 'Demo Lane', 'city': 'Richardson', 'state': 'TX', 'zip': '75080'}
         uid = create('customer', '/customers', {'first_name': 'Alex', 'last_name': 'FinPilot Demo', 'address': address})
-        checking = create('checking', f'/customers/{uid}/accounts', {'type': 'Checking', 'nickname': 'FinPilot Demo Checking', 'rewards': 0, 'balance': 6500})
+        checking = create('checking', f'/customers/{uid}/accounts', {'type': 'Checking', 'nickname': 'FinPilot Demo Checking', 'rewards': 0, 'balance': checking_balance})
         create('savings', f'/customers/{uid}/accounts', {'type': 'Savings', 'nickname': 'Emergency Savings', 'rewards': 0, 'balance': 600})
         create('card', f'/customers/{uid}/accounts', {'type': 'Credit Card', 'nickname': 'Demo Card', 'rewards': 0, 'balance': 420})
         loan = create('loan', f'/accounts/{checking}/loans', {'type': 'auto', 'status': 'approved',
@@ -83,12 +90,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apply', action='store_true')
     parser.add_argument('--configure', action='store_true', help='Select the created customer in root .env')
+    parser.add_argument('--checking-balance', type=float, default=DEFAULT_CHECKING_BALANCE,
+                        help='Opening checking balance for the fictional customer (default 6500)')
     args = parser.parse_args()
     if not args.apply:
         print('Dry run: creates one fictional customer, 3 accounts, an auto loan, 1 merchant, 40 synthetic purchases and 8 historical deposits. Use --apply to create them in Nessie sandbox.')
         return
     try:
-        seed(Settings(), args.configure)
+        seed(Settings(), args.configure, args.checking_balance)
     except Exception as exc:
         # Network errors contain authenticated request URLs; do not print exception details.
         if isinstance(exc, ValueError):
