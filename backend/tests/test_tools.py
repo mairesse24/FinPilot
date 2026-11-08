@@ -1,5 +1,8 @@
+from decimal import Decimal
+
 import pytest
 
+from app.calc.models import Account
 from app.services.gateway import Gateway
 from app.tools.registry import ToolRegistry
 from tests.factories import make_profile
@@ -59,3 +62,17 @@ def test_purchase_gift_portfolio_reconciles_assets_debt_and_net_worth():
         "net_worth_change_before_fees_and_depreciation": 2000.0,
     }
     assert scenario["assets_after_purchase"] - scenario["liabilities_after_purchase"] == scenario["net_worth_after_purchase"]
+
+
+def test_purchase_using_ninety_percent_of_savings_triggers_reserve_warning():
+    profile = make_profile(accounts=[
+        Account("checking", "u-test", "Checking", "checking", Decimal("1000")),
+        Account("savings", "u-test", "Savings", "savings", Decimal("5000")),
+    ])
+    result = ToolRegistry(profile, Gateway("baseline")).call("evaluate_purchase", {
+        "amount": 4500, "item": "purchase", "funding_source": "savings",
+    })
+    assert result["source_usage_percent"] == 90.0
+    assert result["source_funds_after_purchase"] == 500.0
+    assert result["reserve_warning"]["severity"] == "high"
+    assert "90%" in result["reserve_warning"]["message"]

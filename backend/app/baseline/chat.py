@@ -47,6 +47,9 @@ def chat(messages: list[ChatMessage], tools) -> ChatResult:
         if r['funding_source']=='savings':
             reply+=f"Because you specified savings, the relevant available amount is {_usd(r['savings'])}, leaving a {_usd(r['source_funding_gap'])} gap. "
         if r['price_to_net_worth'] is not None:reply+=f"The price is {r['price_to_net_worth']:.2f} times current net worth. "
+        reply+=(f"To preserve the {_usd(r['safety_buffer'])} safety buffer, the simple cash ceiling is "
+                f"{_usd(r['recommended_max_cash_purchase'])}; upcoming bills and ownership costs can make the affordable amount lower. ")
+        if r.get('reserve_warning'):reply+=r['reserve_warning']['message']+' '
         if r.get('gift_amount',0)>0:
             p=r['portfolio_scenario'];reply+=(f"This scenario treats the {_usd(r['gift_amount'])} gift as a down-payment contribution, leaving {_usd(p['hypothetical_financing_needed'])} to finance. "
                 f"The illustrative portfolio would have {_usd(p['assets_after_purchase'])} in assets, {_usd(p['liabilities_after_purchase'])} in liabilities, {_usd(p['liquid_after_down_payment'])} liquid, and {_usd(p['net_worth_after_purchase'])} net worth before fees and depreciation. The gift is not available until received. ")

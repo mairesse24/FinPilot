@@ -53,6 +53,8 @@ def test_chat_evaluates_large_purchase_with_verified_numbers():
     assert "$60,000.00" in r["reply"]
     assert "$3,000.00" in r["reply"]  # checking + savings available in the fixture
     assert "$57,000.00" in r["reply"]
+    assert "$2,500.00" in r["reply"]  # $3,000 liquid less the $500 safety buffer
+    assert "not funded" in r["reply"].lower()
     assert "financing" in r["reply"].lower()
 
 

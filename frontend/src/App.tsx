@@ -20,7 +20,17 @@ import ConnectedDashboard from "./ConnectedDashboard";
 import EconomicIntelligence from "./EconomicIntelligence";
 import FloatingCopilot from "./FloatingCopilot";
 import { FinancialWorkspace } from "./FinancialWorkspace";
-import { get, type Context, type Alert } from "./api";
+import { get, post, type Context, type Alert } from "./api";
+
+type SavingsStress = {
+  mode: "simulation";
+  executed: false;
+  percentage: number;
+  purchase_amount: number;
+  savings_before: number;
+  savings_after: number;
+  alert: Alert;
+};
 
 const pages = [
   { label: "Overview", icon: House },
@@ -46,6 +56,9 @@ export default function App() {
   const [popover, setPopover] = useState<"profile" | "notifications" | null>(null);
   const [alerts, setAlerts] = useState<Alert[] | null>(null);
   const [error, setError] = useState("");
+  const [demoAlert, setDemoAlert] = useState<Alert | null>(null);
+  const [demoBusy, setDemoBusy] = useState(false);
+  const [demoError, setDemoError] = useState("");
   useEffect(() => {
     const sync = () => {
       setActive(currentPage());
@@ -94,6 +107,18 @@ export default function App() {
     return () => c.abort();
   }, [popover]);
   const name = context?.user.name || "Your profile";
+  const runSavingsStress = async () => {
+    setDemoBusy(true);
+    setDemoError("");
+    try {
+      const result = await post<SavingsStress>("demo/savings-stress");
+      setDemoAlert(result.alert);
+    } catch (e) {
+      setDemoError(e instanceof Error ? e.message : "The simulation could not run.");
+    } finally {
+      setDemoBusy(false);
+    }
+  };
   const initials = name
     .split(/\s+/)
     .slice(0, 2)
@@ -179,6 +204,7 @@ export default function App() {
               onClick={() => setPopover((p) => (p === "notifications" ? null : "notifications"))}
             >
               <Bell size={20} />
+              {demoAlert && <span className="notification-badge" aria-label="New simulated alert" />}
             </button>
             <button
               className="profile"
@@ -210,6 +236,25 @@ export default function App() {
               <section className="header-popover" aria-label="Current notifications">
                 <h2>Financial alerts</h2>
                 <p>Latest available analysis: {context?.as_of ?? ""}</p>
+                <button
+                  className="demo-stress-button"
+                  disabled={demoBusy}
+                  onClick={() => void runSavingsStress()}
+                >
+                  {demoBusy ? "Running simulation..." : "Simulate spending 90% of savings"}
+                </button>
+                <small className="demo-disclaimer">Demo only — no transaction is executed or saved.</small>
+                {demoError && <p role="alert">{demoError}</p>}
+                {demoAlert && (
+                  <div className="notification-item demo-alert" role="alert">
+                    <span className="status-dot tone-red" />
+                    <div>
+                      <strong>{demoAlert.title}</strong>
+                      <small>{demoAlert.cause}</small>
+                      <small>{demoAlert.recommended_action}</small>
+                    </div>
+                  </div>
+                )}
                 {error ? (
                   <p role="alert">{error}</p>
                 ) : !alerts ? (

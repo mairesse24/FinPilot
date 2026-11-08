@@ -86,3 +86,17 @@ export async function get<T>(path: string, signal: AbortSignal): Promise<T> {
     throw new Error("API unavailable. Start the backend on port 8000.");
   return response.json() as Promise<T>;
 }
+
+export async function post<T>(path: string, body?: object): Promise<T> {
+  const response = await fetch(`${API_BASE}/api/${path}`, {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(typeof payload.detail === "string" ? payload.detail : "The simulation could not run.");
+  }
+  return response.json() as Promise<T>;
+}

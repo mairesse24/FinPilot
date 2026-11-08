@@ -5,6 +5,7 @@ import { useFinancialWorkspace } from "./FinancialWorkspace";
 import { DeliveryStatus, type Delivery } from "./FloatingCopilot";
 import ReliabilityNotices from "./ReliabilityNotices";
 import { API_BASE, type Notice } from "./api";
+import ChatRichText from "./ChatRichText";
 
 type Facts = Record<string, string | boolean>;
 type Component = {
@@ -913,7 +914,7 @@ export default function EconomicIntelligence({ page }: { page: string }) {
         Ask with confirmed inputs
       </button>
       {delivery && <DeliveryStatus delivery={delivery} />}
-      {answer && <p style={{ whiteSpace: "pre-wrap" }}>{answer}</p>}
+      {answer && <ChatRichText content={answer} />}
     </section>
   );
   const panelByName: Record<string, React.ReactNode> = {

@@ -73,9 +73,13 @@ def statements(name: str, args: dict, result: dict) -> list[str]:
                         f"and therefore requires {usd(result['portfolio_scenario']['hypothetical_financing_needed'])} of financing.")
         facts=[opening,
                f"Current checking is {usd(result['checking'])}, savings are {usd(result['savings'])}, liabilities are {usd(result['liabilities'])}, and net worth is {usd(result['net_worth'])}."]
+        facts.append(f"To preserve the {usd(result['safety_buffer'])} safety buffer, the maximum supported cash price from {source} funds is {usd(result['recommended_max_cash_purchase'])}. This is a cash limit, not an affordability recommendation.")
+        if result.get('reserve_warning'):
+            facts.append(result['reserve_warning']['message'])
         portfolio=result.get('portfolio_scenario')
         if portfolio:
-            facts.append(f"If the contribution is applied as a down payment, the illustrative remaining financing need is {usd(portfolio['hypothetical_financing_needed'])}. Portfolio assets would be {usd(portfolio['assets_after_purchase'])}, liabilities {usd(portfolio['liabilities_after_purchase'])}, liquid funds {usd(portfolio['liquid_after_down_payment'])}, and net worth {usd(portfolio['net_worth_after_purchase'])} before taxes, fees, depreciation, or transaction costs.")
+            lead="If the contribution is applied as a down payment" if result.get('gift_amount',0)>0 else "Under the supplied financing terms"
+            facts.append(f"{lead}, the illustrative remaining financing need is {usd(portfolio['hypothetical_financing_needed'])}. Portfolio assets would be {usd(portfolio['assets_after_purchase'])}, liabilities {usd(portfolio['liabilities_after_purchase'])}, liquid funds {usd(portfolio['liquid_after_down_payment'])}, and net worth {usd(portfolio['net_worth_after_purchase'])} before taxes, fees, depreciation, or transaction costs.")
         if result.get('gift_amount',0)>0:
             facts.append(f"The {usd(result['gift_amount'])} gift or contribution is hypothetical income until received and verified.")
         financing=result.get('financing')

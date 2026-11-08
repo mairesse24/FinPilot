@@ -153,6 +153,20 @@ class ToolRegistry:
         savings=sum((a.balance for a in self.profile.accounts if a.account_type=='savings'),Decimal(0))
         if funding_source not in ('liquid','savings'):raise ValueError('funding source must be liquid or savings')
         source_funds=(savings if funding_source=='savings' else liquid)+gift
+        source_after=source_funds-price
+        usage_percent=round(float(price/source_funds*100),1) if source_funds>0 else None
+        safety=self.profile.user.safety_buffer
+        max_cash=max(Decimal(0),source_funds-safety)
+        warning=None
+        if price>source_funds:
+            warning={'severity':'high','code':'purchase_exceeds_available_funds',
+                'message':f'This cash purchase is not funded: it exceeds available {funding_source} funds by ${price-source_funds:,.2f}. Do not treat credit or overdraft as available cash.'}
+        elif usage_percent is not None and usage_percent>=80:
+            warning={'severity':'high','code':'large_reserve_purchase',
+                'message':f'This purchase would use {usage_percent:g}% of available {funding_source} funds and leave ${max(Decimal(0),source_after):,.2f}. Preserve emergency cash and upcoming bill coverage before buying.'}
+        elif source_after<safety:
+            warning={'severity':'medium','code':'below_safety_buffer',
+                'message':f'This purchase would leave available {funding_source} funds below the ${safety:,.2f} safety buffer.'}
         supplied=[down_payment is not None,apr_percent is not None,term_months is not None]
         if any(supplied) and not all(supplied):raise ValueError('down payment, APR and term months are all required for financing calculations')
         financing=None
@@ -170,20 +184,26 @@ class ToolRegistry:
                 'down_payment_funding_gap':float(max(Decimal(0),down-(liquid+gift))),
                 'liquid_after_down_payment':float(liquid+gift-down),'scheduled_monthly_income':float(income),
                 'payment_to_scheduled_income':round(float(payment/income),4) if income>0 else None}
-        assumed_down=Decimal(str(down_payment)) if down_payment is not None else min(gift,price)
-        assumed_principal=price-assumed_down
-        assets_after=m.assets(self.profile)+gift-assumed_down+price
-        liabilities_after=debt+assumed_principal
-        portfolio={'gift_amount':float(gift),'assumed_down_payment':float(assumed_down),
-            'hypothetical_financing_needed':float(assumed_principal),
-            'liquid_after_down_payment':float(liquid+gift-assumed_down),
-            'assets_after_purchase':float(assets_after),'liabilities_after_purchase':float(liabilities_after),
-            'net_worth_after_purchase':float(assets_after-liabilities_after),
-            'net_worth_change_before_fees_and_depreciation':float((assets_after-liabilities_after)-net)}
+        portfolio=None
+        if gift>0 or all(supplied):
+            assumed_down=Decimal(str(down_payment)) if down_payment is not None else min(gift,price)
+            assumed_principal=price-assumed_down
+            assets_after=m.assets(self.profile)+gift-assumed_down+price
+            liabilities_after=debt+assumed_principal
+            portfolio={'gift_amount':float(gift),'assumed_down_payment':float(assumed_down),
+                'hypothetical_financing_needed':float(assumed_principal),
+                'liquid_after_down_payment':float(liquid+gift-assumed_down),
+                'assets_after_purchase':float(assets_after),'liabilities_after_purchase':float(liabilities_after),
+                'net_worth_after_purchase':float(assets_after-liabilities_after),
+                'net_worth_change_before_fees_and_depreciation':float((assets_after-liabilities_after)-net)}
         return {'item':item,'price':float(price),'checking':float(checking),'savings':float(savings),'liquid_funds':float(liquid),
                 'gift_amount':float(gift),
                 'funding_source':funding_source,'available_source_funds':float(source_funds),
                 'source_funding_gap':float(max(Decimal(0),price-source_funds)),
+                'source_usage_percent':usage_percent,
+                'source_funds_after_purchase':float(source_after),
+                'recommended_max_cash_purchase':float(max_cash),
+                'safety_buffer':float(safety),'reserve_warning':warning,
                 'liabilities':float(debt),'net_worth':float(net),'cash_purchase_supported':price<=liquid,
                 'liquid_funding_gap':float(max(Decimal(0),price-liquid)),
                 'liquid_after_cash_purchase':float(liquid-price),

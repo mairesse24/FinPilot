@@ -102,3 +102,36 @@ test("floating chat launcher is a compact circle", async ({ page }) => {
   expect(Math.abs(box!.width - box!.height)).toBeLessThanOrEqual(2);
   expect(box!.width).toBeLessThanOrEqual(52);
 });
+
+test("chat renders verified sections and bullets instead of raw markdown", async ({ page }) => {
+  await page.route("**/api/chat", (route) =>
+    route.fulfill({
+      json: {
+        reply: "### Purchase analysis\n\n- Price is **$10,000.00**.\n- Keep an emergency reserve.",
+        delivery: { mode: "live", provider: "gemini", message: "Verified tools used." },
+      },
+    }),
+  );
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open FinPilot chat", exact: true }).click();
+  const chat = page.getByRole("dialog", { name: "FinPilot chat", exact: true });
+  await chat.getByLabel("Message FinPilot", { exact: true }).fill("Can I buy it?");
+  await chat.getByRole("button", { name: "Send FinPilot message", exact: true }).click();
+  await expect(chat.getByRole("heading", { name: "Purchase analysis" })).toBeVisible();
+  await expect(chat.getByRole("listitem")).toHaveCount(2);
+  await expect(chat.getByText("$10,000.00", { exact: true })).toHaveJSProperty("tagName", "STRONG");
+  await expect(chat).not.toContainText("###");
+  await expect(chat).not.toContainText("**");
+});
+
+test("notification demo previews a 90 percent savings purchase without executing it", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Notifications", exact: true }).click();
+  const panel = page.getByRole("region", { name: "Current notifications" });
+  await panel.getByRole("button", { name: "Simulate spending 90% of savings" }).click();
+  const alert = panel.getByRole("alert");
+  await expect(alert).toContainText("Large savings purchase simulated");
+  await expect(alert).toContainText("90% of savings");
+  await expect(panel).toContainText("no transaction is executed or saved");
+  await expect(page.getByLabel("New simulated alert")).toBeVisible();
+});

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { MessageSquareText, X, Send } from "lucide-react";
 import { useFinancialWorkspace } from "./FinancialWorkspace";
 import { API_BASE } from "./api";
+import ChatRichText from "./ChatRichText";
 
 export type Delivery = {
   mode: "live" | "offline" | "fallback";
@@ -189,7 +190,7 @@ export default function FloatingCopilot() {
             {messages.map((m, i) => (
               <article key={i} className={`chat-message chat-${m.role}`}>
                 <strong>{m.role === "user" ? "You" : "FinPilot"}</strong>
-                <p>{m.content}</p>
+                <ChatRichText content={m.content} />
                 {m.delivery && <DeliveryStatus delivery={m.delivery} />}
               </article>
             ))}
