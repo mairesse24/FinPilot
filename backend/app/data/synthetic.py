@@ -20,15 +20,15 @@ UTILITIES, UTILITIES_IN_DAYS = D("120.00"), 6
 SUBSCRIPTION, SUBSCRIPTION_IN_DAYS = D("16.00"), 8
 SAFETY_BUFFER = D("500.00")
 HISTORY_DAYS = 360
-# Variable spend by weekday (Mon=0 .. Sun=6): {category: amount}. Roughly 40/day on average.
+# Variable spend by weekday (Mon=0 .. Sun=6): {category: amount}. Roughly 40/day, flat across weekdays so the demo is stable for any as_of.
 WEEKDAY_SPEND = {
-    0: {"groceries": 14, "transportation": 6, "dining": 5},
-    1: {"groceries": 10, "transportation": 6, "dining": 6},
-    2: {"groceries": 16, "transportation": 6, "dining": 8},
-    3: {"groceries": 10, "transportation": 6, "dining": 12},
-    4: {"groceries": 20, "dining": 24, "entertainment": 14},
-    5: {"groceries": 26, "dining": 28, "entertainment": 22, "shopping": 14},
-    6: {"groceries": 18, "dining": 20, "entertainment": 8},
+    0: {"groceries": 16, "transportation": 6, "dining": 8, "entertainment": 8},
+    1: {"groceries": 14, "transportation": 6, "dining": 8, "entertainment": 8},
+    2: {"groceries": 16, "transportation": 6, "dining": 10, "entertainment": 8},
+    3: {"groceries": 14, "transportation": 6, "dining": 10, "entertainment": 8},
+    4: {"groceries": 14, "dining": 14, "entertainment": 10, "shopping": 6},
+    5: {"groceries": 16, "dining": 14, "entertainment": 10, "shopping": 6},
+    6: {"groceries": 14, "dining": 12, "entertainment": 6, "shopping": 6},
 }
 # ---------------------------------------------------------------------------------------------
 
