@@ -11,11 +11,23 @@ log = logging.getLogger(__name__)
 
 
 def build_repo(settings: Settings) -> Repository:
-    """Postgres when DATABASE_URL is set and app.db.postgres exists; else in-memory demo data."""
+    """MongoDB when MONGODB_URI is set, else Postgres when DATABASE_URL is set, else in-memory demo data."""
     if settings.data_source == "nessie":
         from app.data.nessie import build_nessie_repo
         return build_nessie_repo(settings)
     warnings = []
+    if settings.mongodb_uri:
+        try:
+            mongo = importlib.import_module("app.db.mongo")
+            repo = mongo.MongoRepository(settings.mongodb_uri, settings.mongodb_db)
+            if repo.ping():
+                log.warning("repository: mongodb")
+                repo.source = "configured MongoDB"
+                return repo
+            log.warning("MongoDB not reachable; trying next database")
+        except Exception as exc:  # never crash startup; never log the URI
+            log.warning("MongoDB unavailable (%s); trying next database", type(exc).__name__)
+        warnings.append("Configured MongoDB unavailable; falling back.")
     if settings.database_url:
         try:
             pg = importlib.import_module("app.db.postgres")

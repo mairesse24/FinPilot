@@ -3,6 +3,9 @@ uvicorn[standard]
 pydantic>=2
 pydantic-settings
 psycopg[binary,pool]
+pymongo==4.19.0
+dnspython==2.9.2
+mongomock==4.3.0
 pytest
 httpx
 
