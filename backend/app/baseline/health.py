@@ -15,7 +15,7 @@ NAMES = {"cash_flow": "Cash flow", "emergency": "Emergency fund", "debt": "Debt 
 CASH_FLOW_RATIO = (0.8, 1.2)      # inflow/outflow: 0 at <=0.8, 100 at >=1.2
 EMERGENCY_FULL_MONTHS = 6.0       # 100 at >= 6 months of essentials
 DTI = (0.50, 0.10)                # debt/income: 0 at >=0.50, 100 at <=0.10
-DISCRETIONARY_SHARE = (0.40, 0.15)  # 0 at >=0.40, 100 at <=0.15
+DISCRETIONARY_SHARE = (0.60, 0.20)  # 0 at >=0.60, 100 at <=0.20 (design assumption)
 READINESS_COVER = (0.5, 2.0)      # cash/bills: 0 at <=0.5, 100 at >=2.0
 STRENGTH_MIN, WEAKNESS_MAX = 75, 50
 # ---------------------------------------------------------------------------

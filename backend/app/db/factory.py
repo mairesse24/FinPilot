@@ -16,8 +16,10 @@ def build_repo(settings: Settings) -> Repository:
         try:
             pg = importlib.import_module("app.db.postgres")
             repo = pg.PgRepository(settings.database_url)
-            log.warning("repository: postgres")
-            return repo
+            if repo.ping():
+                log.warning("repository: postgres")
+                return repo
+            log.warning("Postgres not reachable; using in-memory demo data")
         except Exception as exc:  # never crash startup for lack of a database
             log.warning("Postgres unavailable (%s); using in-memory demo data", type(exc).__name__)
     as_of = settings.as_of_date or date.today()

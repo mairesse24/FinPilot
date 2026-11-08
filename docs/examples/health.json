@@ -1,5 +1,5 @@
 {
-  "score": 60.4,
+  "score": 62.4,
   "components": [
     {
       "key": "cash_flow",
@@ -41,7 +41,7 @@
       "key": "discipline",
       "name": "Spending discipline",
       "weight": 15.0,
-      "score": 0.0,
+      "score": 13.0,
       "metrics": {
         "variable_spend_90d": 3650.0,
         "discretionary_spend_90d": 2000.0,
@@ -68,13 +68,13 @@
   ],
   "weaknesses": [
     "Emergency fund needs attention (23/100): Liquid savings of $3,000.00 cover 1.4 months of essentials ($2,170.00/month).",
-    "Spending discipline needs attention (0/100): Discretionary items are 55% of $3,650.00 variable spending over 90 days."
+    "Spending discipline needs attention (13/100): Discretionary items are 55% of $3,650.00 variable spending over 90 days."
   ],
   "meta": {
     "source": "baseline",
     "is_prototype_estimate": true,
     "as_of": "2026-11-07",
-    "generated_at": "2026-11-08T00:32:31.462489Z",
+    "generated_at": "2026-11-08T00:33:45.765970Z",
     "warning": null
   }
 }
