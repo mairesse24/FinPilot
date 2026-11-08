@@ -3,6 +3,7 @@ import { get, type Context, type Dashboard, type Forecast } from "./api";
 import "./connected.css";
 import ReliabilityNotices from "./ReliabilityNotices";
 import AccountDetails from "./AccountDetails";
+import LiveTransactionDemo from "./LiveTransactionDemo";
 import type { Notice } from "./api";
 
 const money = (n: number) =>
@@ -151,7 +152,10 @@ export default function ConnectedDashboard({ page }: { page: string }) {
           <h1>{page === "Overview" ? `Welcome, ${context.user.name}` : page}</h1>
           <p>Your accounts, cash flow and upcoming obligations in one place.</p>
         </div>
-        <button onClick={() => setRetry((r) => r + 1)}>Reload analysis</button>
+        <div className="welcome-actions">
+          {page === "Overview" && <LiveTransactionDemo accounts={dashboard.accounts} />}
+          <button onClick={() => setRetry((r) => r + 1)}>Reload analysis</button>
+        </div>
       </section>
       {context.loaded_at && (
         <p className="snapshot-time">Last bank-data sync: {new Date(context.loaded_at).toLocaleString()}</p>

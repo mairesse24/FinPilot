@@ -49,18 +49,23 @@ def seeded(tmp_path, monkeypatch):
     def run(**kwargs):
         seed_nessie.seed(settings, **kwargs)
         accounts = [b for u, b in FakeNessieClient.last.client.posts if u.endswith("/accounts") and b.get("type")]
-        return {a["type"]: a["balance"] for a in accounts}, tmp_path / "schedules.json"
+        return {a["nickname"]: a["balance"] for a in accounts}, tmp_path / "schedules.json"
     return run
 
 
 def test_default_checking_balance_is_unchanged(seeded):
     balances, _ = seeded()
-    assert balances["Checking"] == 6500
+    assert balances["FinPilot Demo Checking"] == 6500
+    assert balances["ABC Bank Checking"] == 5000
+    assert balances["XYZ Bank Checking"] == 20000
 
 
 def test_checking_balance_is_configurable(seeded):
     balances, schedules = seeded(checking_balance=2400)
-    assert balances == {"Checking": 2400, "Savings": 600, "Credit Card": 420}
+    assert balances["FinPilot Demo Checking"] == 2400
+    assert balances["XYZ High-Yield Savings"] == 12000
+    assert balances["ABC Travel Card"] == 1850
+    assert len(balances) == 7
     assert schedules.exists()
 
 

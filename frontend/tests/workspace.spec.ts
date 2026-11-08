@@ -68,6 +68,20 @@ test("profile and notifications show real scoped backend information", async ({
   await expect(page.getByText(/Mission: Financial freedom/i)).toHaveCount(0);
 });
 
+test("home transaction demo evaluates an arbitrary purchase and raises a notification", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Simulate live transaction", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Live transaction simulator" });
+  await expect(dialog).toBeVisible();
+  await dialog.getByLabel("Purchase amount", { exact: true }).fill("6200");
+  await dialog.getByLabel("Description", { exact: true }).fill("Judge demo laptop");
+  await dialog.getByRole("button", { name: "Run transaction simulation", exact: true }).click();
+  await expect(dialog.getByRole("region", { name: "Transaction simulation result" })).toContainText("$300.00");
+  await expect(dialog.getByRole("alert").first()).toContainText("Safety buffer warning");
+  await expect(dialog).toContainText("nothing was executed or saved");
+  await expect(page.getByLabel("New simulated alert")).toBeVisible();
+});
+
 test("assessment explains the savings limit inline, then calculates and runs a scenario", async ({
   page,
 }) => {

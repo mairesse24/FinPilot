@@ -7,6 +7,15 @@ def test_new_routes_are_real_and_legacy_score_is_preserved(client):
     assert new['observed_score_basis']=='imported_accounts_transactions_bills_and_income_schedules'
     assert client.get('/api/health').json()['score']==score
     assert client.get('/api/economy?user_id=another').status_code==404
+    from app.services.economic_intelligence import _economic_impact
+    settings=client.app.state.settings
+    profile=client.app.state.repo.load_profile(settings.demo_user_id,settings.as_of_date)
+    impact=_economic_impact(profile,{'features':{'PCEPI_yoy_pct':3.0},
+        'dimensions':[{'name':'inflation','flagged':True}]})
+    assert impact['available'] is True
+    assert impact['additional_burn_90d']==round(impact['additional_burn_30d']*3,2)
+    assert impact['stress_score']<=impact['baseline_score']
+    assert 'not a prediction' in impact['method']
 
 
 def test_scoped_economic_stress_and_facts(client):

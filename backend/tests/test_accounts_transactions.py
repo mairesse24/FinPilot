@@ -46,6 +46,30 @@ def test_ninety_percent_savings_demo_is_read_only_and_returns_notification(clien
     assert sum(a["balance"] for a in after["accounts"] if a["account_type"] == "savings") == before
 
 
+def test_arbitrary_large_transaction_is_read_only_and_threshold_grounded(client):
+    dashboard = client.get("/api/dashboard").json()
+    checking = next(a for a in dashboard["accounts"] if a["account_type"] == "checking")
+    response = client.post("/api/demo/transaction", json={
+        "account_id": checking["id"], "amount": 900, "description": "Judge demo purchase",
+        "category": "shopping",
+    })
+    assert response.status_code == 200
+    result = response.json()
+    assert result["mode"] == "simulation" and result["executed"] is False
+    assert result["balance_after"] == checking["balance"] - 900
+    assert result["alerts"] and result["alerts"][0]["id"] == "simulated-buffer-breach"
+    unchanged = client.get("/api/dashboard").json()
+    assert next(a for a in unchanged["accounts"] if a["id"] == checking["id"])["balance"] == checking["balance"]
+
+
+def test_transaction_simulation_rejects_debt_foreign_and_invalid_amounts(client):
+    accounts = client.get("/api/dashboard").json()["accounts"]
+    loan = next(a for a in accounts if a["account_type"] == "loan")
+    assert client.post("/api/demo/transaction", json={"account_id": loan["id"], "amount": 10}).status_code == 422
+    assert client.post("/api/demo/transaction", json={"account_id": "foreign", "amount": 10}).status_code == 404
+    assert client.post("/api/demo/transaction", json={"account_id": accounts[0]["id"], "amount": 0}).status_code == 422
+
+
 def test_default_app_boots_without_database_with_demo_data(settings):
     from fastapi.testclient import TestClient
     from app.data.synthetic import DEMO_USER_ID
