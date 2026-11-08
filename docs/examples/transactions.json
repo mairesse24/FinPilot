@@ -1,0 +1,75 @@
+{
+  "items": [
+    {
+      "id": "f24d7aaf-1efb-5c0b-9554-06fbfe7b8218",
+      "account_id": "7bcfb771-de37-5ec6-8ac2-1fc09996471a",
+      "amount": -16.0,
+      "category": "groceries",
+      "date": "2026-11-07"
+    },
+    {
+      "id": "f17b396f-0394-5d90-a4f5-259c8fc20570",
+      "account_id": "7bcfb771-de37-5ec6-8ac2-1fc09996471a",
+      "amount": -14.0,
+      "category": "dining",
+      "date": "2026-11-07"
+    },
+    {
+      "id": "b2eec0c4-d632-5f01-a0be-7df72c5af151",
+      "account_id": "7bcfb771-de37-5ec6-8ac2-1fc09996471a",
+      "amount": -6.0,
+      "category": "shopping",
+      "date": "2026-11-07"
+    },
+    {
+      "id": "947269b7-f875-5780-a1c6-5fe524484ecc",
+      "account_id": "7bcfb771-de37-5ec6-8ac2-1fc09996471a",
+      "amount": -10.0,
+      "category": "entertainment",
+      "date": "2026-11-07"
+    },
+    {
+      "id": "cf30b525-1294-5dbc-8e85-46f7beb77e38",
+      "account_id": "7bcfb771-de37-5ec6-8ac2-1fc09996471a",
+      "amount": -14.0,
+      "category": "groceries",
+      "date": "2026-11-06"
+    },
+    {
+      "id": "96e54a09-9e86-52d1-b0f7-b2464f63e0ce",
+      "account_id": "7bcfb771-de37-5ec6-8ac2-1fc09996471a",
+      "amount": -10.0,
+      "category": "entertainment",
+      "date": "2026-11-06"
+    },
+    {
+      "id": "60cd399b-e901-5ea5-80f7-104a909daa1f",
+      "account_id": "7bcfb771-de37-5ec6-8ac2-1fc09996471a",
+      "amount": -14.0,
+      "category": "dining",
+      "date": "2026-11-06"
+    },
+    {
+      "id": "019e89ee-28c4-5a9e-b4d4-f2d526a59938",
+      "account_id": "7bcfb771-de37-5ec6-8ac2-1fc09996471a",
+      "amount": -6.0,
+      "category": "shopping",
+      "date": "2026-11-06"
+    },
+    {
+      "id": "e923713f-5799-51e9-8abe-5b88746b4a76",
+      "account_id": "7bcfb771-de37-5ec6-8ac2-1fc09996471a",
+      "amount": -6.0,
+      "category": "transportation",
+      "date": "2026-11-05"
+    },
+    {
+      "id": "617e9da0-23c0-50a1-b934-06048dbdafe2",
+      "account_id": "7bcfb771-de37-5ec6-8ac2-1fc09996471a",
+      "amount": -8.0,
+      "category": "entertainment",
+      "date": "2026-11-05"
+    }
+  ],
+  "total": 1505
+}
