@@ -10,6 +10,9 @@ class AccountOut(BaseModel):
     name: str
     account_type: str
     balance: Money
+    apr: float | None = None
+    min_payment: Money | None = None
+    credit_limit: Money | None = None
 
 
 class AccountsResult(BaseModel):

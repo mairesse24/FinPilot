@@ -36,6 +36,7 @@ class ToolRegistry:
             "get_financial_assessment": self._assessment,
             "get_economic_resilience": self._resilience,
             "run_economic_simulation": self._economic_simulation,
+            "evaluate_purchase": self._purchase,
         }
 
     def specs(self) -> list[dict]:
@@ -44,6 +45,12 @@ class ToolRegistry:
             _spec("get_health_score", "Legacy v1 financial score; use get_financial_assessment for the explicitly versioned v2 assessment."),
             _spec("get_economic_conditions", "Cached actual economic observations, source dates and descriptive labels; no predictions."),
             _spec("get_financial_assessment", "FinPilot v2 score, completeness and formulas; missing score means withheld, not zero."),
+            _spec("evaluate_purchase", "Evaluate a proposed purchase against current finances. Pass every financing term the user supplies; payments remain unknown only when terms are missing.",
+                  {"amount":{"type":"number","exclusiveMinimum":0},"item":{"type":"string"},
+                   "funding_source":{"type":"string","enum":["liquid","savings"]},
+                   "down_payment":{"type":"number","minimum":0},
+                   "apr_percent":{"type":"number","minimum":0,"maximum":100},
+                   "term_months":{"type":"integer","minimum":1,"maximum":480}},["amount"]),
             _spec("get_economic_resilience", "Personal exposure grounded in supplied financial facts and dated economic observations."),
             _spec("run_economic_simulation", "Deterministic hypothetical stress; no bank writes. Requires confirmed facts for a complete budget.",
                   {"scenario":{"type":"object","properties":{"type":{"type":"string","enum":["essential_cost_increase","cash_expense_increase","income_reduction","income_interruption","missed_paycheck","emergency_expense","variable_rate_payment","delayed_paycheck","fixed_bill_increase","debt_repayment","savings_transfer"]},
@@ -121,3 +128,40 @@ class ToolRegistry:
         from intelligence.resilience import EconomicScenario
         from intelligence.personal_finance import FinancialFacts
         return simulate(self.profile,self.facts or FinancialFacts(),EconomicScenario.model_validate(scenario))
+
+    def _purchase(self,amount:float,item:str='purchase',funding_source:str='liquid',down_payment:float|None=None,
+                  apr_percent:float|None=None,term_months:int|None=None):
+        if amount<=0:raise ValueError('purchase amount must be greater than zero')
+        price=Decimal(str(amount));liquid=m.liquid_balance(self.profile)
+        checking=m.cash_balance(self.profile);net=m.net_worth(self.profile);debt=m.liabilities(self.profile)
+        savings=sum((a.balance for a in self.profile.accounts if a.account_type=='savings'),Decimal(0))
+        if funding_source not in ('liquid','savings'):raise ValueError('funding source must be liquid or savings')
+        source_funds=savings if funding_source=='savings' else liquid
+        supplied=[down_payment is not None,apr_percent is not None,term_months is not None]
+        if any(supplied) and not all(supplied):raise ValueError('down payment, APR and term months are all required for financing calculations')
+        financing=None
+        if all(supplied):
+            down=Decimal(str(down_payment));apr=Decimal(str(apr_percent));months=int(term_months)
+            if down<0 or down>price:raise ValueError('down payment must be between zero and purchase price')
+            if apr<0 or apr>100:raise ValueError('APR percent must be between zero and 100')
+            if months<1 or months>480:raise ValueError('loan term must be between 1 and 480 months')
+            principal=price-down;rate=apr/Decimal(1200)
+            payment=principal/Decimal(months) if rate==0 else principal*rate/(Decimal(1)-(Decimal(1)+rate)**(-months))
+            total=payment*months;income=m.monthly_income(self.profile)
+            financing={'down_payment':float(down),'principal':float(principal),'apr_percent':float(apr),
+                'term_months':months,'monthly_payment':round(float(payment),2),
+                'total_of_payments':round(float(total),2),'total_interest':round(float(total-principal),2),
+                'down_payment_funding_gap':float(max(Decimal(0),down-liquid)),
+                'liquid_after_down_payment':float(liquid-down),'scheduled_monthly_income':float(income),
+                'payment_to_scheduled_income':round(float(payment/income),4) if income>0 else None}
+        return {'item':item,'price':float(price),'checking':float(checking),'savings':float(savings),'liquid_funds':float(liquid),
+                'funding_source':funding_source,'available_source_funds':float(source_funds),
+                'source_funding_gap':float(max(Decimal(0),price-source_funds)),
+                'liabilities':float(debt),'net_worth':float(net),'cash_purchase_supported':price<=liquid,
+                'liquid_funding_gap':float(max(Decimal(0),price-liquid)),
+                'liquid_after_cash_purchase':float(liquid-price),
+                'price_to_net_worth':round(float(price/net),2) if net>0 else None,
+                'financing':financing,
+                'financing_inputs_needed':([] if financing else ['down payment','APR','loan term'])+
+                    ['taxes and fees','insurance and operating costs'],
+                'note':'Loan math excludes taxes, fees, insurance, maintenance and depreciation. This read-only comparison does not approve or execute a purchase.'}

@@ -20,7 +20,8 @@ def build_dashboard(p: FinancialProfile, gateway: Gateway) -> DashboardResult:
     return DashboardResult(
         net_worth=m.net_worth(p), assets=m.assets(p), liabilities=m.liabilities(p),
         accounts=[AccountOut(id=a.id, name=a.name, account_type=a.account_type,
-                             balance=a.balance) for a in p.accounts],
+                             balance=a.balance,apr=a.apr,min_payment=a.min_payment,
+                             credit_limit=a.credit_limit) for a in p.accounts],
         income_30d=m.window_inflow(p, 30), spending_30d=m.window_outflow(p, 30),
         by_category=[CategorySpend(category=c, amount=v) for c, v in cats],
         upcoming_bills=sorted(bills, key=lambda b: b.due_date),
