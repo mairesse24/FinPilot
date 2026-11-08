@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./connected.css";
 import ReliabilityNotices from './ReliabilityNotices';
+import { API_BASE } from './api';
 import type { Notice } from './api';
 
 type Facts = Record<string, string | boolean>;
@@ -72,7 +73,7 @@ type Simulation = {
 };
 const currency = (n: number) => n.toLocaleString("en-US", { style: "currency", currency: "USD" });
 async function request<T>(path: string, body?: object, signal?: AbortSignal): Promise<T> {
-  const response = await fetch("/api/" + path, {
+  const response = await fetch(API_BASE + "/api/" + path, {
     signal,
     cache: 'no-store',
     method: body ? "POST" : "GET",

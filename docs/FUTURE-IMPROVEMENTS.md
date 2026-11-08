@@ -62,3 +62,13 @@ Status key: **OPEN** = not done. **DEMO-RISK** = could hurt a live demo. **LATER
 - `Gemini` copilot: timeouts of 30 s with one attempt can make chat take over 40 s when Google returns 503 or 504. Lower the timeout to about 8 s. Branch `feature/ai-copilot` has a newer Gemini copilot that is not merged yet.
 - Gateway fallback label: the forecast reports `"source": "baseline"` even when Member 3's adapter shapes the numbers. Cosmetic.
 - Tests that need LightGBM fail on a Mac without `libomp` (`brew install libomp` fixes it). They pass on Linux.
+
+## 11. Two Copilot implementations to reconcile — OPEN, DEMO-RISK
+
+- Branch `feature/ai-copilot` (commit `9153787`, mairesse24) is a second, independent Gemini Copilot built from the `backend-mvp` lineage. Member 3's Copilot on `gokul` writes the same file `backend/intelligence/copilot.py`. A test merge conflicts in `config.py`, `routes/chat.py`, `services/gateway.py`, `tools/registry.py`, `intelligence/copilot.py` and `requirements.txt`.
+- Why it matters: live chat takes about 34 s because Gemini returns `504 DEADLINE_EXCEEDED` and the app waits before falling back. The feature branch reports 0.9–1.7 s after its latency work (its own measurements, `docs/copilot-performance.md`; not verified).
+- Decide with the team which Copilot ships, then merge on a separate test branch and re-run the tests. Quick demo mitigation without code: set `COPILOT_PROVIDER=offline` in Render for instant template replies.
+
+## 12. Frontend hosting — OPEN
+
+- Deployed manually with Netlify Drop (see `docs/frontend-deploy.md`); redeploy by rebuilding and dropping `dist` again. Move to a Git-connected deploy (auto-build on push) once the repo owner can authorize it.
