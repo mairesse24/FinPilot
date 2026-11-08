@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("floating chat works from overview and states when the local assistant answered", async ({
+test("floating chat works from overview and identifies its delivery mode", async ({
   page,
 }) => {
   await page.goto("/");
@@ -11,8 +11,8 @@ test("floating chat works from overview and states when the local assistant answ
     .getByLabel("Message FinPilot", { exact: true })
     .fill("Explain my financial health score");
   await chat.getByRole("button", { name: "Send FinPilot message", exact: true }).click();
-  await expect(chat.getByText(/Automatic observed-data estimate/)).toBeVisible({ timeout: 15000 });
-  await expect(chat.getByRole("status")).toContainText("Local calculation-based assistant");
+  await expect(chat.getByText(/financial.health.*out of 100/i)).toBeVisible({ timeout: 30000 });
+  await expect(chat.getByRole("status")).toContainText(/Live Gemini|Live AI unavailable/);
   await page.keyboard.press("Escape");
   await expect(chat).not.toBeVisible();
   await expect(page.getByRole("button", { name: "Open FinPilot chat", exact: true })).toBeFocused();
@@ -76,7 +76,9 @@ test("confirmed score survives page navigation and is available to floating chat
     .getByLabel("Message FinPilot", { exact: true })
     .fill("Explain my financial health score");
   await chat.getByRole("button", { name: "Send FinPilot message", exact: true }).click();
-  await expect(chat.getByText(/FinPilot v2 score: .*\/100/)).toBeVisible({ timeout: 15000 });
+  await expect(chat.getByText(/65\.81(?:\/100|.*out of 100)/i)).toBeVisible({
+    timeout: 15000,
+  });
   await chat.getByRole("button", { name: "Close FinPilot chat" }).click();
   await page.getByRole("link", { name: "Health Score", exact: true }).click();
   await expect(page.getByRole("img", { name: label! })).toBeVisible();

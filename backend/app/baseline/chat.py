@@ -82,7 +82,7 @@ def chat(messages: list[ChatMessage], tools) -> ChatResult:
     elif _has(text,("assessment","v2","score","health")) and 'legacy' not in text:
         r=use('get_financial_assessment',{},'fetched versioned v2 components and completeness')
         reply=(f"FinPilot v2 score: {r['score']}/100. " if r['score'] is not None else
-               f"Automatic observed-data estimate: {r['observed_score']}/100. The confirmed-input v2 assessment is incomplete. ")
+               f"Automatic observed-data estimate: {r['observed_score']} out of 100. The confirmed-input v2 assessment is incomplete. ")
         reply+=' '.join(r['withheld_reasons'])+' This is not the CFPB questionnaire score.'
         known=[c for c in r['components'] if c['score'] is not None]
         if known:
@@ -109,8 +109,8 @@ def chat(messages: list[ChatMessage], tools) -> ChatResult:
         mt = re.search(r"\$?\s*(\d[\d,]*(?:\.\d+)?)", text)
         if mt:
             amount = float(mt.group(1).replace(",", ""))
-        if not amount or amount <= 0:
-            reply = ("Tell me an amount, like \"what if I cut $200 a month?\", and I will "
+        if not amount or amount <= 0 or amount > 100000:
+            reply = ("Tell me a positive amount up to $100,000, like \"what if I cut $200?\", and I will "
                      "run the numbers.")
         else:
             r = use("run_simulation", {"reduction_amount": amount, "horizon_days": horizon},

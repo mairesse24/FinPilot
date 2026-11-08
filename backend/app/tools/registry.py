@@ -5,6 +5,7 @@ from pydantic import ValidationError
 
 from app.calc import metrics as m
 from app.calc.models import FinancialProfile
+from app.config import Settings
 from app.schemas.common import SpendingCut
 from app.services.forecast import get_forecast
 from app.services.gateway import Gateway
@@ -22,10 +23,12 @@ def _spec(name: str, description: str, properties: dict | None = None,
 
 
 class ToolRegistry:
-    def __init__(self, profile: FinancialProfile, gateway: Gateway, facts=None):
+    def __init__(self, profile: FinancialProfile, gateway: Gateway,
+                 settings: Settings | None = None, facts=None):
         self.profile = profile
         self.gateway = gateway
         self.facts = facts
+        self.settings = settings
         self._tools = {
             "get_accounts_summary": self._accounts,
             "get_health_score": self._health,
@@ -84,7 +87,7 @@ class ToolRegistry:
         r = get_health(self.profile, self.gateway)
         return {"score": round(r.score, 1), "strengths": r.strengths,
                 "weaknesses": r.weaknesses,
-                "components": [{"name": c.name, "score": c.score} for c in r.components],
+                "components": [c.model_dump(mode="json") for c in r.components],
                 'meta':r.meta.model_dump(mode='json'),'forecast_dependency':'none; score uses recorded history and schedules'}
 
     def _forecast(self, days: int) -> dict:
@@ -92,13 +95,19 @@ class ToolRegistry:
             raise ValueError("days must be 7, 30 or 90")
         r = get_forecast(self.profile, self.gateway, days)
         d = r.model_dump(mode="json")
-        return {"days": days, "status":d["status"], "warning":d["meta"].get("warning"), 'meta':d['meta'], "projected_low": d["projected_low"],
+        low_point = next((p for p in d["series"]
+                          if d["projected_low"] and p["date"] == d["projected_low"]["date"]), None)
+        return {"days": days, "as_of": self.profile.as_of.isoformat(), "status":d["status"],
+                "warning":d["meta"].get("warning"), 'meta':d['meta'], "projected_low": d["projected_low"],
                 "safety_buffer": d["safety_buffer"], "shortfall": d["shortfall"],
-                "assumptions": d["assumptions"]}
+                "assumptions": d["assumptions"],
+                "low_point_interval": {"low": low_point["low"], "high": low_point["high"]}
+                if low_point else None}
 
     def _guardian(self) -> dict:
         result=get_guardian(self.profile,self.gateway)
-        return {"alerts": [a.model_dump(mode="json")
+        return {"as_of": self.profile.as_of.isoformat(), "forecast_days": 30,
+                "alerts": [a.model_dump(mode="json")
                            for a in result.alerts], 'meta':result.meta.model_dump(mode='json')}
 
     def _simulate(self, reduction_amount: float, horizon_days: int = 30) -> dict:
@@ -108,6 +117,10 @@ class ToolRegistry:
         d = r.model_dump(mode="json")
         return {"baseline_low": d["baseline"]["projected_low"],
                 "scenario_low": d["scenario"]["projected_low"], "delta": d["delta"],
+                "baseline_end_balance": d["baseline"]["end_balance"],
+                "scenario_end_balance": d["scenario"]["end_balance"],
+                "baseline_health_score": d["baseline"]["health_score"],
+                "scenario_health_score": d["scenario"]["health_score"],
                 "baseline_alerts": len(d["baseline"]["alerts"]),
                 "scenario_alerts": len(d["scenario"]["alerts"]),'meta':d['meta']}
 
