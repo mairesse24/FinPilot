@@ -1,0 +1,70 @@
+{
+  "seed": 42,
+  "data": "PNC synthetic ledger; not real customer performance",
+  "target": "daily variable consumption USD",
+  "features": [
+    "weekday",
+    "day",
+    "month",
+    "payday_distance",
+    "lag_1",
+    "lag_7",
+    "lag_28",
+    "mean_7",
+    "mean_28",
+    "std_28",
+    "calendar_lag_1",
+    "calendar_mean_3"
+  ],
+  "training_history_profile": {
+    "zero_day_fraction_min": 0.8329938900203666,
+    "zero_day_fraction_max": 0.8329938900203666,
+    "fallback_margin": 0.15,
+    "note": "Heuristic support check, not a validated distribution-shift detector."
+  },
+  "train_end_exclusive": "2026-04-04 00:00:00",
+  "validation_end_exclusive": "2026-07-18 00:00:00",
+  "heldout_customers": [
+    "C025",
+    "C026",
+    "C027",
+    "C028",
+    "C029",
+    "C030"
+  ],
+  "training_rows": 11784,
+  "serving_model": "lightgbm",
+  "validation": {
+    "rows": 2520,
+    "lightgbm_mae_usd": 2.5246,
+    "moving_average_28_mae_usd": 155.4396,
+    "seasonal_7_mae_usd": 91.4202,
+    "calendar_month_mae_usd": 4.0166,
+    "interval_coverage_80": 0.9591269841269842,
+    "mean_interval_width_usd": 9.04525585454381
+  },
+  "test": {
+    "rows": 2544,
+    "lightgbm_mae_usd": 2.6188,
+    "moving_average_28_mae_usd": 169.3828,
+    "seasonal_7_mae_usd": 102.4743,
+    "calendar_month_mae_usd": 3.6318,
+    "interval_coverage_80": 0.9567610062893082,
+    "mean_interval_width_usd": 11.235451272734867
+  },
+  "heldout_customer_test": {
+    "rows": 636,
+    "lightgbm_mae_usd": 3.0384,
+    "moving_average_28_mae_usd": 162.3592,
+    "seasonal_7_mae_usd": 98.1539,
+    "calendar_month_mae_usd": 2.8687,
+    "interval_coverage_80": 0.9449685534591195,
+    "mean_interval_width_usd": 13.6096492907054
+  },
+  "limitations": [
+    "One-day walk-forward metrics use observed prior days.",
+    "Recursive 7/30/90-day accuracy is not established by these metrics.",
+    "Quantiles are empirical, uncalibrated, and not guarantees.",
+    "Synthetic posting patterns may make accuracy unrealistically high."
+  ]
+}
