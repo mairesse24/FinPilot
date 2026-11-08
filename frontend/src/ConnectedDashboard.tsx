@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { type Alert, type Dashboard, type HealthV1, type Notice } from "./api";
 import "./connected.css";
+import "./design-dashboard.css";
 import ReliabilityNotices from "./ReliabilityNotices";
 import AccountDetails from "./AccountDetails";
 import { useFinance, useHealthScore, useSlow } from "./financeStore";
@@ -190,7 +191,7 @@ export default function ConnectedDashboard({ page }: { page: string }) {
       <AccountDetails selected={selectedAccounts} accounts={dashboard.accounts} close={() => setSelectedAccounts(null)} />
       <section className="welcome">
         <div>
-          <span className="eyebrow">
+          <span className="eyebrow welcome-meta">
             {fmtDateLong(context.as_of)} · {sourceLabel(context.data_source)}
           </span>
           <h1>{page === "Overview" ? `Welcome, ${context.user.name}` : page}</h1>

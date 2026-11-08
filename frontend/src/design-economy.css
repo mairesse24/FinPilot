@@ -1,0 +1,144 @@
+/* Economic Intelligence pages: scoped polish. */
+.economy-page {
+  --eco-good: #55d5ad;
+  --eco-mid: #eac75f;
+  --eco-warn: #fb923c;
+  --eco-bad: #fb7185;
+  --eco-track: #1f2a3a;
+  --eco-line: #223044;
+  --eco-text-2: #b6c2d3;
+  gap: 20px;
+}
+
+/* type: sentence-case eyebrow, calmer secondary text */
+.economy-page .eyebrow {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 14px;
+  color: var(--teal);
+  font-weight: 500;
+}
+.economy-page .welcome h1 { margin: 4px 0 6px; }
+.economy-page .welcome p { color: var(--eco-text-2); margin: 0; max-width: 60ch; }
+.economy-page .live-panel { padding: 24px 28px; }
+.economy-page .live-panel > h2 { margin: 0 0 6px; font-size: 20px; }
+.economy-page .live-panel > p { color: var(--eco-text-2); line-height: 1.55; max-width: 72ch; }
+.economy-page .live-panel small { color: #9aa8bc; }
+
+/* headline score */
+.economy-page .score-overview { gap: 32px; margin: 20px 0 22px; padding-bottom: 22px; border-bottom: 1px solid var(--eco-line); }
+.economy-page .score-ring { width: 160px; height: 160px; flex-basis: 160px; }
+.economy-page .live-panel .score-ring svg { width: 160px; height: 160px; }
+.economy-page .score-ring strong { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.economy-page .score-ring small { font-size: 12px; margin-top: 2px; }
+.economy-page .score-overview h2 { margin: 2px 0 8px; font-size: 22px; line-height: 1.25; }
+.economy-page .score-overview p { margin: 0 0 10px; color: var(--eco-text-2); }
+.economy-page .score-overview small { font-size: 13px; line-height: 1.5; display: block; max-width: 62ch; }
+
+/* automatic-estimate note */
+.economy-page .score-next-step { display: grid; gap: 8px; padding: 16px 18px; border-radius: 12px; margin-bottom: 18px; }
+.economy-page .score-next-step p { margin: 0; color: var(--eco-text-2); line-height: 1.55; max-width: 80ch; }
+.economy-page .score-next-step p strong { color: #eef2f7; }
+.economy-page .score-next-step button { justify-self: start; margin-top: 6px; }
+
+/* buttons: shared states */
+.economy-page .live-panel button { min-height: 40px; border-radius: 8px; transition: background-color .15s, border-color .15s; }
+.economy-page .live-panel button:not(.primary):hover:not(:disabled) { border-color: #4b5d78; background: #1a2332; }
+.economy-page .live-panel button:focus-visible,
+.economy-page .live-panel input:focus-visible,
+.economy-page .live-panel select:focus-visible,
+.economy-page .live-panel summary:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.economy-page .live-panel button.primary:hover:not(:disabled) { background: #2cf0d0; border-color: #2cf0d0; }
+
+/* ---- score breakdown (the bold part) ---- */
+.economy-page .live-panel > details > summary { font-size: 16px; font-weight: 600; padding: 6px 0 10px; }
+.breakdown-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 230px) minmax(0, 1fr) 96px;
+  grid-template-areas: "head bar score" "help help help";
+  column-gap: 20px;
+  row-gap: 6px;
+  align-items: center;
+  padding: 18px 0;
+  border-top: 1px solid var(--eco-line);
+}
+.breakdown-head { grid-area: head; display: grid; gap: 2px; }
+.breakdown-head strong { font-size: 16px; font-weight: 600; }
+.breakdown-head small { font-size: 13px; color: #9aa8bc; font-variant-numeric: tabular-nums; }
+.breakdown-bar { grid-area: bar; height: 14px; border-radius: 999px; background: var(--eco-track); overflow: hidden; }
+.breakdown-bar span { display: block; height: 100%; border-radius: inherit; background: currentColor; }
+.breakdown-score { grid-area: score; text-align: right; font-size: 30px; line-height: 1; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.breakdown-score small { font-size: 13px; font-weight: 400; color: #8393a9; letter-spacing: 0; }
+.breakdown-score.tone-na { font-size: 15px; font-weight: 500; color: #9aa8bc; }
+.breakdown-help { grid-area: help; margin: 2px 0 0; color: var(--eco-text-2); font-size: 14px; line-height: 1.55; max-width: 74ch; }
+.breakdown-help:empty { display: none; }
+details.breakdown-help summary { color: #9aa8bc; font-size: 14px; }
+.breakdown-bar.good, .breakdown-score.good { color: var(--eco-good); }
+.breakdown-bar.mid, .breakdown-score.mid { color: var(--eco-mid); }
+.breakdown-bar.warn, .breakdown-score.warn { color: var(--eco-warn); }
+.breakdown-bar.bad, .breakdown-score.bad { color: var(--eco-bad); }
+
+/* ---- spending-cut simulator ---- */
+.economy-page .cut-form { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 16px; margin-top: 18px; }
+.economy-page .cut-form label { color: var(--eco-text-2); font-size: 14px; gap: 8px; }
+.economy-page .cut-form input { height: 44px; background: #131b28; border-color: #2f3d52; font-size: 16px; font-variant-numeric: tabular-nums; }
+.economy-page .cut-form input:hover { border-color: #46566f; }
+.economy-page .cut-form input[aria-invalid="true"] { border-color: var(--eco-bad); }
+.economy-page .cut-form button { height: 44px; padding: 0 20px; }
+#cut-help { display: block; margin-top: 8px; min-height: 0; color: #fda4af; }
+#cut-help:empty { display: none; }
+
+/* scenario result */
+.economy-page .scenario-result { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--eco-line); }
+.economy-page .scenario-for { color: #9aa8bc; font-size: 14px; margin: 0 0 10px; font-weight: 400; }
+.economy-page .scenario-verdict { padding: 14px 16px; font-size: 16px; line-height: 1.4; border-radius: 10px; margin-bottom: 14px; border: 1px solid transparent; }
+.economy-page .scenario-verdict.ok { background: #55d5ad14; color: #9cf0d4; border-color: #55d5ad40; }
+.economy-page .scenario-verdict.warn { background: #fb718514; color: #fdb4bf; border-color: #fb718550; }
+.economy-page .scenario-result table { margin: 0 0 4px; font-variant-numeric: tabular-nums; }
+.economy-page .scenario-result thead th { font-size: 13px; color: #9aa8bc; padding: 6px 12px 10px; border-bottom: 1px solid var(--eco-line); }
+.economy-page .scenario-result tbody th { color: var(--eco-text-2); font-size: 15px; }
+.economy-page .scenario-result td, .economy-page .scenario-result tbody th { padding: 14px 12px; border-bottom: 1px solid var(--eco-line); }
+.economy-page .scenario-result tbody tr:last-child th, .economy-page .scenario-result tbody tr:last-child td { border-bottom: 0; }
+.economy-page .scenario-result td { font-size: 16px; color: #d4dcea; }
+.economy-page .scenario-result td:last-child { background: #55d5ad0f; }
+.economy-page .scenario-result thead th:last-child { color: #9cf0d4; }
+.economy-page .scenario-result td strong { font-size: 18px; font-weight: 700; color: #9cf0d4; }
+.economy-page .scenario-result small { margin: 12px 0 0; }
+
+/* empty / error / loading */
+.economy-page .empty-state { padding: 22px; gap: 6px; border-color: #2f3d52; background: #0d121b; }
+.economy-page .empty-state h3 { font-size: 17px; }
+.economy-page .empty-state p { color: var(--eco-text-2); line-height: 1.55; max-width: 60ch; }
+.economy-page .live-warning { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; line-height: 1.5; padding: 14px 16px; border-radius: 10px; }
+.economy-page .live-warning button { flex: none; }
+.economy-page .skeleton-label { color: var(--eco-text-2); font-size: 14px; }
+.economy-page .skeleton { border-radius: 16px; }
+.economy-page .indicator-card .live-value { font-variant-numeric: tabular-nums; }
+
+@media (max-width: 720px) {
+  .economy-page .live-panel { padding: 18px 16px; }
+  .economy-page .score-overview { flex-direction: column; align-items: flex-start; gap: 18px; }
+  .economy-page .score-overview h2 { font-size: 20px; }
+  .breakdown-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "head score" "bar bar" "help help";
+    column-gap: 12px;
+    row-gap: 10px;
+  }
+  .breakdown-score { font-size: 26px; }
+  .economy-page .cut-form { grid-template-columns: 1fr; }
+  .economy-page .cut-form button { width: 100%; }
+  .economy-page .scenario-result td, .economy-page .scenario-result tbody th { padding: 12px 8px; font-size: 14px; }
+  .economy-page .scenario-result td strong { font-size: 16px; }
+  .economy-page .scenario-result thead th { padding: 6px 8px 10px; font-size: 12px; }
+}
+
+/* the ring block repeats the panel heading */
+.economy-page .score-overview .eyebrow { display: none; }
+
+/* what-if form: match the cut form controls */
+.economy-page .stress-select { display: block; width: 100%; max-width: 420px; height: 44px; margin: 14px 0 4px; padding: 0 12px; background: #131b28; border: 1px solid #2f3d52; border-radius: 8px; color: #eef2f7; font-size: 16px; }
+.economy-page .live-panel > .live-grid { margin: 14px 0; gap: 16px; }
+.economy-page .live-panel > .live-grid label { display: grid; gap: 8px; color: var(--eco-text-2); font-size: 14px; }
+.economy-page .live-panel > .live-grid input[type="number"] { height: 44px; background: #131b28; border: 1px solid #2f3d52; border-radius: 8px; font-size: 16px; }
+.economy-page .live-warning { font-size: 15px; }

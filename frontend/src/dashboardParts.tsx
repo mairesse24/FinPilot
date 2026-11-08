@@ -196,7 +196,7 @@ export function SpendingCutSimulator({ defaults, buffer }: { defaults?: Spending
 // ---------- Guardian ----------
 export function GuardianPanel({ alerts, buffer, title = "Guardian · 30-day outlook" }: { alerts: Alert[]; buffer: number | null; title?: string }) {
   return (
-    <section className="live-panel">
+    <section className="live-panel guardian-panel">
       <h2>{title}</h2>
       {alerts.length ? (
         alerts.map((a) => (
@@ -275,7 +275,7 @@ export function BalanceChart({ forecast, events }: { forecast: Forecast; events:
           </g>
         ))}
         <rect x={L} y={y(buffer)} width={W - L - R} height={Math.max(0, y(d0) - y(buffer))} fill="#fb7185" opacity="0.07" />
-        <polygon points={band} fill="#00e5c3" opacity="0.1" />
+        <polygon points={band} fill="#00e5c3" opacity="0.14" />
         <line x1={L} x2={W - R} y1={y(buffer)} y2={y(buffer)} stroke="#fb7185" strokeDasharray="6 4" />
         <text
           x={W - R}
@@ -297,7 +297,7 @@ export function BalanceChart({ forecast, events }: { forecast: Forecast; events:
             </g>
           );
         })}
-        <polyline points={path("projected_balance")} fill="none" stroke="#00e5c3" strokeWidth="3" strokeLinejoin="round" />
+        <polyline points={path("projected_balance")} fill="none" stroke="#00e5c3" strokeWidth="3.5" strokeLinejoin="round" />
         <circle cx={x(minIdx)} cy={y(min.projected_balance)} r="6" fill={below ? "#fb7185" : "#00e5c3"} stroke="#0b0e14" strokeWidth="2" />
         <text
           x={x(minIdx) + (anchor === "end" ? -10 : 10)}
@@ -320,6 +320,11 @@ export function BalanceChart({ forecast, events }: { forecast: Forecast; events:
           </circle>
         ))}
       </svg>
+      <ul className="chart-legend" aria-hidden="true">
+        <li><i className="lg-line" />Projected checking</li>
+        <li><i className="lg-band" />Stress range</li>
+        <li><i className="lg-buffer" />Safety buffer</li>
+      </ul>
       <figcaption>
         Teal line: projected checking balance. Shaded band: a stress range, from a high-spending case up to a case
         with no variable spending. It is not a statistical confidence interval. Dashed line: your safety buffer.
@@ -353,8 +358,8 @@ export function ForecastPanel({
   const events = forecast ? forecastEvents(forecast.series, startBalance, bills) : [];
   const eventByDate = new Map(events.map((e) => [e.date, e]));
   return (
-    <section className="live-panel">
-      <div className="live-row">
+    <section className="live-panel forecast-panel">
+      <div className="live-row panel-head">
         <h2>Predictive spending & cash flow</h2>
         <div className="live-periods" role="group" aria-label="Forecast horizon">
           {[7, 30, 90].map((n) => (

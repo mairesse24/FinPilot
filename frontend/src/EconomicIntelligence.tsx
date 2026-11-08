@@ -8,7 +8,9 @@ import { API_BASE, type Notice } from "./api";
 import ChatRichText from "./ChatRichText";
 import { useFinance, useHealthScore } from "./financeStore";
 import { SpendingCutSimulator, factorHelp, isDebug } from "./dashboardParts";
+import "./design-economy.css";
 
+const scoreTone = (n: number) => (n < 25 ? "bad" : n < 50 ? "warn" : n < 75 ? "mid" : "good");
 type Facts = Record<string, string | boolean>;
 type Component = {
   name: string;
@@ -722,17 +724,17 @@ export default function EconomicIntelligence({ page }: { page: string }) {
         <details open>
           <summary>Score breakdown</summary>
           {v1.components.map((c) => (
-            <article key={c.key} className="live-row">
-              <div style={{ width: "100%" }}>
-                <strong>
-                  {c.name}: {c.score.toFixed(0)} / 100 <small>· {Math.round(c.weight)}% of your score</small>
-                </strong>
-                <div role="progressbar" aria-label={c.name} aria-valuenow={c.score} aria-valuemin={0} aria-valuemax={100} style={{ height: 8, background: "#263345", margin: "10px 0" }}>
-                  <div style={{ width: `${c.score}%`, height: 8, background: c.score < 25 ? "#fb7185" : c.score < 50 ? "#fb923c" : c.score < 75 ? "#eac75f" : "#55d5ad" }} />
-                </div>
-                <p>{factorHelp[c.key] ?? (isDebug() ? c.explanation : "")}</p>
-                {isDebug() && <small>{c.explanation}</small>}
+            <article key={c.key} className="breakdown-row">
+              <div className="breakdown-head">
+                <strong>{c.name}</strong>
+                <small>{Math.round(c.weight)}% of your score</small>
               </div>
+              <div className={`breakdown-bar ${scoreTone(c.score)}`} role="progressbar" aria-label={c.name} aria-valuenow={c.score} aria-valuemin={0} aria-valuemax={100}>
+                <span style={{ width: `${c.score}%` }} />
+              </div>
+              <span className={`breakdown-score ${scoreTone(c.score)}`}>{c.score.toFixed(0)}<small> / 100</small></span>
+              <p className="breakdown-help">{factorHelp[c.key] ?? (isDebug() ? c.explanation : "")}</p>
+              {isDebug() && <small className="breakdown-help">{c.explanation}</small>}
             </article>
           ))}
         </details>
@@ -741,42 +743,23 @@ export default function EconomicIntelligence({ page }: { page: string }) {
         <details open={health.score != null}>
           <summary>Score breakdown</summary>
           {health.components.map((c) => (
-            <article key={c.name} className="live-row">
-              <div style={{ width: "100%" }}>
-                <strong>
-                  {c.name}: {c.score === null ? "Unavailable" : `${c.score.toFixed(2)} / 100`}
-                </strong>
-                {c.score !== null && (
-                  <div
-                    role="progressbar"
-                    aria-label={c.name}
-                    aria-valuenow={c.score}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    style={{ height: 8, background: "#263345", margin: "10px 0" }}
-                  >
-                    <div
-                      style={{
-                        width: `${c.score}%`,
-                        height: 8,
-                        background:
-                          c.score < 25
-                            ? "#fb7185"
-                            : c.score < 50
-                              ? "#fb923c"
-                              : c.score < 75
-                                ? "#eac75f"
-                                : "#55d5ad",
-                      }}
-                    />
-                  </div>
-                )}
-                <details>
-                  <summary>Formula and rationale</summary>
-                  <p>{c.formula}</p>
-                  <p>{c.reason}</p>
-                </details>
+            <article key={c.name} className="breakdown-row">
+              <div className="breakdown-head">
+                <strong>{c.name}</strong>
               </div>
+              {c.score !== null ? (
+                <div className={`breakdown-bar ${scoreTone(c.score)}`} role="progressbar" aria-label={c.name} aria-valuenow={c.score} aria-valuemin={0} aria-valuemax={100}>
+                  <span style={{ width: `${c.score}%` }} />
+                </div>
+              ) : <div />}
+              <span className={`breakdown-score ${c.score === null ? "tone-na" : scoreTone(c.score)}`}>
+                {c.score === null ? "Unavailable" : <>{c.score.toFixed(2)}<small> / 100</small></>}
+              </span>
+              <details className="breakdown-help">
+                <summary>Formula and rationale</summary>
+                <p>{c.formula}</p>
+                <p>{c.reason}</p>
+              </details>
             </article>
           ))}
         </details>
@@ -845,7 +828,7 @@ export default function EconomicIntelligence({ page }: { page: string }) {
         disabled={busy || !context}
         value={scenario.type}
         onChange={(e) => setScenario((s) => ({ ...s, type: e.target.value }))}
-        style={{ background: "#162032", padding: 10 }}
+        className="stress-select"
       >
         {[
           "essential_cost_increase",
@@ -1002,7 +985,7 @@ export default function EconomicIntelligence({ page }: { page: string }) {
           ? ["chat", "inputs"]
           : ["economy", "resilience"];
   return (
-    <div className="live-finance">
+    <div className="live-finance economy-page">
       <section className="welcome">
         <div>
           <span className="eyebrow">Financial planning</span>
