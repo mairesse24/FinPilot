@@ -84,3 +84,26 @@ test("below-buffer forecasts display an explicit warning", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("alert").filter({ hasText: "Cash-shortage warning" })).toBeVisible();
 });
+
+test("forecast separates model spending from inflation sensitivity", async ({ page }) => {
+  await page.route("**/api/resilience", (route) =>
+    route.fulfill({
+      json: {
+        economic_impact: {
+          available: true,
+          inflation_rate_pct: 3,
+          additional_burn_30d: 60,
+          additional_burn_90d: 180,
+          method: "Test sensitivity",
+        },
+      },
+    }),
+  );
+  await page.goto("/#/forecasts");
+  await expect(page.getByText("Economic sensitivity is active:", { exact: false })).toBeVisible();
+  await page.getByText(/Daily forecast ·/).click();
+  await expect(page.getByRole("columnheader", { name: "Inflation-stressed spending" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Inflation-stressed checking" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Higher-spending balance" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Lower-spending balance" })).toBeVisible();
+});

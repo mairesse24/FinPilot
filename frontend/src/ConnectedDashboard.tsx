@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { get, type Context, type Dashboard, type Forecast } from "./api";
+import { get, post, type Context, type Dashboard, type Forecast } from "./api";
 import "./connected.css";
 import ReliabilityNotices from "./ReliabilityNotices";
 import AccountDetails from "./AccountDetails";
@@ -15,6 +15,15 @@ const methodLabel = (method?: string) => ({
   lightgbm: "LightGBM spending model",
   baseline: "Baseline estimate",
 }[method ?? ""] ?? "Spending estimate");
+
+type EconomicImpact = {
+  available: boolean;
+  reason?: string;
+  inflation_rate_pct?: number;
+  additional_burn_30d?: number;
+  additional_burn_90d?: number;
+  method?: string;
+};
 
 function BalanceChart({ forecast }: { forecast: Forecast }) {
   const rows = forecast.series;
@@ -67,8 +76,8 @@ function BalanceChart({ forecast }: { forecast: Forecast }) {
         </text>
       </svg>
       <figcaption>
-        Teal: projected checking. Shaded: spending stress envelope, not a calibrated confidence
-        interval. Dashed: chosen safety buffer.
+        Teal: projected checking. Shaded: heuristic higher/lower-spending balance envelope, not a
+        calibrated confidence interval. Dashed: chosen safety buffer.
       </figcaption>
     </figure>
   );
@@ -80,6 +89,7 @@ export default function ConnectedDashboard({ page }: { page: string }) {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [context, setContext] = useState<Context | null>(null);
   const [forecast, setForecast] = useState<Forecast | null>(null);
+  const [economicImpact, setEconomicImpact] = useState<EconomicImpact | null>(null);
   const [error, setError] = useState("");
   const [forecastError, setForecastError] = useState("");
   const [retry, setRetry] = useState(0);
@@ -115,6 +125,19 @@ export default function ConnectedDashboard({ page }: { page: string }) {
       });
     return () => controller.abort();
   }, [days, retry]);
+  useEffect(() => {
+    let current = true;
+    post<{ economic_impact?: EconomicImpact }>("resilience", { facts: {} })
+      .then((result) => {
+        if (current) setEconomicImpact(result.economic_impact ?? null);
+      })
+      .catch(() => {
+        if (current) setEconomicImpact(null);
+      });
+    return () => {
+      current = false;
+    };
+  }, [retry]);
   if (error)
     return (
       <section className="live-panel" role="alert">
@@ -370,6 +393,20 @@ export default function ConnectedDashboard({ page }: { page: string }) {
               <p>
                 Safety buffer<strong className="live-value">{money(forecast.safety_buffer)}</strong>
               </p>
+              {economicImpact?.available && (
+                <p>
+                  Inflation-stress ending
+                  <strong className="live-value">
+                    {money(
+                      (forecast.series.at(-1)?.projected_balance ?? checking) -
+                        (economicImpact.additional_burn_30d ?? 0) * (days / 30),
+                    )}
+                  </strong>
+                  <small>
+                    PCE sensitivity at {economicImpact.inflation_rate_pct?.toFixed(2)}%
+                  </small>
+                </p>
+              )}
             </div>
             {forecast.shortfall &&
               (page === "Forecasts" ||
@@ -382,6 +419,16 @@ export default function ConnectedDashboard({ page }: { page: string }) {
                 </p>
               )}
             <BalanceChart forecast={forecast} />
+            {economicImpact?.available ? (
+              <p className="inflation-forecast-note">
+                <strong>Economic sensitivity is active:</strong> modeled essential costs add{" "}
+                {money(economicImpact.additional_burn_30d ?? 0)} over 30 days and{" "}
+                {money(economicImpact.additional_burn_90d ?? 0)} over 90 days. The daily table shows
+                this separately from the ML spending estimate.
+              </p>
+            ) : economicImpact?.reason ? (
+              <p className="estimate-notices">Inflation sensitivity unavailable: {economicImpact.reason}</p>
+            ) : null}
             <details>
               <summary>Forecast assumptions</summary>
               <ul>
@@ -399,16 +446,34 @@ export default function ConnectedDashboard({ page }: { page: string }) {
                       <th>Date</th>
                       <th>Variable spending</th>
                       <th>Checking</th>
-                      <th>Low stress</th>
-                      <th>High stress</th>
+                      {economicImpact?.available && <th>Inflation-stressed spending</th>}
+                      {economicImpact?.available && <th>Inflation-stressed checking</th>}
+                      <th>Higher-spending balance</th>
+                      <th>Lower-spending balance</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {forecast.series.map((r) => (
+                    {forecast.series.map((r, index) => (
                       <tr key={r.date}>
                         <td>{r.date}</td>
                         <td>{money(r.predicted_spend)}</td>
                         <td>{money(r.projected_balance)}</td>
+                        {economicImpact?.available && (
+                          <td>
+                            {money(
+                              r.predicted_spend +
+                                (economicImpact.additional_burn_30d ?? 0) / 30,
+                            )}
+                          </td>
+                        )}
+                        {economicImpact?.available && (
+                          <td>
+                            {money(
+                              r.projected_balance -
+                                ((economicImpact.additional_burn_30d ?? 0) / 30) * (index + 1),
+                            )}
+                          </td>
+                        )}
                         <td>{money(r.low)}</td>
                         <td>{money(r.high)}</td>
                       </tr>

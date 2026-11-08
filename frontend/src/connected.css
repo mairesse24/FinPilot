@@ -57,6 +57,7 @@
 .impact-metric span, .impact-metric small { color: #92a2b6; }
 .impact-metric strong { font-size: 27px; color: #eef5f3; }
 .impact-method { padding-left: 14px; border-left: 2px solid #48cfb0; }
+.inflation-forecast-note { padding: 13px 15px; border: 1px solid #3d806f; border-radius: 9px; background: rgba(72, 207, 176, 0.09); color: #b8d8cf !important; }
 @media (max-width: 640px) { .transaction-fields { grid-template-columns: 1fr; } .transaction-description { grid-column: auto; } }
 .live-value {
   display: block;
