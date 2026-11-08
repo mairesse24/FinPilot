@@ -3,6 +3,8 @@
 Read this file first when asked "what should we improve / fix next?". Update it when an item is done or a new one is found.
 Last updated: 2026-11-08, after the MongoDB switch and the `gokul` merge.
 
+> Ranked, current fix list with evidence: [INVESTIGATION-REPORT.md](INVESTIGATION-REPORT.md) (2026-11-08).
+
 Status key: **OPEN** = not done. **DEMO-RISK** = could hurt a live demo. **LATER** = safe to defer.
 
 ## 1. Uncertainty-band calibration does not match the committed model files — OPEN, LATER
